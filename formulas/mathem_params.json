@@ -1,0 +1,125 @@
+{"formulas":
+{
+    "triangle_square1": {
+        "x": {
+            "INFO": "number",
+            "literal": "S",
+            "pattern": "y * z * (1/2)",
+            "formula": "$${S =} {0.5 * a * b}$$"
+        },
+        "y": {
+            "INFO": "number",
+            "literal": "a",
+            "pattern": "(2 * x) / z",
+            "formula": "$${c =} {Q \\over m * t}$$"
+        },
+        "z": {
+            "INFO": "number",
+            "literal": "b",
+            "pattern": "(2 * x) / y",
+            "formula": "$${m =} {Q \\over c * t}$$"
+        }
+    },
+    "progression_arithmetical_next": {
+        "x": {
+            "INFO": "number",
+            "literal": "a_(n+1)",
+            "pattern": "y + z",
+            "formula": "$${a_(n+1) =} {a_n + d}$$"
+        },
+         "y": {
+            "INFO": "number",
+            "literal": "a_n",
+            "pattern": "x - z",
+            "formula": "$${a_(n) =} {a_(n+1) - d}$$"
+        },
+         "z": {
+            "INFO": "number",
+            "literal": "d",
+            "pattern": "x - y",
+            "formula": "$${d = } {a_(n+1) - a_n}$$"
+        }
+    },
+    "teorema-kosinusov": {
+        "x": {
+            "INFO": "number",
+            "literal": "a",
+            "pattern": "((y)**2 + (z)**2 - 2 * y * z * w)**0.5",
+            "formula": "$${a_(n+1) =} {a_n + d}$$"
+        },
+         "y": {
+            "INFO": "number",
+            "literal": "b",
+            "pattern": "((x)**2 - (z)**2 - 2 * x * z * w)**0.5",
+            "formula": "$${a_(n) =} {a_(n+1) - d}$$"
+        },
+         "z": {
+            "INFO": "number",
+            "literal": "c",
+            "pattern": "((x)**2 - (y)**2 - 2 * y * x * w)**0.5",
+            "formula": "$${d = } {a_(n+1) - a_n}$$"
+        },
+        "w": {
+            "INFO": "cos",
+            "literal": "cos(A)",
+            "pattern": "((x)**2 - (z)**2 - 2 * y * z * x)**0.5",
+            "formula": "$${d = } {a_(n+1) - a_n}$$"
+        }
+    }
+
+},
+
+    "constants": {
+        "pi": {
+            "value": 3.1415926535
+        },
+        "e": {
+            "value": 2.7182818284
+        }
+    },
+
+    "functions": {
+        "cos": {
+            "name": "cos",
+            "si": {
+               "degree": 0.0174533,
+                "radians": 1
+            }
+        },
+        "tg": {
+            "name": "tan",
+            "si": {
+                "degree": 0.0174533,
+                "radians": 1
+            }
+        },
+        "sin": {
+            "name": "sin",
+            "si": {
+               "degree": 0.0174533,
+                "radians": 1
+            }
+        },
+        "arccos": {
+            "name": "arccos",
+            "si": {
+                "degree": 0.0174533,
+                "radians": 1
+            }
+        },
+        "arctg": {
+           "name": "arctan",
+            "si": {
+                "degree": 0.0174533,
+                "radians": 1
+            }
+        },
+        "arcsin": {
+           "name": "arcsin",
+            "si": {
+                "degree": 0.0174533,
+                "radians": 1
+            }
+        }
+    }
+}

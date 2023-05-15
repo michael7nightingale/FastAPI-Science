@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<h2 class="white_text">{{ title }}</h2>
+<div class="form">
+        <form method="post" action="{{ url_for('register_post') }}">
+            <input type="text" name="username">
+            <input type="text" name="email">
+            <input type="text" name="password">
+        <button type="submit">Log in</button>
+        </form>
+</div>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{% endblock %}
+

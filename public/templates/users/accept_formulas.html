@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h2>Предложенные формулы</h2>
+    <p class="lead">Просмотрите предложенные формулы.</p>
+    <a href="{% url 'users_cabinet' %}" class="btn btn-primary btn-large">назад к кабинету &raquo;</a>
+</div>
+
+<div class="container">
+    {% if formulas %}
+    <ul>
+        {% for formula in formulas %}
+            <li>
+                <h6 class='white_text'><a class='white_text' href="{% url 'users_accept_formula' formula.user.pk formula.pk %}">
+                    {{ formula.title }} | {{ formula.date }} | {{ formula.user }}
+                </a></h6>
+
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+
+
+
+     <h4 class='white_text'>Нет предложенных формул</h4>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+

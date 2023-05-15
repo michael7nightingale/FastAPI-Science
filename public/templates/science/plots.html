@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h2>Графики функций</h2>
+    <p class="lead">Вносите изменения в неопубликованные статьи или вовсе удаляйте их</p>
+    {% if message %}
+        <h4 style="color: indianred">{{ message }}</h4>
+    {% endif %}
+    <a href="{{ url_for('science_main', science_slug=current_science) }}" class="btn btn-primary btn-large">назад к математике &raquo;</a>
+
+</div>
+
+<div class="container">
+    <form method="post" action="{{ url_for('science_category_post', science_slug=current_science, cat_slug='plots') }}">
+        <input class="form-control" type="text" name="function1" placeholder="Функция 1">
+        <input class="form-control" type="text" name="function2" placeholder="Функция 2">
+        <input class="form-control" type="text" name="function3" placeholder="Функция 3">
+        <input class="form-control" type="text" name="function4" placeholder="Функция 4">
+        <input class="form-control" type="text" value=-100 name="xmin" placeholder="x min">
+        <input class="form-control" type="text" value=100 name="xmax" placeholder="x max">
+        <input class="form-control" type="text" value=-100 name="ymin" placeholder="y min">
+        <input class="form-control" type="text" value=100 name="ymax" placeholder="y max">
+        <input type="submit" value="Построить график">
+    </form>
+
+    {% if image_url %}
+    <img src="{{ image_url }}">
+    <form method="post" action="{{ url_for('download_plot') }}">
+        <input class="white_text" type="text" name="filesurname" placeholder="Скачать как:">
+        <input class="white_text" type="text" hidden="hidden" name="filename" value="{{ image_url }}">
+        <input type="submit" value="Скачать">
+    </form>
+    {% else %}
+        <h3>{{ message }}</h3>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+

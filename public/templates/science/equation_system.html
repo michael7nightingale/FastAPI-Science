@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="jumbotron">
+    <h2>Системы уравнений</h2>
+    <p class="lead">Решение систем уравнений</p>
+    <a href="{% url 'mathem_main' %}" class="btn btn-primary btn-large">назад к математике &raquo;</a>
+</div>
+        <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                    <input type="submit" name="submit" >
+            </form>
+       <h4 class="white_text">Решение: {{ result }} </h4>
+{% endblock %}
