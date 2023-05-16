@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import passlib
 from fastapi import HTTPException
 from starlette.requests import Request
-from sqlalchemy import String, Integer, Column, Text, Boolean, select, create_engine
+from sqlalchemy import String, Integer, Column, Text, Boolean, select, create_engine, delete
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
@@ -200,6 +200,10 @@ class HistoryDb(DbInterface):
         res = await self.db_session.execute(select(History).where(History.user_id == user_id))
         history_list = [i[0] for i in res.all()]
         return history_list
+
+    async def delete_history(self, user_id: int):
+        res = await self.db_session.execute(delete(History).where(History.user_id == user_id))
+        await self.db_session.commit()
 
 
 class FormulasDb(DbInterface):

@@ -6,12 +6,14 @@
     <p class="lead">Скачать или удалить историю вычислений.</p>
     <a href="{{ url_for('cabinet', username=user.username) }}" class="btn btn-primary btn-large">назад к кабинету &raquo;</a>
 </div>
-           <form method="post" action="">
-        <input class="white_text" type="text" name="filepath" placeholder="Скачать как:">
+           <form method="post" action="{{ url_for('history_download') }}">
+        <input class="white_text" type="text" name="filename" placeholder="Скачать как:">
         <input type="submit" value="Скачать">
 
     </form>
-        <a href="">Удалить историю</a>
+    <form method="post" action="{{ url_for('history_delete') }}">
+        <button class="btn-link" type="submit">Удалить историю</button>
+    </form>
             {% for i in history %}
                 <div class="u-layout-horizontal">
                     <h4 class="leqn white_text">{{ i.history_view()|safe }} </h4>

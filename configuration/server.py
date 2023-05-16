@@ -47,13 +47,15 @@ class Server:
         async def validation_exc_handler(request: Request, exc):
             # if exc.status_code >= 400:
             # logger.error(exc)
+            print(exc)
             self.__error_templates = Jinja2Templates(directory=os.getcwd() + self.TEMPLATES_DIR + "/error/")
             return self.__error_templates.TemplateResponse("500.html", context={'request': request})
 
         @self.app.exception_handler(StarletteHTTPException)
         async def http_exc_handler(request: Request, exc):
-            # if exc.status_code >= 400:
-            #     logger.error(exc)
+            if exc.status_code >= 400:
+                logger.error(exc)
+            print(exc)
             self.__error_templates = Jinja2Templates(directory=os.getcwd() + self.TEMPLATES_DIR + "/error/")
             if exc.status_code == 402:
                 # logger.error(exc)

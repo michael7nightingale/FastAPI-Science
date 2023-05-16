@@ -6,13 +6,14 @@ from datetime import timedelta
 from fastapi_login import LoginManager
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, FileResponse
 from starlette.templating import Jinja2Templates
 
 from package.exceptions import NotAuthenticatedException
 from package.database import UsersDb as UDb, session, Users, HistoryDb as HDb
 from package.schema import UserInSchema
 from configuration.logger import logger
+from package import tables
 
 
 users_router = APIRouter(
@@ -23,6 +24,7 @@ UsersDb = UDb(session)
 HistoryDb = HDb(session)
 templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/users/')
 
+HISTORY_DIR = '/public/static/data/'
 
 loginManager = LoginManager(
     'secret',
@@ -162,9 +164,49 @@ async def cabinet(request: Request, user=None, username: str = Path()):
 @permission(permissions=())
 async def history(request: Request,
                   user=None,):
+    delete_history_csv(user.id)
     history_list = await HistoryDb.get_history(user.id)
     context = {"title": "История вычислений",
                "history": history_list,
                "user": user,
                'request': request}
     return templates.TemplateResponse("history.html", context=context)
+
+
+@users_router.post('/download_history')
+@permission(permissions=())
+async def history_download(
+        request: Request,
+        user=None,
+        filename: str = Form()):
+    history_list = await HistoryDb.get_history(user.id)
+    filepath = os.getcwd() + HISTORY_DIR + f'{user.id}.csv'
+    table = tables.CsvTableManager(filepath)
+    history_list = [i.as_dict() for i in history_list]
+    if history_list:
+        table.init_data(history_list[0].keys())
+        for line in history_list:
+            table.add_line(line.values())
+        table.save_data(filepath)
+        return FileResponse(path=filepath, filename=f"{filename}.csv")
+    else:
+        return RedirectResponse(url=users_router.url_path_for('history'), status_code=303)
+
+
+def delete_history_csv(user_id: int):
+    """Удаление файла .csv с историей вычислений"""
+    path = os.getcwd() + HISTORY_DIR + f'{user_id}.csv'
+    if os.path.exists(path):
+        os.remove(path)
+    else:
+        return None
+
+
+@users_router.post('/delete_history')
+@permission(permissions=())
+async def history_delete(
+        request: Request,
+        user=None
+):
+    await HistoryDb.delete_history(user.id)
+    return RedirectResponse(url=users_router.url_path_for('history'), status_code=303)
