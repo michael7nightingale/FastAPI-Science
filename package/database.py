@@ -212,7 +212,7 @@ class FormulasDb(DbInterface):
         self.FORMULAS = {}
         self.SCIENCES = {}
 
-    async def get_formulas_by_cat(self, category_name, _initial = False) -> list[Formulas]:
+    async def get_formulas_by_cat(self, category_name, _initial=False) -> list:
         if _initial or not self.FORMULAS:
             cat = await self.__cat_db.get_category(category_name)
             res = await self.db_session.execute(select(Formulas).where(Formulas.category_id == cat.id))
@@ -301,7 +301,7 @@ class CategoriesDb(DbInterface):
             return cat[0]
         raise HTTPException(status_code=404)
 
-    async def get_all_categories(self, science: str):
+    async def get_all_categories(self, science: str) -> list:
         res = await self.db_session.execute(select(Categories).where(Categories.super_category == science))
         return [i[0] for i in res.all()]
 
