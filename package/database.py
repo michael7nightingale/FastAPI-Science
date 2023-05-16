@@ -235,6 +235,7 @@ class FormulasDb(DbInterface):
                 raise HTTPException(status_code=404)
 
     async def update_data(self):
+        await create_db()
         for i in await self.__science_db.get_all_sciences():
             self.SCIENCES[i.slug] = await self.__cat_db.get_all_categories(i.slug)
         for science, categories in self.SCIENCES.items():
@@ -319,4 +320,4 @@ async def create_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-asyncio.run(create_db())
+# asyncio.run(create_db())
