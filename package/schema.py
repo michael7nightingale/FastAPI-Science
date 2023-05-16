@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel, validator
 from datetime import datetime
@@ -39,12 +40,12 @@ class HistorySchema(BaseModel):
 
 
 class RequestSchema(BaseModel):
-    user_id: int | None = None
+    user_id: Optional[int] = None
     method: str
     url: str
-    find_mark: str | None = None
-    nums_comma: int | None = None
-    data: dict | None = None
+    find_mark: Optional[str] = None
+    nums_comma: Optional[int] = None
+    data: Optional[dict] = None
 
 
 

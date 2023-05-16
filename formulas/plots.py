@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import cos, sin, tan, pi, e, power, sqrt
@@ -27,7 +29,7 @@ class Plot:
 
     def __init__(self, functions: list,
                  xlim: tuple,
-                 ylim: tuple = None):
+                 ylim: Optional[tuple] = None):
         self.__functions = functions
         self.__xlim = int(xlim[0]), int(xlim[1])
         if ylim is not None:

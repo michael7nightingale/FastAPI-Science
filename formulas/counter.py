@@ -29,7 +29,7 @@ def counter(num_vector: ndarray, constants, functions, pattern, nums_comma, patt
         )
 
 
-def function_counter(num: float, f_name: str in FUNCTIONS):
+def function_counter(num: float, f_name: str):
     return str(
         FUNCTIONS[f_name](num)
                )

@@ -99,7 +99,7 @@ SPECIAL_CATEGORIES_POST = {
 # =================================== DEPENDENCIES ================================== #
 
 async def science_basic(request: Request,
-                        science_slug: ScienceEnum = Path()) -> dict[object, str]:
+                        science_slug: ScienceEnum = Path()):
     """Зависимость для науки."""
     return {'request': request, "science_slug": science_slug.value}
 

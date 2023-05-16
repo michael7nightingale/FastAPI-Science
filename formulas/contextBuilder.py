@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import logging
 from numpy import pi, e
@@ -16,7 +18,7 @@ MathemParameters = jsonGetParams.Parameters('mathem')
 PhysicsParameters = jsonGetParams.Parameters('phy')
 
 
-async def build_template(request_schema: schema.RequestSchema | None, user_id, formula_name, science_name):
+async def build_template(request_schema: Optional[schema.RequestSchema], user_id, formula_name, science_name):
     # получение параметров
     find_mark = 'x'
     _history = 'Вы не зарегистрированы'

@@ -39,7 +39,7 @@ async def get_user_from_db(username: str):
     return await UsersDb.get_user(username)
 
 
-async def get_current_user(request: Request) -> None | Users:
+async def get_current_user(request: Request):
     token = request.cookies.get('access-token')
     if token is not None:
         try:
@@ -54,13 +54,13 @@ async def get_current_user(request: Request) -> None | Users:
         return user
 
 
-async def is_superuser(request: Request) -> Users | None:
+async def is_superuser(request: Request):
     user = await get_current_user(request)
     if user:
         return user if user.is_superuser else None
 
 
-async def is_stuff(request: Request) -> Users | None:
+async def is_stuff(request: Request):
     user = await get_current_user(request)
     if user:
         return user if user.is_stuff else None
