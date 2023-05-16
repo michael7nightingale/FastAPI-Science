@@ -7,7 +7,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
 
-from app.configuration.routes import __routes__
+from configuration.routes import __routes__
 
 
 class Server:
