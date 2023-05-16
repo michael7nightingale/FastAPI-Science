@@ -4,10 +4,11 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import FileResponse
-from app.formulas import contextBuilder, plots
-from app.internal.users import get_current_user, permission
-from app.package.schema import RequestSchema, ScienceEnum
-from app.package.database import FormulasDb as FDb, CategoriesDb as CDb, session, ScienceDb as SDb
+
+from formulas import contextBuilder, plots
+from internal.users import get_current_user, permission
+from package.schema import RequestSchema, ScienceEnum
+from package.database import FormulasDb as FDb, CategoriesDb as CDb, session, ScienceDb as SDb
 
 
 science_router = APIRouter(
