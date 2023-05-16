@@ -1,7 +1,7 @@
 import datetime
 import os
 from dotenv import load_dotenv
-from functools import singledispatchmethod
+# from functools import singledispatchmethod
 import passlib
 from fastapi import HTTPException
 from starlette.requests import Request
@@ -141,19 +141,28 @@ class UsersDb(DbInterface):
                 await self.db_session.commit()
                 return user
 
-    @singledispatchmethod
-    async def get_user(self, identifier: object):
-        res = await self.db_session.execute(select(Users).where(Users.id == identifier))
-        return res.first()[0]
+    # @singledispatchmethod
+    # async def get_user(self, identifier: object):
+    #     res = await self.db_session.execute(select(Users).where(Users.id == identifier))
+    #     return res.first()[0]
+    #
+    # @get_user.register
+    # async def _(self, id_: int):
+    #     res = await self.db_session.execute(select(Users).where(Users.id == id_))
+    #     return res.first()[0]
+    #
+    # @get_user.register
+    # async def _(self, username: str):
+    #     res = await self.db_session.execute(select(Users).where(Users.username == username))
+    #     return res.first()[0]
 
-    @get_user.register
-    async def _(self, id_: int):
-        res = await self.db_session.execute(select(Users).where(Users.id == id_))
-        return res.first()[0]
-
-    @get_user.register
-    async def _(self, username: str):
-        res = await self.db_session.execute(select(Users).where(Users.username == username))
+    async def get_user(self, identifier):
+        if isinstance(identifier, int):
+            res = await self.db_session.execute(select(Users).where(Users.id == identifier))
+        elif isinstance(identifier, str):
+            res = await self.db_session.execute(select(Users).where(Users.username == identifier))
+        else:
+            raise HTTPException(status_code=500)
         return res.first()[0]
 
     async def delete_user(self, id_: int):
@@ -185,7 +194,7 @@ class HistoryDb(DbInterface):
         await self.db_session.commit()
         return history
 
-    @singledispatchmethod
+    # @singledispatchmethod
     async def get_history(self, user_id: int):
         res = await self.db_session.execute(select(History).where(History.user_id == user_id))
         history_list = [i[0] for i in res.all()]
@@ -255,30 +264,41 @@ class ScienceDb(DbInterface):
 
 class CategoriesDb(DbInterface):
     __slots__ = ()
-    @singledispatchmethod
-    async def get_category(self, identifier: object):
-        res = await self.db_session.execute(select(Categories).where(Categories.id == identifier))
+    # @singledispatchmethod
+    # async def get_category(self, identifier: object):
+    #     res = await self.db_session.execute(select(Categories).where(Categories.id == identifier))
+    #     cat = res.first()
+    #     if cat is not None:
+    #         return cat[0]
+    #     raise HTTPException(status_code=404)
+    #
+    # @get_category.register
+    # async def _(self, id_: int):
+    #     res = await self.db_session.execute(select(Categories).where(Categories.id == id_))
+    #     cat = res.first()
+    #     if cat is not None:
+    #         return cat[0]
+    #     raise HTTPException(status_code=404)
+    #
+    # @get_category.register
+    # async def _(self, slug: str):
+    #     res = await self.db_session.execute(select(Categories).where(Categories.slug == slug))
+    #     cat = res.first()
+    #     if cat is not None:
+    #         return cat[0]
+    #     raise HTTPException(status_code=404)
+
+    async def get_category(self, identifier):
+        if isinstance(identifier, str):
+            res = await self.db_session.execute(select(Categories).where(Categories.category_name == identifier))
+        elif identifier(identifier, int):
+            res = await self.db_session.execute(select(Categories).where(Categories.id == identifier))
+        else:
+            raise HTTPException(status_code=500)
         cat = res.first()
         if cat is not None:
             return cat[0]
         raise HTTPException(status_code=404)
-
-    @get_category.register
-    async def _(self, id_: int):
-        res = await self.db_session.execute(select(Categories).where(Categories.id == id_))
-        cat = res.first()
-        if cat is not None:
-            return cat[0]
-        raise HTTPException(status_code=404)
-
-    @get_category.register
-    async def _(self, slug: str):
-        res = await self.db_session.execute(select(Categories).where(Categories.slug == slug))
-        cat = res.first()
-        if cat is not None:
-            return cat[0]
-        raise HTTPException(status_code=404)
-
 
     async def get_all_categories(self, science: str):
         res = await self.db_session.execute(select(Categories).where(Categories.super_category == science))
