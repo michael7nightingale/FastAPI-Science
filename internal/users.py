@@ -1,18 +1,17 @@
 import os
-
 from fastapi import APIRouter, Depends, Form, Path
 from functools import lru_cache, wraps
 from typing import Callable
 from datetime import timedelta
-
 from fastapi_login import LoginManager
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
-from app.package.exceptions import NotAuthenticatedException
-from app.package.database import UsersDb as UDb, session, Users, HistoryDb as HDb
-from app.package.schema import UserInSchema
+
+from package.exceptions import NotAuthenticatedException
+from package.database import UsersDb as UDb, session, Users, HistoryDb as HDb
+from package.schema import UserInSchema
 
 
 users_router = APIRouter(
