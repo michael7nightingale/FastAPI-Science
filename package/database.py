@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 from dotenv import load_dotenv
@@ -5,14 +6,14 @@ from dotenv import load_dotenv
 import passlib
 from fastapi import HTTPException
 from starlette.requests import Request
-from sqlalchemy import String, Integer, Column,  Text, Boolean, select
+from sqlalchemy import String, Integer, Column, Text, Boolean, select, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from passlib.hash import django_pbkdf2_sha256
 
 from package import schema
-
+create_engine
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -314,9 +315,8 @@ async def main():
     await userdb.create_user('michael7', 'suslan7@mail.ru', 'password7')
 
 
-
 async def create_db():
-    async with  engine.begin() as conn:
+    async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-# asyncio.run(create_db())
+asyncio.run(create_db())
