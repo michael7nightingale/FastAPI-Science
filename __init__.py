@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from app.configuration.server import Server
-from app.internal.users import loginManager
+
+from configuration.server import Server
+from internal.users import loginManager
 
 
 def create_app(_=None) -> FastAPI:
