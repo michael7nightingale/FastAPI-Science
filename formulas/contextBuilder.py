@@ -2,10 +2,10 @@ import numpy as np
 import logging
 from numpy import pi, e
 
-from app.package import database
-from app.package import schema
-from app.formulas import jsonGetParams
-from app.formulas import counter
+from package import database
+from package import schema
+from formulas import jsonGetParams
+from formulas import counter
 
 
 # логирование
