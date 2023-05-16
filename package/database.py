@@ -105,17 +105,17 @@ def nowTime() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def unfined(f):
+    async def inner(*a, **k):
+        try:
+            return await f(*a, **k)
+        except TypeError:
+                return None
+    return inner
+
+
 class UsersDb(DbInterface):
     __slots__ = ()
-
-    @staticmethod
-    def unfined(f):
-        async def inner(*a, **k):
-            try:
-                return await f(*a, **k)
-            except TypeError:
-                return None
-        return inner
 
     async def create_user(self, username: str,
                           email: str,
@@ -238,6 +238,7 @@ class FormulasDb(DbInterface):
             self.SCIENCES[i.slug] = await self.__cat_db.get_all_categories(i.slug)
         for science, categories in self.SCIENCES.items():
             for category in categories:
+                print(category)
                 self.CATEGORIES[category.slug] = await self.get_formulas_by_cat(category.slug, _initial=True)
         for category, formulas in self.CATEGORIES.items():
             for formula in formulas:
@@ -290,7 +291,7 @@ class CategoriesDb(DbInterface):
 
     async def get_category(self, identifier):
         if isinstance(identifier, str):
-            res = await self.db_session.execute(select(Categories).where(Categories.category_name == identifier))
+            res = await self.db_session.execute(select(Categories).where(Categories.slug == identifier))
         elif identifier(identifier, int):
             res = await self.db_session.execute(select(Categories).where(Categories.id == identifier))
         else:
