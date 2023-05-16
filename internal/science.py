@@ -9,12 +9,13 @@ from formulas import contextBuilder, plots
 from internal.users import get_current_user, permission
 from package.schema import RequestSchema, ScienceEnum
 from package.database import FormulasDb as FDb, CategoriesDb as CDb, session, ScienceDb as SDb
+from configuration.logger import logger
 
 
 science_router = APIRouter(
     prefix='/science'
 )
-STATIC_DIR = "/app/public/static/"       # appends to BASE_DIR
+STATIC_DIR = "/public/static/"       # appends to BASE_DIR
 PLOTS_DIR = "/plots/"
 
 session = session()
@@ -22,13 +23,14 @@ FormulasDb = FDb(session)
 CategoriesDb = CDb(session)
 ScienceDb = SDb(session)
 
-templates = Jinja2Templates(directory=os.getcwd() + '/app/public/templates/science/')
+templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/science/')
 
 
 @science_router.on_event("startup")
 async def create_formulas():
     """Перед запуском сервера формируется кэш-словарь формул и категорий из БД."""
     await FormulasDb.update_data()
+    logger.info("Updated formulas database info!")
 
 
 # ================================= PLOTS ================================ #
@@ -131,7 +133,6 @@ async def science_main(params: dict = Depends(science_basic)):
     """
     science = await ScienceDb.get_science(params['science_slug'])
     categories = await CategoriesDb.get_all_categories(science=params['science_slug'])
-    print(science, science.title, science.slug)
     return templates.TemplateResponse("main.html", context={"request": params['request'],
                                                             "current_science": science,
                                                             "categories": categories})

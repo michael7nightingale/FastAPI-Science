@@ -1,4 +1,6 @@
 import datetime
+import os
+from dotenv import load_dotenv
 from functools import singledispatchmethod
 import passlib
 from fastapi import HTTPException
@@ -11,17 +13,17 @@ from passlib.hash import django_pbkdf2_sha256
 
 from package import schema
 
-
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 ECHO = False
 FUTURE = True
 EXPIRE_ON_COMMIT = False
-
-engine = create_async_engine("postgresql+asyncpg://postgres:password@localhost/calculations",
-                             echo=ECHO, future
-                             =FUTURE)
+engine = create_async_engine(
+    f"postgresql+asyncpg://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}/{os.getenv('DATABASE_NAME')}",
+    echo=ECHO,
+    future=FUTURE)
 session = sessionmaker(engine,
                        class_=AsyncSession,
                        expire_on_commit=EXPIRE_ON_COMMIT)

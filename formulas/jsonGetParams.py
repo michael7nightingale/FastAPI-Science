@@ -8,7 +8,7 @@ from functools import lru_cache
 
 class Parameters:
     __slots__ = ("DATA", "FORMULAS", "CONSTANTS", "FORMULAS_NAMES", "LITERALS", "FUNCTIONS", "science_name")
-    BASE_DIR: str = os.getcwd() + '/app/'
+    BASE_DIR: str = os.getcwd()
     params_path: str = '/formulas/'
 
     def __init__(self, science_name):
@@ -64,6 +64,7 @@ class Parameters:
 
     def load_data(self) -> None:
         try:
+            print(str(self.BASE_DIR) + self.params_path + self.science_name + '_params.json')
             with open(str(self.BASE_DIR) + self.params_path + self.science_name + '_params.json') as file:
                 self.DATA = json.load(file)
         except Exception as e:

@@ -22,8 +22,10 @@
             <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Главная</a>
                  <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Поиск</a>
             <a class="p-2 text-dark" href="{{ url_for('logout') }}">Выйти</a>
+                 {% if user %}
                 <a class="p-2 text-dark" href="{{ url_for('cabinet', username=user.username) }}">Кабинет</a>
-            {% else %}
+                     {% endif %}
+                 {% else %}
                 <a class="p-2 text-dark" href="{{ url_for('login') }}">Войти</a>
                 <a class="p-2 text-dark" href="{{ url_for('register') }}">Зарегистрироваться</a>
             {% endif %}
@@ -32,7 +34,7 @@
 
 <style>
     .background{
-        background-image: url("/app/public/static/images/main_bg .jpg");
+        background-image: url("/public/static/images/main_bg .jpg");
         min-height: 700px;
     }
     .white_text{

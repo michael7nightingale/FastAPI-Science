@@ -12,6 +12,7 @@ from starlette.templating import Jinja2Templates
 from package.exceptions import NotAuthenticatedException
 from package.database import UsersDb as UDb, session, Users, HistoryDb as HDb
 from package.schema import UserInSchema
+from configuration.logger import logger
 
 
 users_router = APIRouter(
@@ -20,7 +21,7 @@ users_router = APIRouter(
 session = session()
 UsersDb = UDb(session)
 HistoryDb = HDb(session)
-templates = Jinja2Templates(directory=os.getcwd() + '/app/public/templates/users/')
+templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/users/')
 
 
 loginManager = LoginManager(
@@ -44,8 +45,8 @@ async def get_current_user(request: Request) -> None | Users:
         try:
             user_dict = loginManager._get_payload(token)
             user = await get_user_from_db(username=user_dict['username'])
+            logger.info(f"Got user with id: {user.id}!")
             # user = await UsersDb.get_user(user_dict['username'])
-            return user
         except NotAuthenticatedException:
             user = None
         except:
