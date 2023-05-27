@@ -10,9 +10,14 @@
 
 
 ## Запуск
+<<<<<<< HEAD
  ```
  uvicorn __init__:create_app --reload 
 ```
 
+=======
+ 
+ uvicorn  __init__:create_app --reload 
+>>>>>>> 34ef51d59293990132a41146a9572c4adae09a94
 (путь до create_app из корневого __init__.py,  возможно,в вашем случае следует скорректировать)
  
