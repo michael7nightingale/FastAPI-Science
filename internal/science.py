@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append(os.getcwd())
+
 from fastapi import APIRouter, Depends, Form, Path
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
@@ -8,7 +11,7 @@ from starlette.responses import FileResponse
 from formulas import contextBuilder, plots
 from internal.users import get_current_user, permission
 from package.schema import RequestSchema, ScienceEnum
-from package.database import FormulasDb as FDb, CategoriesDb as CDb, session, ScienceDb as SDb
+from package import database
 from configuration.logger import logger
 
 
@@ -18,10 +21,10 @@ science_router = APIRouter(
 STATIC_DIR = "/public/static/"       # appends to BASE_DIR
 PLOTS_DIR = "/plots/"
 
-session = session()
-FormulasDb = FDb(session)
-CategoriesDb = CDb(session)
-ScienceDb = SDb(session)
+session = database.session()
+FormulaDb = database.FormulaDb(session)
+CategoryDb = database.CategoryDb(session)
+ScienceDb = database.ScienceDb(session)
 
 templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/science/')
 
@@ -29,7 +32,7 @@ templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/science/'
 @science_router.on_event("startup")
 async def create_formulas():
     """Перед запуском сервера формируется кэш-словарь формул и категорий из БД."""
-    await FormulasDb.update_data()
+    await FormulaDb.update_data()
     logger.info("Updated formulas database info!")
 
 
@@ -98,24 +101,27 @@ SPECIAL_CATEGORIES_POST = {
 
 # =================================== DEPENDENCIES ================================== #
 
-async def science_basic(request: Request,
-                        science_slug: ScienceEnum = Path()):
-    """Зависимость для науки."""
-    return {'request': request, "science_slug": science_slug.value}
-
-
-async def formula_basic(
+async def science_basic(
         request: Request,
         science_slug: ScienceEnum = Path(),
+    ):
+    """Зависимость для науки."""
+    return {
+        "science_slug": science_slug.value,
+        "request": request
+    }
+        
+
+async def formula_basic(
+        science_slug: ScienceEnum = Path(),
         formula_slug: str = Path()
-):
+    ):
     """Зависимость для формулы."""
-    formula = await FormulasDb.get_formula(formula_slug)
-    category = await CategoriesDb.get_category(formula.category_id)
+    formula = await FormulaDb.get_formula(formula_slug)
+    category = await CategoryDb.get_category(formula.category_id)
     if category.super_category == science_slug:
         return {
-            "current_science": science_slug.value,
-            "request": request,
+            "science_slug": science_slug.value,
             "category": category,
             "formula": formula,
                 }
@@ -126,40 +132,50 @@ async def formula_basic(
 # ============================== SCIENCE ============================ #
 
 @science_router.get('/{science_slug}')
-async def science_main(params: dict = Depends(science_basic)):
+async def science_main( 
+        request: Request, 
+        science_slug: str = Path(),
+    ):
     """
     Главная страница науки. Для всех пользователей.
     SQL: science; categories on science.
     """
-    science = await ScienceDb.get_science(params['science_slug'])
-    categories = await CategoriesDb.get_all_categories(science=params['science_slug'])
-    return templates.TemplateResponse("main.html", context={"request": params['request'],
-                                                            "current_science": science,
-                                                            "categories": categories})
+    science = await ScienceDb.get_science(science_slug)
+    categories = await CategoryDb.get_all_categories(science=science_slug)
+    context = {
+        "science": science, 
+        "categories": categories,
+        "request": request
+    }
+    return templates.TemplateResponse("main.html", context=context)
 
 
 @science_router.get('/{science_slug}/category/{cat_slug}/')
-async def science_category(params: dict = Depends(science_basic),
-                           cat_slug: str = Path()):
+async def science_category(
+        params: dict = Depends(science_basic),
+        cat_slug: str = Path()
+    ):
     """
     Category page. For all sciences. Available for everyone.
     SQL: - category; formulas on category;
     """
-    context = {"request": params['request'],
-               "current_science": params['science_slug']}
+    context = params.copy()
+    
     if cat_slug in SPECIAL_CATEGORIES_GET:
         return await SPECIAL_CATEGORIES_GET[cat_slug](**params)
     else:
-        formulas_objects = await FormulasDb.get_formulas_by_cat(cat_slug)
-        category = await CategoriesDb.get_category(cat_slug)
+        formulas_objects = await FormulaDb.get_formulas_by_cat(cat_slug)
+        category = await CategoryDb.get_category(cat_slug)
         formulas = [i.as_dict() for i in formulas_objects]
         context.update({'formulas': formulas, "title": category.category_name})
         return templates.TemplateResponse("category.html", context=context)
 
 
 @science_router.post('/{science_slug}/category/{cat_slug}/')
-async def science_category_post(params: dict = Depends(science_basic),
-                                cat_slug: str = Path()):
+async def science_category_post(
+        params: dict = Depends(science_basic),
+        cat_slug: str = Path()
+    ):
     """
     Маршрут необходим только для одностраничных специальных категорий. Для всех пользователей.
     SQL: _.
@@ -167,7 +183,7 @@ async def science_category_post(params: dict = Depends(science_basic),
     context = {"request": params['request'],
                "current_science": params['science_slug']}
     if cat_slug in SPECIAL_CATEGORIES_POST:
-        return await SPECIAL_CATEGORIES_POST[cat_slug](**params, )
+        return await SPECIAL_CATEGORIES_POST[cat_slug](**params)
     else:
        raise HTTPException(status_code=404)
 
@@ -175,22 +191,23 @@ async def science_category_post(params: dict = Depends(science_basic),
 @science_router.get('/{science_slug}/formula/{formula_slug}/')
 async def science_formula(
         request: Request,
-        context: dict = Depends(formula_basic)):
+        context: dict = Depends(formula_basic)
+    ):
     """
      Форма c формулой при первом открытии или обновлении страницы. Для всех пользователей.
      SQL: category; formula on category.
      """
+    user = await get_current_user(request)
     requestSchema = RequestSchema(
-        url=context["request"].url.path,
-        method=context["request"].method,
+        url=request.url.path,
+        method=request.method,
     )
     built_context = await contextBuilder.build_template(
-        request_schema=requestSchema,
-        user_id=None,
-        formula_name=context['formula'].slug,
-        science_name=context['current_science']
+        request=requestSchema,
+        science_slug=context['science_slug'], 
+        formula_slug=context['formula'].slug,
     )
-    context.update(built_context)
+    context.update(built_context, request=request)
     return templates.TemplateResponse("template_formula.html", context=context)
 
 
@@ -201,22 +218,24 @@ async def science_formula_post(
         nums_comma: int = Form(),
         find_mark: str = Form()):
     """
-      Форма в формулой после отправки формы впервые. Для всех пользователей.
-      SQL: category; formula on category.
-      """
-    data = await context["request"].form()
-    requestSchema = RequestSchema(url=context["request"].url.path,
-                                         method=context["request"].method,
-                                         find_mark=find_mark,
-                                         data=data,
-                                         nums_comma=nums_comma)
+     Форма в формулой после отправки формы впервые. Для всех пользователей.
+     SQL: category; formula on category.
+     """
     user = await get_current_user(request)
-    built_context = await contextBuilder.build_template(
-        request_schema=requestSchema,
-        user_id=user.id if user else None,
-        formula_name=context['formula'].slug,
-        science_name=context['current_science']
+    data = await request.form()
+    requestSchema = RequestSchema(
+        url=request.url.path,
+        method=request.method,
+        find_mark=find_mark,
+        user_id=user.id if user is not None else None,
+        data=data,
+        nums_comma=nums_comma
     )
-    context.update(built_context)
+    built_context = await contextBuilder.build_template(
+        request=requestSchema,
+        science_slug=context['science_slug'], 
+        formula_slug=context['formula'].slug,
+    )
+    context.update(built_context, request=request)
     return templates.TemplateResponse("template_formula.html", context=context)
 

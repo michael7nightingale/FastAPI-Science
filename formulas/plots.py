@@ -23,7 +23,7 @@ class BasePlot(ABC):
 
 
 class Plot:
-    mathematical_names = {'cos', 'sin', 'tan', 'e', 'pi', 'sqrt'}
+    mathematical_names = {'cos', 'sin', 'tan', 'e', 'pi', 'sqrt', 'abs'}
     pattern = r'\s|\*|\d|-|/|\+|\(|\)'
     __step = 0.1
 

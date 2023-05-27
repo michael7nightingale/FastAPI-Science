@@ -25,10 +25,17 @@ ECHO = False
 FUTURE = True
 EXPIRE_ON_COMMIT = False
 
+DATABASE_USER = os.getenv('DATABASE_USER')
+DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
+DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_NAME = os.getenv('DATABASE_NAME')
+
+
 engine = create_async_engine(
-    f"postgresql+asyncpg://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}/{os.getenv('DATABASE_NAME')}",
+    f"postgresql+asyncpg://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}/{DATABASE_NAME}",
     echo=ECHO,
-    future=FUTURE)
+    future=FUTURE
+)
 session = sessionmaker(engine,
                        class_=AsyncSession,
                        expire_on_commit=EXPIRE_ON_COMMIT)
@@ -49,7 +56,7 @@ class Science(Base, TableMixin):
     slug = Column(String(40), unique=True)
 
 
-class Users(Base, TableMixin):
+class User(Base, TableMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -62,7 +69,7 @@ class Users(Base, TableMixin):
     is_superuser = Column(Boolean, default=False)
 
 
-class Categories(Base, TableMixin):
+class Category(Base, TableMixin):
     __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -72,7 +79,7 @@ class Categories(Base, TableMixin):
     slug = Column(String(40), unique=True)
 
 
-class Formulas(Base, TableMixin):
+class Formula(Base, TableMixin):
     __tablename__ = 'formulas'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -119,14 +126,14 @@ def unfined(f):
     return inner
 
 
-class UsersDb(DbInterface):
+class UserDb(DbInterface):
     __slots__ = ()
 
-    async def create_user(self, user_schema: schema.RegisterUser) -> Users:
+    async def create_user(self, user_schema: schema.RegisterUser) -> User:
         psw = user_schema.password
         hashed_pws = django_pbkdf2_sha256.hash(psw)
         user_schema.password = hashed_pws
-        user = Users(
+        user = User(
             **user_schema.dict(),
             last_login=nowTime(),
             joined=nowTime()
@@ -137,7 +144,7 @@ class UsersDb(DbInterface):
 
     @unfined
     async def login_user(self, user_schema: schema.LoginUser):
-        res = await self.db_session.execute(select(Users).where(Users.username == user_schema.username))
+        res = await self.db_session.execute(select(User).where(User.username == user_schema.username))
         user = res.first()[0]
         if user:
             if django_pbkdf2_sha256.verify(user_schema.password, user.hasw_psw):
@@ -149,16 +156,16 @@ class UsersDb(DbInterface):
 
     async def get_user(self, identifier):
         if isinstance(identifier, int):
-            res = await self.db_session.execute(select(Users).where(Users.id == identifier))
+            res = await self.db_session.execute(select(User).where(User.id == identifier))
         elif isinstance(identifier, str):
-            res = await self.db_session.execute(select(Users).where(Users.username == identifier))
+            res = await self.db_session.execute(select(User).where(User.username == identifier))
         else:
             raise HTTPException(status_code=500)
         return res.first()[0]
 
 
     async def delete_user(self, id_: int):
-        Users.query.get(id_).delete()
+        User.query.get(id_).delete()
         await self.db_session.commit()
 
     @staticmethod
@@ -197,12 +204,12 @@ class HistoryDb(DbInterface):
         await self.db_session.commit()
 
 
-class FormulasDb(DbInterface):
+class FormulaDb(DbInterface):
     __slots__ = ("__db_session", "__cat_db", "__science_db", "CATEGORIES", "FORMULAS", "SCIENCES")
 
     def __init__(self, db_session):
         super().__init__(db_session)
-        self.__cat_db = CategoriesDb(self.db_session)
+        self.__cat_db = CategoryDb(self.db_session)
         self.__science_db = ScienceDb(self.db_session)
         self.CATEGORIES = {}
         self.FORMULAS = {}
@@ -211,14 +218,14 @@ class FormulasDb(DbInterface):
     async def get_formulas_by_cat(self, category_name, _initial=False) -> list:
         if _initial or not self.FORMULAS:
             cat = await self.__cat_db.get_category(category_name)
-            res = await self.db_session.execute(select(Formulas).where(Formulas.category_id == cat.id))
+            res = await self.db_session.execute(select(Formula).where(Formula.category_id == cat.id))
             return [i[0] for i in res.all()]
         else:
             return self.CATEGORIES[category_name]
 
-    async def get_formula(self, formula_name: str) -> Formulas:
+    async def get_formula(self, formula_name: str) -> Formula:
         if not self.FORMULAS:
-            res = await self.db_session.execute(select(Formulas).where(Formulas.slug == formula_name))
+            res = await self.db_session.execute(select(Formula).where(Formula.slug == formula_name))
             formula = res.first()
             if formula is not None:
                 return formula[0]
@@ -243,7 +250,7 @@ class FormulasDb(DbInterface):
         return
 
     async def create_formula(self, **data):
-        formula = Formulas(**data)
+        formula = Formula(**data)
         self.db_session.add(formula)
         await self.db_session.commit()
         return formula
@@ -260,14 +267,14 @@ class ScienceDb(DbInterface):
         return [i[0] for i in res.all()]
 
 
-class CategoriesDb(DbInterface):
+class CategoryDb(DbInterface):
     __slots__ = ()
 
     async def get_category(self, identifier):
         if isinstance(identifier, str):
-            res = await self.db_session.execute(select(Categories).where(Categories.slug == identifier))
-        elif identifier(identifier, int):
-            res = await self.db_session.execute(select(Categories).where(Categories.id == identifier))
+            res = await self.db_session.execute(select(Category).where(Category.slug == identifier))
+        elif isinstance(identifier, int):
+            res = await self.db_session.execute(select(Category).where(Category.id == identifier))
         else:
             raise HTTPException(status_code=500)
         cat = res.first()
@@ -276,14 +283,13 @@ class CategoriesDb(DbInterface):
         raise HTTPException(status_code=404)
 
     async def get_all_categories(self, science: str) -> list:
-        res = await self.db_session.execute(select(Categories).where(Categories.super_category == science))
+        res = await self.db_session.execute(select(Category).where(Category.super_category == science))
         return [i[0] for i in res.all()]
 
 
-userdb = UsersDb(session())
-
 
 async def main():
+    userdb = UserDb(session())
     await userdb.create_user('michael', 'suslan@mail.ru', 'password')
     await userdb.create_user('michael7', 'suslan7@mail.ru', 'password7')
 
@@ -292,4 +298,7 @@ async def create_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-# asyncio.run(create_db())
+
+if __name__ == "__main__":
+    # asyncio.run(create_db())
+    ...

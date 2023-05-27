@@ -2,16 +2,15 @@
 
  {% block content %}
      <div class="jumbotron">
-    <h2>{{ current_science.title }}</h2>
-    <p class="lead">&nbsp;{{ current_science.content }}</p>
+         <h2>{{ science.title }}</h2>
+         <p class="lead">&nbsp;{{ science.content }}</p>
     <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-large">назад на главную &raquo;</a>
 </div>
 
     <div class="container">
-        {#  <h1 class="white_text">{{ current_science. }}</h1>#}
         <ul>{% for i in categories %}
                 <li>
-                <h5><a href="{{ url_for('science_category', cat_slug=i.slug, science_slug=current_science.slug) }}" class="white_text">{{ i.category_name  }}</a></h5>
+                <h5><a href="{{ url_for('science_category', cat_slug=i.slug, science_slug=science.slug) }}" class="white_text">{{ i.category_name  }}</a></h5>
                 </li>
             {% endfor %}
           </ul>

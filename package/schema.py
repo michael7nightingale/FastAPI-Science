@@ -47,20 +47,11 @@ class HistorySchema(BaseModel):
 
 
 class RequestSchema(BaseModel):
-    user_id: int| None = None
     method: str
     url: str
-    find_mark: str | None = None
-    nums_comma: int | None = None
+    user_id: int| None = None
     data: dict | None = None
+    nums_comma: int| None = None
+    find_mark: str| None = None
 
-
-
-
-if __name__ == '__main__':
-    user = UserSchema(
-        username="michael",
-        email='suslanchikmopl@gmail.com',
-        password=''
-    )
 

@@ -19,8 +19,8 @@ api_router = APIRouter(
 templates = Jinja2Templates(directory="public/templates/")
 
 session = database.session()
-UsersDb = database.UsersDb(session)
-FormulasDb = database.FormulasDb(session)
+UserDb = database.UserDb(session)
+FormulaDb = database.FormulaDb(session)
 HistoryDb = database.HistoryDb(session)
 
 
@@ -57,7 +57,7 @@ async def get_science(science_name: schema.ScienceEnum, request: Request):
         "categories": {i: {
             "url": str(request.url_for("get_category", science_name=science_name.value, category_name=i))
                            }
-                       for i in FormulasDb.CATEGORIES[science_name]}
+                       for i in FormulaDb.CATEGORIES[science_name]}
     })
 
 
@@ -65,7 +65,7 @@ async def get_science(science_name: schema.ScienceEnum, request: Request):
 async def get_category(science_name: schema.ScienceEnum,
                        category_name):
     # if await validators.check_category(science_name, category_name):
-    return await FormulasDb.get_formulas_by_cat(category_name)
+    return await FormulaDb.get_formulas_by_cat(category_name)
     # else:
         # raise HTTPException(status_code=403, detail='Science and category don`t match~!')
 
@@ -88,7 +88,7 @@ async def get_formula(science_name: schema.ScienceEnum,
                        formula_name: str = Path(title="Name of the formula", min_length=5, max_length=35)):
     # print(FormulasDb.FORMULAS[science_name][category_name])
     # if await validators.check_formula(science_name, category_name, formula_name):
-    formula = await FormulasDb.get_formula(formula_name)
+    formula = await FormulaDb.get_formula(formula_name)
     return formula
 
 
@@ -129,7 +129,7 @@ async def count_formula(
 @api_router.post('/register/')
 async def register(user_data: dict = Depends(user_parameters_extra)):
     try:
-       await UsersDb.register_user(**user_data)
+       await UserDb.register_user(**user_data)
        return await login(await user_parameters(user_data['username'], user_data["password"]))
     except Exception as e:
         print(str(e))
@@ -138,7 +138,7 @@ async def register(user_data: dict = Depends(user_parameters_extra)):
 
 @api_router.post('/api/login/', response_model=schema.User)
 async def login(user_data: dict = Depends(user_parameters)):
-    user = await UsersDb.login_user(**user_data)
+    user = await UserDb.login_user(**user_data)
     return JSONResponse(jsonable_encoder(user))
 
 

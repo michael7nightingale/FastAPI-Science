@@ -3,6 +3,7 @@ __pycache__
 .idea
 .env
 .vs/
-
+env
+venv_ste
 
 

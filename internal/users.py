@@ -10,7 +10,7 @@ from starlette.responses import RedirectResponse, FileResponse
 from starlette.templating import Jinja2Templates
 
 from package.exceptions import NotAuthenticatedException
-from package.database import UsersDb as UDb, session, Users, HistoryDb as HDb
+from package import database
 from package import schema
 from configuration.logger import logger
 from package import tables
@@ -19,9 +19,9 @@ from package import tables
 users_router = APIRouter(
     prefix='/accounts'
 )
-session = session()
-UsersDb = UDb(session)
-HistoryDb = HDb(session)
+session = database.session()
+UserDb = database.UserDb(session)
+HistoryDb = database.HistoryDb(session)
 templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/users/')
 
 HISTORY_DIR = '/public/static/data/'
@@ -38,10 +38,10 @@ loginManager = LoginManager(
 
 @loginManager.user_loader()
 async def get_user_from_db(username: str):
-    return await UsersDb.get_user(username)
+    return await UserDb.get_user(username)
 
 
-async def get_current_user(request: Request):
+async def get_current_user(request: Request) -> database.User:
     token = request.cookies.get('access-token')
     if token is not None:
         try:
@@ -133,7 +133,7 @@ async def login_post(
         user_schema: schema.LoginUser = Depends(user_login_parameters), 
 
     ):
-    user: Users = await UsersDb.login_user(user_schema)
+    user: database.Users = await UserDb.login_user(user_schema)
     if user is not None:
         user_access_token = loginManager.create_access_token(
             data=user.as_dict(),
@@ -164,7 +164,7 @@ async def register_post(
         request: Request,
         user_schema: schema.RegisterUser = Depends(user_register_parameters)
     ):
-    user = await UsersDb.create_user(user_schema)
+    user = await UserDb.create_user(user_schema)
     return login_redirect()
 
 
@@ -177,13 +177,19 @@ async def logout(request: Request):
 
 @users_router.get('/{username}/')
 @permission(permissions=())
-async def cabinet(request: Request, user=None, username: str = Path()):
+async def cabinet(
+        request: Request,
+        user=None,
+        username: str = Path()
+    ):
     if user.username == username:
-        context = {'request': request,
-                   "user": user}
+        context = {
+            'request': request,
+            "user": user
+        }
         return templates.TemplateResponse("personal_cabinet.html", context=context)
     else:
-        raise HTTPException(status_code=403)
+        raise HTTPException(status_code=403, detail='Unauthorized.')
 
 
 @users_router.get('/history')
@@ -192,10 +198,12 @@ async def history(request: Request,
                   user=None,):
     delete_history_csv(user.id)
     history_list = await HistoryDb.get_history(user.id)
-    context = {"title": "История вычислений",
-               "history": history_list,
-               "user": user,
-               'request': request}
+    context = {
+        "title": "История вычислений",
+        "history": history_list,
+        "user": user,
+        'request': request
+    }
     return templates.TemplateResponse("history.html", context=context)
 
 
@@ -204,11 +212,13 @@ async def history(request: Request,
 async def history_download(
         request: Request,
         user=None,
-        filename: str = Form()):
+        filename: str = Form()
+    ):
     history_list = await HistoryDb.get_history(user.id)
     filepath = os.getcwd() + HISTORY_DIR + f'{user.id}.csv'
     table = tables.CsvTableManager(filepath)
     history_list = [i.as_dict() for i in history_list]
+
     if history_list:
         table.init_data(history_list[0].keys())
         for line in history_list:
@@ -233,6 +243,6 @@ def delete_history_csv(user_id: int):
 async def history_delete(
         request: Request,
         user=None
-):
+    ):
     await HistoryDb.delete_history(user.id)
     return RedirectResponse(url=users_router.url_path_for('history'), status_code=303)

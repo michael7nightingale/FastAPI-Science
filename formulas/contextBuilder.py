@@ -1,79 +1,92 @@
-from typing import Optional
-
+import datetime
 import numpy as np
 import logging
-from numpy import pi, e
+from functools import lru_cache
+from numpy import pi, e, cos, sin     # for eval()
 
+from formulas import counter
+from formulas.metadata import storage
 from package import database
 from package import schema
-from formulas import jsonGetParams
-from formulas import counter
+
+
+
+ses = database.session()
+formulaDB = database.FormulaDb(ses)
+historyDB = database.HistoryDb(ses)
+
 
 
 # логирование
 logger = logging.getLogger(__name__)
 
-HistoryDb = database.HistoryDb(database.session())
-MathemParameters = jsonGetParams.Parameters('mathem')
-PhysicsParameters = jsonGetParams.Parameters('phy')
 
-
-async def build_template(request_schema: Optional[schema.RequestSchema], user_id, formula_name, science_name):
+async def build_template(request: schema.RequestSchema, formula_slug: str, science_slug: str):
     # получение параметров
-    find_mark = 'x'
+    formula_obj = storage[formula_slug]
+    params = formula_obj.literals
+    args = formula_obj.args
+    find_mark = args[0]
     _history = 'Вы не зарегистрированы'
     result = ''
     message = ""
-    if science_name == 'physics':
-        params, constants, functions, args = PhysicsParameters.get_params(name=formula_name)
-    elif science_name == 'mathem':
-        params, constants, functions, args = MathemParameters.get_params(name=formula_name)
-    logger.debug(f"Getting formula params by name: {formula_name}")
+
+    logger.debug(f"Getting formula params by name: {formula_slug}")
+
     try:
         # переменные, которые могут поменяться если будет POST метод
-        if request_schema.method == "POST":
+        if request.method == "POST":
             # параметры для шаблона
-            find_mark = request_schema.find_mark
+            find_mark = request.find_mark
             # параметры для вычисления
-            nums_comma = request_schema.nums_comma
-            pattern = params[find_mark]['pattern']
+            nums_comma = int(request.nums_comma)
             nums = np.array([], dtype='float16')
             si = np.array([], dtype='float16')
-            for arg in args.replace(find_mark, ''):
-                nums = np.append(nums, eval(request_schema.data[arg]))
-                si = np.append(si, float(params[arg]["INFO"]['si'].get(request_schema.data.get(f"{arg}si"), 1)))
+            find_args = tuple(filter(lambda x: x != find_mark, formula_obj.args))
+
+            for arg in find_args:
+                nums = np.append(nums, eval(request.data[arg]))
+                si = np.append(si, float(params[arg].si[request.data[f"{arg}si"]]))
             logger.debug("Setting calculation data SUCCESS")
+
             # считать результат
-            result = counter.counter(num_vector=nums * si,
-                                         pattern=pattern,
-                                         nums_comma=nums_comma,
-                                         constants=constants,
-                                         functions=functions,
-                                         pattern_args=args.replace(find_mark, ''))
+            result = formula_obj.match(
+                **dict(zip(find_args, nums * si))
+            )[0]
+            result = round(result, nums_comma)
             logger.debug(f"Calculating SUCCESS with result: {result}")
+
         # заносить результат в историю
-        if request_schema.method == "POST":
-            if user_id is not None:
-                historySchema = schema.HistorySchema(result=result,
-                                                     formula=params[find_mark]['formula'],
-                                                     user_id=user_id,
-                                                     formula_url=request_schema.url,
-                                                     date_time=database.nowTime())
-                _history = await HistoryDb.form_history(historySchema)
+            if request.user_id is not None:
+                history_schema = schema.HistorySchema(
+                    formula_url=request.url, 
+                    date_time=str(datetime.datetime.now()),
+                    formula=formula_obj.formula,
+                    result=str(result),
+                    user_id=request.user_id
+                )
+                await historyDB.form_history(history_schema)
+
     except (SyntaxError, NameError):
         message = "Невалидные данные."
     except TypeError:
         message = "Ожидаются рациональные числа."
     except ZeroDivisionError:
         message = "На ноль делить нет смысла."
+    except ArithmeticError:
+        message = "Вычислительно невозможное выражение"
+
     logger.debug("Forming history SUCCESS")
     logger.debug("Building context SUCCESS")
-    tab_div, tab_content_div = await build_html(params=params,
-                                              constants=constants,
-                                              args=args,
-                                              url=request_schema.url,
-                                              result=str(result),
-                                              find_mark=find_mark)
+
+    tab_div, tab_content_div = await build_html(
+        params=params,
+        args=formula_obj.args,
+        url=request.url,
+        result=str(result),
+        find_mark=find_mark
+    )
+
     # контекст шаблона
     return {
         "tab_div": tab_div,
@@ -83,24 +96,24 @@ async def build_template(request_schema: Optional[schema.RequestSchema], user_id
     }
 
 
-async def build_html(params: dict,
-               constants: dict,
-               args: str,
-               url: str,
-               find_mark: str,
-               result: str = ""):
+async def build_html(
+        params: dict,
+        args: tuple,
+        url: str,
+        find_mark: str,
+        result: str = ""
+    ):
     tab_div = ""
     tab_content_divs = ""
     # формирование шаблона в питончике удобнее
     for find_ in args:
         # форматирование тега табов
         # если это обычный литерал
-        # [find_]['literal']
-        if find_ not in constants:
+        if not params[find_].is_constant:
             if find_ == find_mark:
-                tab_div += f"""<button class="tablinks active" onclick="openCity(event, 'tab_{find_}')">Найти {params[find_]['literal']}</button>"""
+                tab_div += f"""<button class="tablinks active" onclick="openCity(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
             else:
-                tab_div += f"""<button class="tablinks" onclick="openCity(event, 'tab_{find_}')">Найти {params[find_]['literal']}</button>"""
+                tab_div += f"""<button class="tablinks" onclick="openCity(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
         # формирование форм для каждого таб контента
         style = "style=\"display: none;\"" if find_ != find_mark else ""
         find_tab_content = (f"<div id=\"tab_{find_}\" class=\"tabcontent white_text\" {style}>\n"
@@ -119,12 +132,19 @@ async def build_html(params: dict,
                             "<option value=\"8\">8</option>\n"
                             "<option value=\"9\">9</option>\n"
                             "</select>")
-        for formula_argument in args.replace(find_, ''):
-            formula_argument_literal = params[formula_argument]["literal"]
+        for formula_argument in filter(lambda x: x != find_mark, args):
+            formula_argument_literal = params[formula_argument].literal
             options_tab = ""
-            for ed in params[formula_argument]['INFO']['si']:
+            for ed in params[formula_argument].si:
                 options_tab += f"<option value=\"{ed}\">{ed}</option>\n"
-            if formula_argument not in constants:
+            if params[formula_argument].is_constant:
+                formula_argument_value = params[formula_argument].value
+                find_tab_content += ("<div class=\"form\">\n"
+                                     f"<input type=\"text\" placeholder=\"{formula_argument_literal}= {formula_argument_value}\" value=\"{formula_argument_value}\" name=\"{formula_argument}\" class=\"form-control\" >\n"
+                                     f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
+                                     f"{options_tab}"
+                                     "</select></div>\n")
+            else:
                 find_tab_content += ("<div class=\"form\">\n"
                                      f"<input type=\"text\" placeholder=\"{formula_argument_literal} = \"  name=\"{formula_argument}\" class=\"form-control\" >\n"
                                      f"<label for=\"{formula_argument}si\">Ед.измерения:</label>\n"
@@ -132,24 +152,17 @@ async def build_html(params: dict,
                                      f"{options_tab}"
                                      "</select>\n"
                                      "</div>")
-            else:
-                formula_argument_value = params[formula_argument]["INFO"]["value"]
-                find_tab_content += ("<div class=\"form\">\n"
-                                     f"<input type=\"text\" placeholder=\"{formula_argument_literal}= {formula_argument_value}\" value=\"{formula_argument_value}\" name=\"{formula_argument}\" class=\"form-control\" >\n"
-                                     f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
-                                     f"{options_tab}"
-                                     "</select></div>\n")
-
+                
         # закрываем тег таб контента для данного искомого аргумента
         if find_ == find_mark:
             find_tab_content += (f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
                                  "<input type=\"submit\">\n"
-                                 f"<h4 class=\"text\" style='color: green'>{params[find_]['literal']} = {result}</h4>\n"
+                                 f"<h4 class=\"text\" style='color: green'>{params[find_].literal} = {result}</h4>\n"
                                  "</form></div>")
         else:
             find_tab_content += (f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
                                  "<input type=\"submit\">\n"
-                                 f"<h4 class=\"text\">{params[find_]['literal']} = ...</h4>\n"
+                                 f"<h4 class=\"text\">{params[find_].literal} = ...</h4>\n"
                                  "</form></div>")
         tab_content_divs += find_tab_content
     return tab_div, tab_content_divs
