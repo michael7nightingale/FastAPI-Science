@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.append(os.getcwd())
+
 from fastapi import FastAPI
 import uvicorn
 from configuration.server import Server
@@ -14,4 +19,4 @@ if __name__ == "__main__":
        app=create_app(), 
        port=8000, 
        host='localhost'
-        )
+     )

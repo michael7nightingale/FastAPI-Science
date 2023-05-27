@@ -136,7 +136,7 @@ async def register(user_data: dict = Depends(user_parameters_extra)):
         raise HTTPException(status_code=402, detail="Register Failed")
 
 
-@api_router.post('/api/login/', response_model=schema.UserInSchema)
+@api_router.post('/api/login/', response_model=schema.User)
 async def login(user_data: dict = Depends(user_parameters)):
     user = await UsersDb.login_user(**user_data)
     return JSONResponse(jsonable_encoder(user))

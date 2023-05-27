@@ -13,14 +13,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from passlib.hash import django_pbkdf2_sha256
 
 from package import schema
-create_engine
+
+
 load_dotenv()
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
 ECHO = False
 FUTURE = True
 EXPIRE_ON_COMMIT = False
+
 engine = create_async_engine(
     f"postgresql+asyncpg://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}/{os.getenv('DATABASE_NAME')}",
     echo=ECHO,
@@ -118,44 +122,30 @@ def unfined(f):
 class UsersDb(DbInterface):
     __slots__ = ()
 
-    async def create_user(self, username: str,
-                          email: str,
-                          password: str) -> Users:
-        user = Users(username=username,
-                     email=email,
-                     hasw_psw=django_pbkdf2_sha256.hash(password),
-                     last_login=nowTime(),
-                     joined=nowTime()
+    async def create_user(self, user_schema: schema.RegisterUser) -> Users:
+        psw = user_schema.password
+        hashed_pws = django_pbkdf2_sha256.hash(psw)
+        user_schema.password = hashed_pws
+        user = Users(
+            **user_schema.dict(),
+            last_login=nowTime(),
+            joined=nowTime()
         )
         self.db_session.add(user)
         await self.db_session.commit()
         return user
 
     @unfined
-    async def login_user(self, username: str, password: str):
-        res = await self.db_session.execute(select(Users).where(Users.username == username))
+    async def login_user(self, user_schema: schema.LoginUser):
+        res = await self.db_session.execute(select(Users).where(Users.username == user_schema.username))
         user = res.first()[0]
         if user:
-            if django_pbkdf2_sha256.verify(password, user.hasw_psw):
+            if django_pbkdf2_sha256.verify(user_schema.password, user.hasw_psw):
                 user.last_login = nowTime()
                 self.db_session.add(user)
                 await self.db_session.commit()
                 return user
 
-    # @singledispatchmethod
-    # async def get_user(self, identifier: object):
-    #     res = await self.db_session.execute(select(Users).where(Users.id == identifier))
-    #     return res.first()[0]
-    #
-    # @get_user.register
-    # async def _(self, id_: int):
-    #     res = await self.db_session.execute(select(Users).where(Users.id == id_))
-    #     return res.first()[0]
-    #
-    # @get_user.register
-    # async def _(self, username: str):
-    #     res = await self.db_session.execute(select(Users).where(Users.username == username))
-    #     return res.first()[0]
 
     async def get_user(self, identifier):
         if isinstance(identifier, int):
@@ -165,6 +155,7 @@ class UsersDb(DbInterface):
         else:
             raise HTTPException(status_code=500)
         return res.first()[0]
+
 
     async def delete_user(self, id_: int):
         Users.query.get(id_).delete()
@@ -271,29 +262,6 @@ class ScienceDb(DbInterface):
 
 class CategoriesDb(DbInterface):
     __slots__ = ()
-    # @singledispatchmethod
-    # async def get_category(self, identifier: object):
-    #     res = await self.db_session.execute(select(Categories).where(Categories.id == identifier))
-    #     cat = res.first()
-    #     if cat is not None:
-    #         return cat[0]
-    #     raise HTTPException(status_code=404)
-    #
-    # @get_category.register
-    # async def _(self, id_: int):
-    #     res = await self.db_session.execute(select(Categories).where(Categories.id == id_))
-    #     cat = res.first()
-    #     if cat is not None:
-    #         return cat[0]
-    #     raise HTTPException(status_code=404)
-    #
-    # @get_category.register
-    # async def _(self, slug: str):
-    #     res = await self.db_session.execute(select(Categories).where(Categories.slug == slug))
-    #     cat = res.first()
-    #     if cat is not None:
-    #         return cat[0]
-    #     raise HTTPException(status_code=404)
 
     async def get_category(self, identifier):
         if isinstance(identifier, str):

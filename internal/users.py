@@ -11,7 +11,7 @@ from starlette.templating import Jinja2Templates
 
 from package.exceptions import NotAuthenticatedException
 from package.database import UsersDb as UDb, session, Users, HistoryDb as HDb
-from package.schema import UserInSchema
+from package import schema
 from configuration.logger import logger
 from package import tables
 
@@ -96,16 +96,28 @@ def permission(permissions: tuple):
     return decorator
 
 
-async def user_parameters(username: str = Form(),
-                          password: str = Form()):
-    return {"username": username,
-            "password": password}
+async def user_login_parameters(
+        request: Request, 
+        #username: str = Form(default=""),
+        #password: str = Form(default=""), 
+
+    ) -> schema.LoginUser:
+    form_data = await request.form()
+    print(form_data)
+    return schema.LoginUser(**form_data)
+    #return schema.LoginUser(username=username, password=password)
 
 
-async def user_parameters_extra(parameters: dict = Depends(user_parameters),
-                                email: str = Form()):
-    parameters.update({"email": email})
-    return parameters
+async def user_register_parameters(
+        request: Request,
+        #parameters: dict = Depends(user_login_parameters),
+        #email: str = Form()
+    ) -> schema.RegisterUser:
+    form_data = await request.form()
+    print(form_data)
+    return schema.RegisterUser(**form_data)
+    #parameters.update({"email": email})
+    #return parameters
 
 
 # =================================== USERS ============================ #
@@ -116,30 +128,44 @@ async def login(request: Request):
 
 
 @users_router.post('/login')
-async def login_post(request: Request,
-                     user_data: dict = Depends(user_parameters)):
-    user: Users = await UsersDb.login_user(user_data["username"],
-                                           user_data['password'])
-    user_access_token = loginManager.create_access_token(data=UserInSchema(**user.as_dict()).dict(),
-                                                         expires=timedelta(hours=12))
-    response = RedirectResponse(url="/", status_code=303)
-    loginManager.set_cookie(response, user_access_token)
-    request.state.user = user
-    request.cookies['access-token'] = user_access_token
-    return response
+async def login_post(
+        request: Request,
+        user_schema: schema.LoginUser = Depends(user_login_parameters), 
+
+    ):
+    user: Users = await UsersDb.login_user(user_schema)
+    if user is not None:
+        user_access_token = loginManager.create_access_token(
+            data=user.as_dict(),
+            expires=timedelta(hours=12)
+        )
+        response = RedirectResponse(url="/", status_code=303)
+        loginManager.set_cookie(response, user_access_token)
+        request.state.user = user
+        request.cookies['access-token'] = user_access_token
+        return response
+    return login_redirect()
+
+
+def login_redirect():
+     return RedirectResponse(users_router.url_path_for("login"), status_code=303)
 
 
 @users_router.get("/register")
-async def register(request: Request,
-                   user=None):
+async def register(
+        request: Request,
+
+    ):
     return templates.TemplateResponse('register.html', context={"request": request,})
 
 
 @users_router.post("/register")
-async def register_post(request: Request,
-                        user_data: dict = Depends(user_parameters_extra)):
-    user = await UsersDb.create_user(**user_data)
-    return RedirectResponse(users_router.url_path_for('login'), status_code=303)
+async def register_post(
+        request: Request,
+        user_schema: schema.RegisterUser = Depends(user_register_parameters)
+    ):
+    user = await UsersDb.create_user(user_schema)
+    return login_redirect()
 
 
 @users_router.get('/logout')

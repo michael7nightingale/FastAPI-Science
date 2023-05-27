@@ -1,13 +1,11 @@
 from enum import Enum
-from typing import Optional
-
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 from datetime import datetime
 
 
-class UserInSchema(BaseModel):
-    username: str
-    email: str
+class User(BaseModel):
+    username: str = Field(min_length=5, max_length=40)
+    email: str = Field(min_length=5, max_lenght=40)
 
     @classmethod
     @validator('email')
@@ -20,8 +18,17 @@ class UserInSchema(BaseModel):
         raise ValueError("Email is not correct")
 
 
-class UserSchema(UserInSchema):
-    password: str
+class LoginUser(BaseModel):
+     username: str = Field(min_length=5, max_length=40)
+     password: str = Field(min_length=5, max_length=40)
+
+
+class RegisterUser(LoginUser):
+    email: str = Field(min_length=5, max_lenght=40)
+
+
+class UserInDB(User):
+    hashed_password: str = Field(min_length=5, max_length=40)
     last_login: datetime
     joined: datetime
 
@@ -40,12 +47,12 @@ class HistorySchema(BaseModel):
 
 
 class RequestSchema(BaseModel):
-    user_id: Optional[int] = None
+    user_id: int| None = None
     method: str
     url: str
-    find_mark: Optional[str] = None
-    nums_comma: Optional[int] = None
-    data: Optional[dict] = None
+    find_mark: str | None = None
+    nums_comma: int | None = None
+    data: dict | None = None
 
 
 

@@ -1,8 +1,10 @@
 import os
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi_login import LoginManager
 from fastapi.templating import Jinja2Templates
+
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
