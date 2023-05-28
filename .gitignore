@@ -1,9 +1,7 @@
-venv_ste
 __pycache__
 .idea
 .env
 .vs/
-env
-venv_ste
+venv_site
 
 
