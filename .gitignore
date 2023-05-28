@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 venv_site/
 
 __pycache__/
@@ -9,3 +10,12 @@ env/
 .idea/
 .env
 .vs/
+=======
+__pycache__
+.idea
+.env
+.vs/
+venv_site
+
+
+>>>>>>> f678ad6abb2c3df3917495201363b735a2fa5898
