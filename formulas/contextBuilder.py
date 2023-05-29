@@ -132,7 +132,7 @@ async def build_html(
                             "<option value=\"8\">8</option>\n"
                             "<option value=\"9\">9</option>\n"
                             "</select>")
-        for formula_argument in filter(lambda x: x != find_mark, args):
+        for formula_argument in filter(lambda x: x != find_, args):
             formula_argument_literal = params[formula_argument].literal
             options_tab = ""
             for ed in params[formula_argument].si:

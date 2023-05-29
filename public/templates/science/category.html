@@ -10,7 +10,7 @@
                  {% for f in formulas %}
                  <a class="" href="{{ url_for('science_formula', formula_slug=f.slug, science_slug=science_slug) }}">
 
-                     <h3 class="">{{ f.slug}}</h3>
+                     <h3 class="">{{ f.title }}</h3>
                  </a>
                 {% endfor %}
                 </div>

@@ -13,11 +13,14 @@
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
     <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
         <a href="{{ url_for('homepage') }}" >
-          <img src="/app/public/static/images/logo.png" class="nav-logo" width=17% height="10%">
+          <img src="/public/static/images/logo.png" class="nav-logo" width=17% height="10%">
         </a>
 
         <nav class="my-2 my-md-0 mr-md-4">
-
+    <a href="{{ url_for('github_redirect') }}">
+                Edit me
+                <img alt="" src="/public/static/images/github.png" class="nav-logo" width=10% height="10%">
+            </a>
              {% if request.cookies['access-token'] %}
             <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Главная</a>
                  <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Поиск</a>

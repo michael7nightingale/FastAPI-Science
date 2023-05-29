@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import passlib
 from fastapi import HTTPException
 from starlette.requests import Request
-from sqlalchemy import String, Integer, Column, Text, Boolean, select, create_engine, delete
+from sqlalchemy import String, Integer, Column, Text, Boolean, select, delete, Table
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,10 +25,10 @@ ECHO = False
 FUTURE = True
 EXPIRE_ON_COMMIT = False
 
-DATABASE_USER = os.getenv('DATABASE_USER')
-DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-DATABASE_HOST = os.getenv('DATABASE_HOST')
-DATABASE_NAME = os.getenv('DATABASE_NAME')
+DATABASE_USER = os.getenv('DB_USER')
+DATABASE_PASSWORD = os.getenv('DB_PASSWORD')
+DATABASE_HOST = os.getenv('DB_HOST')
+DATABASE_NAME = os.getenv('DB_NAME')
 
 
 engine = create_async_engine(
@@ -43,6 +43,8 @@ Base = declarative_base()
 
 
 class TableMixin:
+    __table__: Table
+
     def as_dict(self) -> dict:
         return {i.name: getattr(self, i.name) for i in self.__table__.columns}
 
@@ -106,12 +108,14 @@ class History(Base, TableMixin):
 
 class DbInterface:
     __slots__ = ('__db_session', )
+
     def __init__(self, db_session: AsyncSession):
         self.__db_session = db_session
 
     @property
     def db_session(self):
         return self.__db_session
+
 
 def nowTime() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -153,7 +157,6 @@ class UserDb(DbInterface):
                 await self.db_session.commit()
                 return user
 
-
     async def get_user(self, identifier):
         if isinstance(identifier, int):
             res = await self.db_session.execute(select(User).where(User.id == identifier))
@@ -162,7 +165,6 @@ class UserDb(DbInterface):
         else:
             raise HTTPException(status_code=500)
         return res.first()[0]
-
 
     async def delete_user(self, id_: int):
         User.query.get(id_).delete()
@@ -187,6 +189,7 @@ class UserDb(DbInterface):
 
 class HistoryDb(DbInterface):
     __slots__ = ()
+
     async def form_history(self, data: schema.HistorySchema):
         history = History(**data.dict())
         self.db_session.add(history)
@@ -258,6 +261,7 @@ class FormulaDb(DbInterface):
 
 class ScienceDb(DbInterface):
     __slots__ = ()
+
     async def get_science(self, slug: str):
         res = await self.db_session.execute(select(Science).where(Science.slug == slug))
         return res.first()[0]
@@ -287,7 +291,6 @@ class CategoryDb(DbInterface):
         return [i[0] for i in res.all()]
 
 
-
 async def main():
     userdb = UserDb(session())
     await userdb.create_user('michael', 'suslan@mail.ru', 'password')
@@ -299,6 +302,64 @@ async def create_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
+async def drop_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all,)
+
+
+import csv
+
+
+async def dump_data_category():
+    with open('d:/KING/science_category.csv', encoding='utf-8') as file:
+        data = list(csv.DictReader(file))
+    ses = session()
+
+    for line in data:
+        line['id'] = int(line['id'])
+        line['category_name'] = line['title']
+        del line['title']
+        science = await ses.execute(select(Science).where(Science.id == int(line['science_id'])))
+        s_slug = science.first()[0].slug
+        del line['science_id']
+        line['super_category'] = s_slug
+        obj = Category(**line)
+        ses.add(obj)
+        await ses.commit()
+
+    return True
+
+
+async def dump_data_science():
+    with open('d:/KING/science_science.csv', encoding='utf-8') as file:
+        data = list(csv.DictReader(file))
+    ses = session()
+
+    for line in data:
+        line['id'] = int(line['id'])
+        obj = Science(**line)
+        ses.add(obj)
+        await ses.commit()
+
+    return True
+
+
+async def dump_data_formula():
+    with open('d:/KING/science_formula.csv', encoding='utf-8') as file:
+        data = list(csv.DictReader(file))
+    ses = session()
+
+    for line in data:
+        line['id'] = int(line['id'])
+        line['category_id'] = int(line['category_id'])
+        obj = Formula(**line)
+        ses.add(obj)
+        await ses.commit()
+
+    return True
+
+
 if __name__ == "__main__":
     # asyncio.run(create_db())
+    # asyncio.run(dump_data_formula())
     ...

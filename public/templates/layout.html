@@ -17,7 +17,10 @@
         </a>
 
         <nav class="my-2 my-md-0 mr-md-4">
-
+            <a href="{{ url_for('github_redirect') }}">
+                Edit me
+                <img alt="" src="/public/static/images/github.png" class="nav-logo" width=10% height="10%">
+            </a>
              {% if request.cookies['access-token'] %}
             <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Главная</a>
                  <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Поиск</a>

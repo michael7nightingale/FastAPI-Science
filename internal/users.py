@@ -15,7 +15,6 @@ from package import schema
 from configuration.logger import logger
 from package import tables
 
-
 users_router = APIRouter(
     prefix='/accounts'
 )
@@ -34,6 +33,10 @@ loginManager = LoginManager(
     default_expiry=timedelta(hours=12),
 
 )
+
+GITHUB_CLIENT_ID = os.environ.get("GITHUB_CLIENT_ID")
+
+GITHUB_LOGIN_URL = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}"
 
 
 @loginManager.user_loader()
@@ -68,29 +71,49 @@ async def is_stuff(request: Request):
         return user if user.is_stuff else None
 
 
+async def is_accessed(request: Request):
+    return "access-token" in request.cookies
+
+
 @lru_cache(maxsize=64)
 def permission(permissions: tuple):
-    __permissions = ('superuser', 'stuff')
+    __permissions = ('superuser', 'stuff', 'token', 'user')
+
     def decorator(func: Callable):
         @wraps(func)
-        async def inner(request: Request, user, *args, **kwargs):
+        async def inner(request: Request, user=None, **kwargs):
             nonlocal __permissions
-            if not all(perm in __permissions for perm in permissions):
-                raise HTTPException(status_code=403, detail='Permission denied')
-            for i in set(permissions):
-                if user is None:
-                    if i == 'stuff':
-                        user = await is_stuff(request)
-                    elif i == 'superuser':
-                        user = await is_superuser(request)
-            if user is None:
-                if permissions:
+            assert all(perm in __permissions for perm in permissions), f"There is not such permissions: {permissions}"
+            if "token" in permissions:
+                assert len(permissions) == 1, f"Ridiculous permissions: {permissions}"
+
+            if any(i in permissions for i in __permissions[:2]):       # if permissions are set
+                for i in set(permissions):
+                    if user is None:    # while there is no matching permission
+                        if i == 'stuff':
+                            user = await is_stuff(request)
+                        elif i == 'superuser':
+                            user = await is_superuser(request)
+
+                if user is None:    # no matching user permission
                     raise HTTPException(status_code=403, detail='Permission denied')
+
+            elif "user" in permissions:   # if just to check user in db
+                user = await get_current_user(request)
+                if user is None:
+                    return login_redirect()
+
+            elif "token" in permissions:     # if just to check token
+                user = await is_accessed(request)
+                if user:
+                    user = None
                 else:
-                    user = await get_current_user(request)
-                    if user is None:
-                        return RedirectResponse(url=users_router.url_path_for('login'), status_code=303)
-            res = await func(request, user, *args, **kwargs)
+                    return login_redirect()
+
+
+
+            res = await func(request=request, user=user, **kwargs)
+
             return res
         return inner
     return decorator
@@ -120,6 +143,24 @@ async def user_register_parameters(
     #return parameters
 
 
+# =================================== OAUTH ============================ #
+
+@users_router.get('/github-login/')
+async def github_login(request: Request):
+    """Login with GitHub."""
+    return RedirectResponse(GITHUB_LOGIN_URL, status_code=303)
+
+
+@users_router.get("/github-got")
+async def github_get(request: Request, code: str):
+    """Add access token from GitHub to cookies"""
+    response = RedirectResponse(url='/', status_code=303)
+    loginManager.set_cookie(response, token=code)
+    request.cookies['access-token'] = code
+
+    return response
+
+
 # =================================== USERS ============================ #
 
 @users_router.get("/login")
@@ -133,7 +174,7 @@ async def login_post(
         user_schema: schema.LoginUser = Depends(user_login_parameters), 
 
     ):
-    user: database.Users = await UserDb.login_user(user_schema)
+    user: database.User = await UserDb.login_user(user_schema)
     if user is not None:
         user_access_token = loginManager.create_access_token(
             data=user.as_dict(),
@@ -148,7 +189,8 @@ async def login_post(
 
 
 def login_redirect():
-     return RedirectResponse(users_router.url_path_for("login"), status_code=303)
+    """Just a function to avoid writing redirect every time"""
+    return RedirectResponse(users_router.url_path_for("login"), status_code=303)
 
 
 @users_router.get("/register")
@@ -170,13 +212,14 @@ async def register_post(
 
 @users_router.get('/logout')
 async def logout(request: Request):
+    """Logout user"""
     response = RedirectResponse(url='/', status_code=303)
     response.delete_cookie(key='access-token')
     return response
 
 
 @users_router.get('/{username}/')
-@permission(permissions=())
+@permission(permissions=("user", ))
 async def cabinet(
         request: Request,
         user=None,
@@ -193,7 +236,7 @@ async def cabinet(
 
 
 @users_router.get('/history')
-@permission(permissions=())
+@permission(permissions=("user", ))
 async def history(request: Request,
                   user=None,):
     delete_history_csv(user.id)
@@ -208,7 +251,7 @@ async def history(request: Request,
 
 
 @users_router.post('/download_history')
-@permission(permissions=())
+@permission(permissions=("user", ))
 async def history_download(
         request: Request,
         user=None,
@@ -239,7 +282,7 @@ def delete_history_csv(user_id: int):
 
 
 @users_router.post('/delete_history')
-@permission(permissions=())
+@permission(permissions=("user", ))
 async def history_delete(
         request: Request,
         user=None
