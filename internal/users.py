@@ -123,12 +123,9 @@ async def user_login_parameters(
         request: Request, 
         #username: str = Form(default=""),
         #password: str = Form(default=""), 
-
     ) -> schema.LoginUser:
     form_data = await request.form()
-    print(form_data)
     return schema.LoginUser(**form_data)
-    #return schema.LoginUser(username=username, password=password)
 
 
 async def user_register_parameters(
@@ -137,10 +134,7 @@ async def user_register_parameters(
         #email: str = Form()
     ) -> schema.RegisterUser:
     form_data = await request.form()
-    print(form_data)
     return schema.RegisterUser(**form_data)
-    #parameters.update({"email": email})
-    #return parameters
 
 
 # =================================== OAUTH ============================ #

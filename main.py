@@ -1,22 +1,35 @@
 import sys
 import os
-
 sys.path.append(os.getcwd())
-
-from fastapi import FastAPI
 import uvicorn
-from configuration.server import Server
-from internal.users import loginManager
+
+from package.database import dump_database
+from configuration.server import create_app
 
 
-def create_app(_=None) -> FastAPI:
-    app = FastAPI()
-    return Server(app, loginManager).app
+def runserver():
+    uvicorn.run(
+        app="main:create_app",
+        port=8000,
+        host='localhost',
+        reload=True,
+
+     )
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-       app=create_app(), 
-       port=8000, 
-       host='localhost', 
-     )
+    args = sys.argv[1:]
+    assert len(args) == 1, "Only one option is allowed."
+
+    options = {'runserver', 'dumpdata'}
+    opt = args[0]
+
+    assert opt in options, "There is not such an option: {}. \nAllowed:\n\t-{}".format(opt, "\n\t-".join(options))
+
+    match opt:
+        case "runserver":
+            runserver()
+        case "dumpdata":
+            dump_database()
+
+

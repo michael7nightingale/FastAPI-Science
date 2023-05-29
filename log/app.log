@@ -9822,3 +9822,358 @@
 2023-05-29 09:42:14,677   |   INFO   |   Registering login manager...
 2023-05-29 09:42:14,677   |   INFO   |   Registering routes...
 2023-05-29 09:42:15,021   |   INFO   |   Updated formulas database info!
+2023-05-29 09:43:20,828   |   INFO   |   Load main Page
+2023-05-29 09:43:21,012   |   ERROR   |   
+2023-05-29 09:43:30,096   |   INFO   |   Load main Page
+2023-05-29 09:43:30,238   |   ERROR   |   
+2023-05-29 09:43:31,542   |   ERROR   |   
+2023-05-29 09:43:33,267   |   ERROR   |   
+2023-05-29 09:43:34,827   |   ERROR   |   
+2023-05-29 09:43:38,247   |   ERROR   |   
+2023-05-29 09:43:42,923   |   ERROR   |   
+2023-05-29 09:43:44,142   |   INFO   |   Load main Page
+2023-05-29 09:43:44,239   |   ERROR   |   
+2023-05-29 09:43:46,462   |   ERROR   |   
+2023-05-29 09:43:47,690   |   ERROR   |   
+2023-05-29 09:43:48,902   |   ERROR   |   
+2023-05-29 09:43:51,895   |   ERROR   |   
+2023-05-29 09:43:51,923   |   ERROR   |   
+2023-05-29 09:44:33,752   |   INFO   |   Scanning directories...
+2023-05-29 09:44:33,752   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:44:33,752   |   INFO   |   Registering login manager...
+2023-05-29 09:44:33,753   |   INFO   |   Registering routes...
+2023-05-29 09:44:33,883   |   INFO   |   Updated formulas database info!
+2023-05-29 09:44:34,332   |   INFO   |   Load main Page
+2023-05-29 09:44:34,417   |   ERROR   |   
+2023-05-29 09:44:43,622   |   INFO   |   Scanning directories...
+2023-05-29 09:44:43,623   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:44:43,623   |   INFO   |   Registering login manager...
+2023-05-29 09:44:43,623   |   INFO   |   Registering routes...
+2023-05-29 09:44:43,755   |   INFO   |   Updated formulas database info!
+2023-05-29 09:44:45,684   |   INFO   |   Load main Page
+2023-05-29 09:44:45,776   |   ERROR   |   
+2023-05-29 09:46:10,577   |   INFO   |   Scanning directories...
+2023-05-29 09:46:10,578   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:46:10,578   |   INFO   |   Registering login manager...
+2023-05-29 09:46:10,578   |   INFO   |   Registering routes...
+2023-05-29 09:46:10,712   |   INFO   |   Updated formulas database info!
+2023-05-29 09:46:14,986   |   INFO   |   Load main Page
+2023-05-29 09:46:15,067   |   ERROR   |   
+2023-05-29 09:46:17,518   |   ERROR   |   
+2023-05-29 09:46:18,718   |   ERROR   |   
+2023-05-29 09:46:19,673   |   ERROR   |   
+2023-05-29 09:46:23,402   |   ERROR   |   
+2023-05-29 09:46:23,417   |   ERROR   |   
+2023-05-29 09:46:36,827   |   INFO   |   Load main Page
+2023-05-29 09:46:36,928   |   ERROR   |   
+2023-05-29 09:46:39,534   |   ERROR   |   
+2023-05-29 09:46:41,105   |   ERROR   |   
+2023-05-29 09:46:46,113   |   ERROR   |   
+2023-05-29 09:46:46,130   |   ERROR   |   
+2023-05-29 09:46:49,804   |   ERROR   |   
+2023-05-29 09:46:52,182   |   INFO   |   Load main Page
+2023-05-29 09:46:52,256   |   ERROR   |   
+2023-05-29 09:46:53,576   |   ERROR   |   
+2023-05-29 09:46:53,608   |   ERROR   |   
+2023-05-29 09:46:58,944   |   ERROR   |   
+2023-05-29 09:46:58,955   |   ERROR   |   
+2023-05-29 09:47:03,279   |   ERROR   |   
+2023-05-29 09:47:03,294   |   ERROR   |   
+2023-05-29 09:47:15,352   |   ERROR   |   
+2023-05-29 09:48:42,713   |   INFO   |   Scanning directories...
+2023-05-29 09:48:42,713   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:48:42,713   |   INFO   |   Registering login manager...
+2023-05-29 09:48:42,713   |   INFO   |   Registering routes...
+2023-05-29 09:48:42,838   |   INFO   |   Updated formulas database info!
+2023-05-29 09:48:45,244   |   ERROR   |   
+2023-05-29 09:48:46,476   |   ERROR   |   
+2023-05-29 09:48:49,534   |   ERROR   |   
+2023-05-29 09:50:03,423   |   INFO   |   Scanning directories...
+2023-05-29 09:50:03,423   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:50:03,423   |   INFO   |   Registering login manager...
+2023-05-29 09:50:03,423   |   INFO   |   Registering routes...
+2023-05-29 09:50:03,552   |   INFO   |   Updated formulas database info!
+2023-05-29 09:50:03,818   |   ERROR   |   
+2023-05-29 09:53:10,047   |   INFO   |   Scanning directories...
+2023-05-29 09:53:10,048   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:53:10,048   |   INFO   |   Registering login manager...
+2023-05-29 09:53:10,048   |   INFO   |   Registering routes...
+2023-05-29 09:53:10,178   |   INFO   |   Updated formulas database info!
+2023-05-29 09:53:15,333   |   ERROR   |   
+2023-05-29 09:53:15,347   |   ERROR   |   
+2023-05-29 09:53:18,953   |   ERROR   |   
+2023-05-29 09:53:34,854   |   INFO   |   Scanning directories...
+2023-05-29 09:53:34,855   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:53:34,855   |   INFO   |   Registering login manager...
+2023-05-29 09:53:34,855   |   INFO   |   Registering routes...
+2023-05-29 09:53:34,986   |   INFO   |   Updated formulas database info!
+2023-05-29 09:53:35,093   |   INFO   |   Load main Page
+2023-05-29 09:53:35,094   |   INFO   |   Got user with id: 1!
+2023-05-29 09:53:35,197   |   ERROR   |   
+2023-05-29 09:53:38,073   |   ERROR   |   
+2023-05-29 09:53:41,281   |   INFO   |   Got user with id: 1!
+2023-05-29 09:53:41,378   |   ERROR   |   
+2023-05-29 09:53:44,432   |   INFO   |   Got user with id: 1!
+2023-05-29 09:53:44,434   |   INFO   |   Got user with id: 1!
+2023-05-29 09:53:45,535   |   ERROR   |   
+2023-05-29 09:53:54,533   |   INFO   |   Got user with id: 1!
+2023-05-29 09:53:54,534   |   INFO   |   Got user with id: 1!
+2023-05-29 09:53:54,791   |   ERROR   |   
+2023-05-29 09:54:01,738   |   INFO   |   Got user with id: 1!
+2023-05-29 09:54:01,739   |   INFO   |   Got user with id: 1!
+2023-05-29 09:54:02,000   |   ERROR   |   
+2023-05-29 09:54:06,822   |   INFO   |   Got user with id: 1!
+2023-05-29 09:54:06,823   |   INFO   |   Got user with id: 1!
+2023-05-29 09:54:06,955   |   ERROR   |   
+2023-05-29 09:55:34,935   |   INFO   |   Scanning directories...
+2023-05-29 09:55:34,936   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:55:34,936   |   INFO   |   Registering login manager...
+2023-05-29 09:55:34,936   |   INFO   |   Registering routes...
+2023-05-29 09:55:35,066   |   INFO   |   Updated formulas database info!
+2023-05-29 09:55:35,309   |   INFO   |   Got user with id: 1!
+2023-05-29 09:55:35,310   |   INFO   |   Got user with id: 1!
+2023-05-29 09:55:35,568   |   ERROR   |   
+2023-05-29 09:55:40,636   |   INFO   |   Got user with id: 1!
+2023-05-29 09:55:40,637   |   INFO   |   Got user with id: 1!
+2023-05-29 09:55:40,773   |   ERROR   |   
+2023-05-29 09:56:28,493   |   INFO   |   Scanning directories...
+2023-05-29 09:56:28,493   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:56:28,493   |   INFO   |   Registering login manager...
+2023-05-29 09:56:28,494   |   INFO   |   Registering routes...
+2023-05-29 09:56:28,624   |   INFO   |   Updated formulas database info!
+2023-05-29 09:56:28,815   |   INFO   |   Got user with id: 1!
+2023-05-29 09:56:28,817   |   INFO   |   Got user with id: 1!
+2023-05-29 09:56:29,069   |   ERROR   |   
+2023-05-29 09:56:35,075   |   INFO   |   Got user with id: 1!
+2023-05-29 09:56:35,077   |   INFO   |   Got user with id: 1!
+2023-05-29 09:56:35,319   |   ERROR   |   
+2023-05-29 09:56:38,401   |   INFO   |   Got user with id: 1!
+2023-05-29 09:56:38,402   |   INFO   |   Got user with id: 1!
+2023-05-29 09:56:38,685   |   ERROR   |   
+2023-05-29 09:57:48,702   |   INFO   |   Scanning directories...
+2023-05-29 09:57:48,702   |   INFO   |   Scanned directories successfully!
+2023-05-29 09:57:48,703   |   INFO   |   Registering login manager...
+2023-05-29 09:57:48,703   |   INFO   |   Registering routes...
+2023-05-29 09:57:48,830   |   INFO   |   Updated formulas database info!
+2023-05-29 10:49:08,126   |   INFO   |   Scanning directories...
+2023-05-29 10:49:08,126   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:49:08,126   |   INFO   |   Registering login manager...
+2023-05-29 10:49:08,126   |   INFO   |   Registering routes...
+2023-05-29 10:49:43,654   |   INFO   |   Scanning directories...
+2023-05-29 10:49:43,654   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:49:43,655   |   INFO   |   Registering login manager...
+2023-05-29 10:49:43,655   |   INFO   |   Registering routes...
+2023-05-29 10:50:21,101   |   INFO   |   Scanning directories...
+2023-05-29 10:50:21,101   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:50:21,101   |   INFO   |   Registering login manager...
+2023-05-29 10:50:21,101   |   INFO   |   Registering routes...
+2023-05-29 10:50:21,226   |   INFO   |   Updated formulas database info!
+2023-05-29 10:50:28,969   |   INFO   |   Scanning directories...
+2023-05-29 10:50:28,970   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:50:28,970   |   INFO   |   Registering login manager...
+2023-05-29 10:50:28,970   |   INFO   |   Registering routes...
+2023-05-29 10:50:29,089   |   INFO   |   Updated formulas database info!
+2023-05-29 10:50:39,568   |   INFO   |   Got user with id: 1!
+2023-05-29 10:50:39,569   |   INFO   |   Got user with id: 1!
+2023-05-29 10:50:39,928   |   ERROR   |   
+2023-05-29 10:50:41,341   |   INFO   |   Load main Page
+2023-05-29 10:50:41,435   |   ERROR   |   
+2023-05-29 10:51:37,686   |   INFO   |   Scanning directories...
+2023-05-29 10:51:37,686   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:51:37,686   |   INFO   |   Registering login manager...
+2023-05-29 10:51:37,686   |   INFO   |   Registering routes...
+2023-05-29 10:51:37,820   |   INFO   |   Updated formulas database info!
+2023-05-29 10:51:41,064   |   INFO   |   Load main Page
+2023-05-29 10:51:41,238   |   ERROR   |   
+2023-05-29 10:51:44,264   |   ERROR   |   
+2023-05-29 10:51:44,279   |   ERROR   |   
+2023-05-29 10:51:45,659   |   INFO   |   Load main Page
+2023-05-29 10:51:45,804   |   ERROR   |   
+2023-05-29 10:51:50,850   |   INFO   |   Load main Page
+2023-05-29 10:51:50,969   |   ERROR   |   
+2023-05-29 10:51:52,883   |   ERROR   |   
+2023-05-29 10:51:52,911   |   ERROR   |   
+2023-05-29 10:51:58,032   |   INFO   |   Load main Page
+2023-05-29 10:51:58,033   |   INFO   |   Got user with id: 1!
+2023-05-29 10:51:58,102   |   ERROR   |   
+2023-05-29 10:52:01,433   |   INFO   |   Got user with id: 1!
+2023-05-29 10:52:01,468   |   ERROR   |   
+2023-05-29 10:52:01,522   |   ERROR   |   
+2023-05-29 10:52:02,841   |   INFO   |   Got user with id: 1!
+2023-05-29 10:52:02,881   |   ERROR   |   
+2023-05-29 10:52:02,943   |   ERROR   |   
+2023-05-29 10:52:57,428   |   INFO   |   Got user with id: 1!
+2023-05-29 10:52:57,499   |   ERROR   |   
+2023-05-29 10:53:00,134   |   INFO   |   Load main Page
+2023-05-29 10:53:00,136   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:00,221   |   ERROR   |   
+2023-05-29 10:53:01,609   |   ERROR   |   
+2023-05-29 10:53:03,046   |   ERROR   |   
+2023-05-29 10:53:04,053   |   ERROR   |   
+2023-05-29 10:53:06,680   |   ERROR   |   
+2023-05-29 10:53:10,243   |   ERROR   |   
+2023-05-29 10:53:13,686   |   ERROR   |   
+2023-05-29 10:53:14,496   |   ERROR   |   
+2023-05-29 10:53:15,693   |   ERROR   |   
+2023-05-29 10:53:17,477   |   ERROR   |   
+2023-05-29 10:53:18,536   |   ERROR   |   
+2023-05-29 10:53:20,839   |   ERROR   |   
+2023-05-29 10:53:21,955   |   ERROR   |   
+2023-05-29 10:53:25,513   |   ERROR   |   
+2023-05-29 10:53:30,994   |   ERROR   |   
+2023-05-29 10:53:32,822   |   INFO   |   Load main Page
+2023-05-29 10:53:32,823   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:32,890   |   ERROR   |   
+2023-05-29 10:53:35,167   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:35,241   |   ERROR   |   
+2023-05-29 10:53:36,750   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:36,824   |   ERROR   |   
+2023-05-29 10:53:41,371   |   INFO   |   Load main Page
+2023-05-29 10:53:41,372   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:41,437   |   ERROR   |   
+2023-05-29 10:53:42,919   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:43,016   |   ERROR   |   
+2023-05-29 10:53:43,994   |   INFO   |   Load main Page
+2023-05-29 10:53:43,995   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:44,059   |   ERROR   |   
+2023-05-29 10:53:44,780   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:44,848   |   ERROR   |   
+2023-05-29 10:53:45,218   |   INFO   |   Load main Page
+2023-05-29 10:53:45,219   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:45,281   |   ERROR   |   
+2023-05-29 10:53:45,595   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:45,652   |   ERROR   |   
+2023-05-29 10:53:46,410   |   INFO   |   Load main Page
+2023-05-29 10:53:46,411   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:46,491   |   ERROR   |   
+2023-05-29 10:53:47,492   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:47,548   |   ERROR   |   
+2023-05-29 10:53:49,033   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:49,095   |   ERROR   |   
+2023-05-29 10:53:51,098   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:51,103   |   INFO   |   Got user with id: 1!
+2023-05-29 10:53:51,170   |   ERROR   |   
+2023-05-29 10:54:57,266   |   INFO   |   Scanning directories...
+2023-05-29 10:54:57,266   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:54:57,266   |   INFO   |   Registering login manager...
+2023-05-29 10:54:57,266   |   INFO   |   Registering routes...
+2023-05-29 10:54:57,400   |   INFO   |   Updated formulas database info!
+2023-05-29 10:54:58,775   |   INFO   |   Load main Page
+2023-05-29 10:54:58,853   |   INFO   |   Got user with id: 1!
+2023-05-29 10:54:58,944   |   ERROR   |   
+2023-05-29 10:54:59,981   |   ERROR   |   
+2023-05-29 10:55:01,184   |   ERROR   |   
+2023-05-29 10:55:02,249   |   ERROR   |   
+2023-05-29 10:55:03,296   |   ERROR   |   
+2023-05-29 10:55:04,279   |   ERROR   |   
+2023-05-29 10:55:07,971   |   ERROR   |   
+2023-05-29 10:55:12,650   |   ERROR   |   
+2023-05-29 10:55:43,590   |   INFO   |   Scanning directories...
+2023-05-29 10:55:43,590   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:55:43,591   |   INFO   |   Registering login manager...
+2023-05-29 10:55:43,591   |   INFO   |   Registering routes...
+2023-05-29 10:55:43,712   |   INFO   |   Updated formulas database info!
+2023-05-29 10:55:43,807   |   ERROR   |   
+2023-05-29 10:55:45,267   |   ERROR   |   
+2023-05-29 10:55:48,447   |   ERROR   |   
+2023-05-29 10:56:48,934   |   INFO   |   Scanning directories...
+2023-05-29 10:56:48,934   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:56:48,935   |   INFO   |   Registering login manager...
+2023-05-29 10:56:48,935   |   INFO   |   Registering routes...
+2023-05-29 10:56:49,051   |   INFO   |   Updated formulas database info!
+2023-05-29 10:56:49,370   |   INFO   |   Got user with id: 1!
+2023-05-29 10:56:49,419   |   ERROR   |   
+2023-05-29 10:56:53,230   |   INFO   |   Got user with id: 1!
+2023-05-29 10:56:53,263   |   ERROR   |   
+2023-05-29 10:58:01,480   |   INFO   |   Scanning directories...
+2023-05-29 10:58:01,481   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:58:01,481   |   INFO   |   Registering login manager...
+2023-05-29 10:58:01,481   |   INFO   |   Registering routes...
+2023-05-29 10:58:01,606   |   INFO   |   Updated formulas database info!
+2023-05-29 10:58:01,693   |   INFO   |   Got user with id: 1!
+2023-05-29 10:58:01,738   |   ERROR   |   
+2023-05-29 10:58:04,901   |   INFO   |   Got user with id: 1!
+2023-05-29 10:58:04,944   |   ERROR   |   
+2023-05-29 10:58:26,478   |   INFO   |   Scanning directories...
+2023-05-29 10:58:26,478   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:58:26,478   |   INFO   |   Registering login manager...
+2023-05-29 10:58:26,478   |   INFO   |   Registering routes...
+2023-05-29 10:58:26,587   |   INFO   |   Updated formulas database info!
+2023-05-29 10:58:42,309   |   INFO   |   Scanning directories...
+2023-05-29 10:58:42,309   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:58:42,309   |   INFO   |   Registering login manager...
+2023-05-29 10:58:42,309   |   INFO   |   Registering routes...
+2023-05-29 10:58:42,434   |   INFO   |   Updated formulas database info!
+2023-05-29 10:58:59,649   |   INFO   |   Scanning directories...
+2023-05-29 10:58:59,649   |   INFO   |   Scanned directories successfully!
+2023-05-29 10:58:59,649   |   INFO   |   Registering login manager...
+2023-05-29 10:58:59,649   |   INFO   |   Registering routes...
+2023-05-29 10:58:59,786   |   INFO   |   Updated formulas database info!
+2023-05-29 10:59:00,474   |   INFO   |   Got user with id: 1!
+2023-05-29 10:59:00,709   |   ERROR   |   
+2023-05-29 10:59:03,973   |   INFO   |   Got user with id: 1!
+2023-05-29 10:59:04,013   |   ERROR   |   
+2023-05-29 10:59:04,985   |   INFO   |   Load main Page
+2023-05-29 10:59:04,986   |   INFO   |   Got user with id: 1!
+2023-05-29 10:59:05,058   |   ERROR   |   
+2023-05-29 10:59:06,628   |   INFO   |   Got user with id: 1!
+2023-05-29 10:59:06,700   |   ERROR   |   
+2023-05-29 10:59:07,811   |   INFO   |   Got user with id: 1!
+2023-05-29 10:59:07,893   |   ERROR   |   
+2023-05-29 10:59:14,410   |   INFO   |   Got user with id: 1!
+2023-05-29 11:36:16,861   |   INFO   |   Scanning directories...
+2023-05-29 11:36:16,861   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:36:16,862   |   INFO   |   Registering login manager...
+2023-05-29 11:36:16,862   |   INFO   |   Registering routes...
+2023-05-29 11:36:17,008   |   INFO   |   Updated formulas database info!
+2023-05-29 11:38:22,026   |   INFO   |   Scanning directories...
+2023-05-29 11:38:22,027   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:38:22,027   |   INFO   |   Registering login manager...
+2023-05-29 11:38:22,027   |   INFO   |   Registering routes...
+2023-05-29 11:40:23,331   |   INFO   |   Scanning directories...
+2023-05-29 11:40:23,331   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:40:23,332   |   INFO   |   Registering login manager...
+2023-05-29 11:40:23,332   |   INFO   |   Registering routes...
+2023-05-29 11:41:24,285   |   INFO   |   Scanning directories...
+2023-05-29 11:41:24,285   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:41:24,286   |   INFO   |   Registering login manager...
+2023-05-29 11:41:24,286   |   INFO   |   Registering routes...
+2023-05-29 11:42:11,624   |   INFO   |   Scanning directories...
+2023-05-29 11:42:11,624   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:42:11,624   |   INFO   |   Registering login manager...
+2023-05-29 11:42:11,624   |   INFO   |   Registering routes...
+2023-05-29 11:42:11,746   |   INFO   |   Updated formulas database info!
+2023-05-29 11:43:08,588   |   INFO   |   Scanning directories...
+2023-05-29 11:43:08,588   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:43:08,589   |   INFO   |   Registering login manager...
+2023-05-29 11:43:08,589   |   INFO   |   Registering routes...
+2023-05-29 11:43:08,708   |   INFO   |   Updated formulas database info!
+2023-05-29 11:43:14,412   |   INFO   |   Load main Page
+2023-05-29 11:43:14,592   |   INFO   |   Got user with id: 1!
+2023-05-29 11:43:14,733   |   ERROR   |   
+2023-05-29 11:43:15,860   |   INFO   |   Load main Page
+2023-05-29 11:43:15,950   |   ERROR   |   
+2023-05-29 11:43:16,832   |   ERROR   |   
+2023-05-29 11:43:20,130   |   INFO   |   Load main Page
+2023-05-29 11:43:20,132   |   INFO   |   Got user with id: 1!
+2023-05-29 11:43:20,220   |   ERROR   |   
+2023-05-29 11:44:08,043   |   INFO   |   Scanning directories...
+2023-05-29 11:44:08,043   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:44:08,044   |   INFO   |   Registering login manager...
+2023-05-29 11:44:08,044   |   INFO   |   Registering routes...
+2023-05-29 11:44:08,167   |   INFO   |   Updated formulas database info!
+2023-05-29 11:44:08,743   |   INFO   |   Load main Page
+2023-05-29 11:44:08,903   |   ERROR   |   
+2023-05-29 11:44:10,306   |   ERROR   |   
+2023-05-29 11:44:13,937   |   INFO   |   Load main Page
+2023-05-29 11:44:13,938   |   INFO   |   Got user with id: 1!
+2023-05-29 11:44:14,068   |   ERROR   |   
+2023-05-29 11:44:16,207   |   INFO   |   Got user with id: 1!
+2023-05-29 11:44:16,311   |   ERROR   |   
+2023-05-29 11:44:17,343   |   INFO   |   Got user with id: 1!
+2023-05-29 11:44:17,414   |   ERROR   |   
+2023-05-29 11:45:51,538   |   INFO   |   Scanning directories...
+2023-05-29 11:45:51,539   |   INFO   |   Scanned directories successfully!
+2023-05-29 11:45:51,539   |   INFO   |   Registering login manager...
+2023-05-29 11:45:51,539   |   INFO   |   Registering routes...
+2023-05-29 11:45:51,664   |   INFO   |   Updated formulas database info!

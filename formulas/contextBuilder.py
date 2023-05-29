@@ -10,11 +10,9 @@ from package import database
 from package import schema
 
 
-
 ses = database.session()
 formulaDB = database.FormulaDb(ses)
 historyDB = database.HistoryDb(ses)
-
 
 
 # логирование
@@ -55,7 +53,6 @@ async def build_template(request: schema.RequestSchema, formula_slug: str, scien
             )[0]
             result = round(result, nums_comma)
             logger.debug(f"Calculating SUCCESS with result: {result}")
-
         # заносить результат в историю
             if request.user_id is not None:
                 history_schema = schema.HistorySchema(

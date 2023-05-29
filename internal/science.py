@@ -69,10 +69,22 @@ async def plots_view_post(request: Request,
         if all(x_lim) and functions_list:
             y_lim = data['ymin'], data['ymax']
             y_lim = y_lim if all(y_lim) else None
-            plot = plots.Plot(functions_list, x_lim, y_lim)
-            plot_path = os.getcwd() + STATIC_DIR + PLOTS_DIR + f"{user.id}.png"
-            plot.save_plot(plot_path)
-            context.update(image_url=plot_path.replace(os.getcwd(), ''))
+            try:
+                plot = plots.Plot(functions_list, x_lim, y_lim)
+                plot_path = os.getcwd() + STATIC_DIR + PLOTS_DIR + f"{user.id}.png"
+                plot.save_plot(plot_path)
+                context.update(image_url=plot_path.replace(os.getcwd(), ''))
+            except (SyntaxError, NameError):
+                message = "Невалидные данные."
+            except TypeError:
+                message = "Ожидаются рациональные числа."
+            except ZeroDivisionError:
+                message = "На ноль делить нет смысла."
+            except ArithmeticError:
+                message = "Вычислительно невозможное выражение"
+            except ValueError as e:     # raises from Plot class
+                message = str(e)
+
         else:
             message = "Неполные данные."
     else:
@@ -260,8 +272,8 @@ async def science_formula_post(
      Форма в формулой после отправки формы впервые. Для всех пользователей.
      SQL: category; formula on category.
      """
+    user = await get_current_user(request)
     data = await request.form()
-    print(123, data)
     requestSchema = RequestSchema(
         url=request.url.path,
         method=request.method,
@@ -270,14 +282,11 @@ async def science_formula_post(
         data=data,
         nums_comma=nums_comma
     )
-    print(requestSchema)
-
     built_context = await contextBuilder.build_template(
         request=requestSchema,
         science_slug=context['science_slug'],
         formula_slug=context['formula'].slug,
         )
     context.update(built_context, request=request)
-    print(228, context)
     return templates.TemplateResponse("template_formula.html", context=context)
 

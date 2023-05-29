@@ -1,14 +1,12 @@
 import asyncio
 import datetime
 import os
+import csv
 from dotenv import load_dotenv
-# from functools import singledispatchmethod
-import passlib
 from fastapi import HTTPException
-from starlette.requests import Request
 from sqlalchemy import String, Integer, Column, Text, Boolean, select, delete, Table
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from passlib.hash import django_pbkdf2_sha256
 
@@ -20,6 +18,8 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+# DUMP_DATA_DIR = '\\'.join(os.getcwd().split('\\')[:-1]) + "\\dump_data\\"
+DUMP_DATA_DIR = os.getcwd() + '\\dump_data\\'
 
 ECHO = False
 FUTURE = True
@@ -40,6 +40,11 @@ session = sessionmaker(engine,
                        class_=AsyncSession,
                        expire_on_commit=EXPIRE_ON_COMMIT)
 Base = declarative_base()
+
+
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+event = asyncio.Event()
 
 
 class TableMixin:
@@ -64,7 +69,7 @@ class User(Base, TableMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(40), unique=True)
     email = Column(String(40), unique=True)
-    hasw_psw = Column(String(100))
+    hash_psw = Column(String(100))
     last_login = Column(String(50))
     joined = Column(String(50))
     is_stuff = Column(Boolean, default=False)
@@ -137,10 +142,13 @@ class UserDb(DbInterface):
         psw = user_schema.password
         hashed_pws = django_pbkdf2_sha256.hash(psw)
         user_schema.password = hashed_pws
+        data = user_schema.dict()
+        data['hash_psw'] = hashed_pws
+        del data['password']
         user = User(
-            **user_schema.dict(),
             last_login=nowTime(),
-            joined=nowTime()
+            joined=nowTime(),
+            **data
         )
         self.db_session.add(user)
         await self.db_session.commit()
@@ -151,7 +159,7 @@ class UserDb(DbInterface):
         res = await self.db_session.execute(select(User).where(User.username == user_schema.username))
         user = res.first()[0]
         if user:
-            if django_pbkdf2_sha256.verify(user_schema.password, user.hasw_psw):
+            if django_pbkdf2_sha256.verify(user_schema.password, user.hash_psw):
                 user.last_login = nowTime()
                 self.db_session.add(user)
                 await self.db_session.commit()
@@ -172,11 +180,11 @@ class UserDb(DbInterface):
 
     @staticmethod
     def get_hashed_password(password: str) -> str:
-        return passlib.hash.django_pbkdf2_sha256.hash(password)
+        return django_pbkdf2_sha256.hash(password)
 
     @staticmethod
     def verify_password(password: str, secret_hash: str) -> bool:
-        return passlib.hash.django_pbkdf2_sha256.verify(password, secret_hash)
+        return django_pbkdf2_sha256.verify(password, secret_hash)
 
     async def authenticate_user(self, username: str, password: str):
         user = await self.get_user(username)
@@ -192,6 +200,7 @@ class HistoryDb(DbInterface):
 
     async def form_history(self, data: schema.HistorySchema):
         history = History(**data.dict())
+        print(history, 12123123)
         self.db_session.add(history)
         await self.db_session.commit()
         return history
@@ -240,12 +249,10 @@ class FormulaDb(DbInterface):
                 raise HTTPException(status_code=404)
 
     async def update_data(self):
-        await create_db()
         for i in await self.__science_db.get_all_sciences():
             self.SCIENCES[i.slug] = await self.__cat_db.get_all_categories(i.slug)
         for science, categories in self.SCIENCES.items():
             for category in categories:
-                print(category)
                 self.CATEGORIES[category.slug] = await self.get_formulas_by_cat(category.slug, _initial=True)
         for category, formulas in self.CATEGORIES.items():
             for formula in formulas:
@@ -291,47 +298,40 @@ class CategoryDb(DbInterface):
         return [i[0] for i in res.all()]
 
 
-async def main():
-    userdb = UserDb(session())
-    await userdb.create_user('michael', 'suslan@mail.ru', 'password')
-    await userdb.create_user('michael7', 'suslan7@mail.ru', 'password7')
-
-
 async def create_db():
+    global event
+    event.clear()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    event.set()
 
 
 async def drop_db():
+    event.clear()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all,)
-
-
-import csv
+    event.set()
 
 
 async def dump_data_category():
-    with open('d:/KING/science_category.csv', encoding='utf-8') as file:
+    global event
+    event.clear()
+    with open(DUMP_DATA_DIR + 'categories.csv', encoding='utf-8') as file:
         data = list(csv.DictReader(file))
     ses = session()
 
     for line in data:
         line['id'] = int(line['id'])
-        line['category_name'] = line['title']
-        del line['title']
-        science = await ses.execute(select(Science).where(Science.id == int(line['science_id'])))
-        s_slug = science.first()[0].slug
-        del line['science_id']
-        line['super_category'] = s_slug
         obj = Category(**line)
         ses.add(obj)
         await ses.commit()
-
-    return True
+    event.set()
 
 
 async def dump_data_science():
-    with open('d:/KING/science_science.csv', encoding='utf-8') as file:
+    global event
+    event.clear()
+    with open(DUMP_DATA_DIR + 'sciences.csv', encoding='utf-8') as file:
         data = list(csv.DictReader(file))
     ses = session()
 
@@ -340,12 +340,13 @@ async def dump_data_science():
         obj = Science(**line)
         ses.add(obj)
         await ses.commit()
-
-    return True
+    event.set()
 
 
 async def dump_data_formula():
-    with open('d:/KING/science_formula.csv', encoding='utf-8') as file:
+    global event
+    event.clear()
+    with open(DUMP_DATA_DIR + 'formulas.csv', encoding='utf-8') as file:
         data = list(csv.DictReader(file))
     ses = session()
 
@@ -355,11 +356,42 @@ async def dump_data_formula():
         obj = Formula(**line)
         ses.add(obj)
         await ses.commit()
+    event.set()
 
-    return True
+
+async def dump_data_users():
+    global event
+    event.clear()
+    with open(DUMP_DATA_DIR + 'users.csv') as file:
+        data = list(csv.DictReader(file))
+    ses = session()
+
+    for line in data:
+        line['id'] = int(line['id'])
+        line['is_stuff'] = eval(line['is_stuff'])
+        line['is_superuser'] = eval(line['is_superuser'])
+        obj = User(**line)
+        ses.add(obj)
+        await ses.commit()
+    event.set()
 
 
-if __name__ == "__main__":
-    # asyncio.run(create_db())
-    # asyncio.run(dump_data_formula())
-    ...
+async def run_dump():
+    global event
+
+    await drop_db()
+    await event.wait()
+    await create_db()
+    await event.wait()
+    await dump_data_science()
+    await event.wait()
+    await dump_data_category()
+    await event.wait()
+    await dump_data_formula()
+    await event.wait()
+    await dump_data_users()
+    await event.wait()
+
+
+def dump_database():
+    asyncio.run(run_dump())

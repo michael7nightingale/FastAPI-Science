@@ -11,6 +11,7 @@ from starlette.staticfiles import StaticFiles
 
 from configuration.routes import __routes__
 from configuration.logger import logger
+from internal.users import loginManager
 
 
 class Server:
@@ -100,3 +101,9 @@ class Server:
     def __register_login_manager(self):
         logger.info("Registering login manager...")
         self.__login_manager.useRequest(self.app)
+
+
+def create_app(_=None) -> FastAPI:
+
+    app = FastAPI()
+    return Server(app, loginManager).app
