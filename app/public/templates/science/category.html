@@ -1,0 +1,17 @@
+{% extends '../layout.html' %}
+
+ {% block content %}
+     <div class="jumbotron">
+    <h2>{{ title }}</h2>
+    <p class="lead">{{ title }}</p>
+    <a href="{{ url_for('science_main', science_slug=science_slug) }}" class="btn btn-primary btn-large">назад к {{ science_slug }} &raquo;</a>
+</div>
+             <div class="">
+                 {% for f in formulas %}
+                 <a class="" href="{{ url_for('science_formula', formula_slug=f.slug, science_slug=science_slug) }}">
+
+                     <h3 class="">{{ f.title }}</h3>
+                 </a>
+                {% endfor %}
+                </div>
+    {% endblock %}

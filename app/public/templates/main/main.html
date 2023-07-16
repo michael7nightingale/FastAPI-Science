@@ -1,0 +1,33 @@
+{% extends "../layout.html" %}
+{% block content %}
+
+<div class="jumbotron">
+    <h1>Сайт для физико-математических вычислений</h1>
+</div>
+
+
+<div class="row">
+    <div class="col-md-4 white_text">
+        <img src="/app/public/main_math.png" width=30% height=60%>
+        <h2>Математика</h2>
+        <p>
+            Алгебра и геометрия.
+        </p>
+        <p><a class="btn-link" href="{{ url_for('science_main', science_slug='mathem')  }}">перейти &raquo;</a></p>
+    </div>
+    <div class="col-md-4 white_text">
+        <img src="/app/public/main_phy.jpg" width=30% height=60%>
+        <h2>Физика</h2>
+        <p>Кинематика, Термодинамика, Электричество и магнетизм, Динамика.</p>
+        <p><a class="btn-link" href="{{ url_for('science_main', science_slug='physics') }}">перейти &raquo;</a></p>
+    </div>
+    <div class="col-md-4 white_text">
+        <img src="/app/public/main_calc.jpg" width=30% height=60%>
+        <h2>Калькулятор</h2>
+        <p>Онлайн-калькулятор.</p>
+        <p><a class="btn-link" href="{{ url_for('homepage') }}">перейти &raquo;</a></p>
+    </div>
+</div>
+
+{% endblock %}
+

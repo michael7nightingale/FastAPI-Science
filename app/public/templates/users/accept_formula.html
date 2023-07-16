@@ -1,0 +1,51 @@
+{% extends "../layout.html" %}
+
+<style>
+    .red_text{
+  color: red;
+        background-color: red;
+}
+</style>
+
+{% block content %}
+
+<div class="jumbotron">
+    <h2>Принять формулу</h2>
+    <p class="lead">Станьте частичкой сайта, помогите собрать коллекцию формул</p>
+    <a href="{% url 'users_cabinet' %}" class="btn btn-primary btn-large">назад к кабинету &raquo;</a>
+</div>
+
+<div class="container">
+    <p class="lead white_text">Название: {{ request.title }}</p>
+    <p class="lead white_text">Формула: {{ request.formula }}</p>
+    <p class="lead white_text">Контент: {{ request.content }}</p>
+    <p class="lead white_text">Время предложения: {{ request.date }}</p>
+    <p class="lead white_text">Пользователь: {{ request.user }}</p>
+    <p class="lead white_text">Категория: {{ request.cat }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" hidden="hidden" name="delete">
+        <button type="submit">Удалить предложение</button>
+    </form>
+
+    <h3 class="white_text">Добавить формулу на основе предложения:</h3>
+    <h1 class="red_text" style="color: red">Добавить информацию в архив вручную</h1>
+     <form method="post">
+         {% csrf_token %}
+         <input type="text" name="title" value="{{ request.title }}" placeholder="Название: ">
+         <select name="category" placeholder="Категория: ">
+              {% for op in options %}
+                <option value="{{ op }}">{{ op }}</option>
+              {% endfor %}
+          </select>
+        <input type="text" name="formula" value="{{ request.formula }}" placeholder="Формула: ">
+        <input type="text" name="content" value="{{ request.content }}" placeholder="Контент: ">
+         <button type="submit">Добавить формулу</button>
+     </form>
+
+</div>
+
+
+{% endblock %}
+

@@ -4,7 +4,7 @@ venv_site/
 __pycache__/
 internal/__pycache__/
 package/__pycache__/
-formulas/__pycache__/
+app/formulas/__pycache__/
 configuration/__pycache__/
 env/
 .idea/

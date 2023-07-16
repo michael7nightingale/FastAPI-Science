@@ -1,0 +1,23 @@
+{% extends "../layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h2>Предложить формулу</h2>
+    <p class="lead">Станьте частичкой сайта, помогите собрать коллекцию формул</p>
+    <a href="{% url 'users_cabinet' %}" class="btn btn-primary btn-large">назад к кабинету &raquo;</a>
+</div>
+
+<div class="container">
+     <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Добавить</button>
+            </form>
+
+</div>
+
+
+{% endblock %}
+
+
