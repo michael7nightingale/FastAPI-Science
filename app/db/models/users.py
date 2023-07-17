@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Boolean
 
 from app.db import Base
-from app.db.tables.base import TableMixin
+from app.db.models.base import TableMixin
 
 
 class User(Base, TableMixin):
