@@ -23,10 +23,7 @@ Python >= 3.10
 > __!!!__ main.py для запуска находится в корневой директории проекта
 
 
-```commandline
-python main.py dumpdata
-```
 
 ```commandline
-python main.py runserver
+uvicorn app.main:create_app
 ```
