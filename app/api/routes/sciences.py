@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, Form, Path, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
+from fastapi_authtools import login_required
 from starlette.exceptions import HTTPException
 import os
 
-from app.models.schemas import ScienceEnum, RequestSchema
+from app.models.schemas import RequestSchema
 from app.formulas import contextBuilder, plots, mathem_extra_counter
 from app.db.repositories import ScienceRepository, CategoryRepository, FormulaRepository, HistoryRepository
 from app.api.dependencies import get_repository
@@ -147,6 +148,7 @@ async def science_main(
 @science_router.get('/category/{category_slug}/')
 async def science_category(
         request: Request,
+        science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
         category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
         category_slug: str = Path(),
@@ -159,12 +161,15 @@ async def science_category(
         return await SPECIAL_CATEGORIES_GET[category_slug](request, category_slug=category_slug)
     else:
         category = await category_repo.get(category_slug)
+        science = await science_repo.get_by(id=category.science_id)
         formulas = await formula_repo.filter(category_id=category.id)
         # formulas = [i.as_dict() for i in formulas_objects]
         context = {
             'formulas': formulas,
-            "title": category.category_name,
-            "request": request
+            "title": category.title,
+            "request": request,
+            "category": category,
+            "science_slug": science.slug
         }
         return templates.TemplateResponse("category.html", context=context)
 
@@ -188,7 +193,7 @@ async def science_category_post(
 async def science_formula(
         request: Request,
         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
-        history_repo: HistoryRepository = Depends(get_repository(HistoryRepository)),
+        category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         formula_slug: str = Path()
 ):
     """
@@ -200,22 +205,26 @@ async def science_formula(
     )
     try:
         formula = await formula_repo.get(formula_slug)
+        category = await category_repo.get_by(id=formula.category_id)
         context = await contextBuilder.build_template(
             request=request_schema,
             formula_slug=formula_slug
         )
-        context.update(formula=formula, request=request)
+        context.update(formula=formula, request=request, category=category)
         return templates.TemplateResponse("template_formula.html", context=context)
     except KeyError:
         raise HTTPException(status_code=500)
 
 
 @science_router.post('/formula/{formula_slug}/')
+@login_required
 async def science_formula_post(
         request: Request,
-        formula_slug: str = Form(),
+        formula_slug: str = Path(),
         nums_comma: int = Form(),
+        category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
+        history_repo: HistoryRepository = Depends(get_repository(HistoryRepository)),
         find_mark: str = Form()
 ):
     """
@@ -232,9 +241,31 @@ async def science_formula_post(
         nums_comma=nums_comma
     )
     formula = await formula_repo.get(formula_slug)
+    category = await category_repo.get_by(id=formula.category_id)
     context = await contextBuilder.build_template(
         request=request_schema,
         formula_slug=formula_slug
         )
-    context.update(formula=formula, request=request)
+    context.update(formula=formula, request=request,  category=category)
     return templates.TemplateResponse("template_formula.html", context=context)
+
+
+# @science_router.get("/load-data")
+# async def load_data(
+#         request: Request,
+#         science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
+#         category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
+#         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
+# ):
+#     import csv
+#     with open("app/data/categories.csv") as file:
+#         lines = list(csv.DictReader(file))
+#
+#     # for l in lines:
+#     #     l["id"] = str(uuid4())
+#     #     l["title"] = l['category_name']
+#     #     l['science_id'] = (await science_repo.get(l["super_category"])).id
+#     #     del l["super_category"]
+#     #     del l["category_name"]
+#     #     await category_repo.create(**l)
+#

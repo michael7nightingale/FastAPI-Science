@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from fastapi_authtools.models import UserModel
 
 from app.api.dependencies import get_repository, get_user_register_data
-from app.models.schemas import UserRegister
+from app.models.schemas import UserRegister, UserCustomModel
 from app.db.repositories import UserRepository
 from app.core.config import get_app_settings
 
@@ -47,7 +46,7 @@ async def login_post(
     if user is None:
         return login_redirect()
     response = RedirectResponse("/", status_code=303)
-    user_model = UserModel(**user.as_dict())
+    user_model = UserCustomModel(**user.as_dict())
     request.app.state.auth_manager.login(response, user_model)
     return response
 
