@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi_authtools import AuthManager
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
+from starlette.staticfiles import StaticFiles
 
 from app.core.config import get_app_settings
 from app.api.routes import __routers__
@@ -47,6 +48,7 @@ class Server:
             expire_minutes=self.settings.expire_minutes,
         )
         self.app.state.auth_manager = auth_manager
+        self.app.mount("/static", StaticFiles(directory="app/public/static/"), name='static')
 
     def _configurate_db(self) -> None:
         self._engine = create_engine(self.settings.db_uri)
