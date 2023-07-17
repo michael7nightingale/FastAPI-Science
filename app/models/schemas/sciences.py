@@ -3,12 +3,12 @@ from enum import Enum
 
 
 class RequestSchema(BaseModel):
-    data: dict
+    data: dict | None = None
     url: str
     method: str = "GET"
     result: str | None = None
     find_mark: str = "x"
-    user_id: str | None
+    user_id: str | None = None
     nums_comma: int = 10
 
 

@@ -1,2 +1,2 @@
 from .sciences import RequestSchema, ScienceEnum
-from .users import UserRegister
+from .users import UserRegister, UserCustomModel

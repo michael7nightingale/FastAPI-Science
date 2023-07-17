@@ -5,6 +5,7 @@ from starlette.staticfiles import StaticFiles
 
 from app.core.config import get_app_settings
 from app.api.routes import __routers__
+from app.models.schemas import UserCustomModel
 from app.db import create_engine, create_pool
 
 
@@ -43,6 +44,8 @@ class Server:
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
         auth_manager = AuthManager(
             app=self.app,
+            use_cookies=True,
+            user_model=UserCustomModel,
             algorithm=self.settings.algorithm,
             secret_key=self.settings.secret_key,
             expire_minutes=self.settings.expire_minutes,
