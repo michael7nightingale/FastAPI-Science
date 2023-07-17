@@ -11,7 +11,7 @@ class History(Base, TableMixin):
     result = Column(String(40))
     formula_url = Column(String(50))
     date_time = Column(String(40))
-    user_id = Column(String(100), ForeignKey("auth.id"))
+    user_id = Column(String(100), ForeignKey("users.id"))
 
     def history_view(self) -> str:
         return f"{self.formula} | {self.result} | {self.formula_url}"

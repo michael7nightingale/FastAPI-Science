@@ -15,7 +15,7 @@ class Science(Base, TableMixin):
 class Category(Base, TableMixin):
     __tablename__ = 'categories'
 
-    category_name = Column(String(40), unique=True)
+    title = Column(String(40), unique=True)
     content = Column(Text)
     science_id = Column(String(100), ForeignKey("sciences.id"))
     slug = Column(String(40), unique=True)
