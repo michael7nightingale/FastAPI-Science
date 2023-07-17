@@ -1,0 +1,13 @@
+version: "5"
+
+services:
+  db:
+    image: postgres:15-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=calculation_db
