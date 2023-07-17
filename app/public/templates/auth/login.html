@@ -1,18 +1,15 @@
-{% extends '../layout.html' %}
-
+{% extends 'layout.html' %}
 {% block content %}
 
 <h2 class="white_text">{{ title }}</h2>
 <div class="form">
-        <form method="post" action="{{ url_for('register_post') }}">
+        <form method="post" action="{{ url_for('login_post') }}">
             <input class='form-control' type="text" name="username">
-            <input class='form-control' type="text" name="email">
             <input class='form-control' type="text" name="password">
             <button type="submit">Log in</button>
         </form>
-
-        <a href="{{ url_for('github_login') }}">
-            <img src="/app/public/github.png" alt="" width="8%" height="8%">
+    <a href="{{ url_for('github_login') }}">
+            <img src="{{ url_for('static', path='images/github.png') }}" alt="" width="8%" height="8%">
             Войти с помощью GitHub
         </a>
 </div>
@@ -23,5 +20,9 @@
 
 
 {% block scripts %}
+
+
 {% endblock %}
+
+
 
