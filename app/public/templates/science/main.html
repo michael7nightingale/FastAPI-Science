@@ -10,7 +10,7 @@
     <div class="container">
         <ul>{% for i in categories %}
                 <li>
-                <h5><a href="{{ url_for('science_category', cat_slug=i.slug, science_slug=science.slug) }}" class="white_text">{{ i.category_name  }}</a></h5>
+                <h5><a href="{{ url_for('science_category', category_slug=i.slug) }}" class="white_text">{{ i.title  }}</a></h5>
                 </li>
             {% endfor %}
           </ul>
