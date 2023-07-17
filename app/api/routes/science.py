@@ -1,40 +1,20 @@
-import os
-import sys
-sys.path.append(os.getcwd())
-
-from fastapi import APIRouter, Depends, Form, Path
+from fastapi import APIRouter, Depends, Form, Path, Request
 from fastapi.templating import Jinja2Templates
-
+from fastapi.responses import FileResponse
 from starlette.exceptions import HTTPException
-from starlette.requests import Request
-from starlette.responses import FileResponse
+import os
 
-from formulas import contextBuilder, plots, mathem_extra_counter
-from app.api.routes.users import get_current_user, permission
-from package.schema import RequestSchema, ScienceEnum
-from package import database
-from configuration.logger import logger
+from app.models.schemas import ScienceEnum
+from app.formulas import contextBuilder, plots, mathem_extra_counter
 
 
 science_router = APIRouter(
     prefix='/science'
 )
-STATIC_DIR = "/public/static/"       # appends to BASE_DIR
+STATIC_DIR = "app/public/static/"       # appends to BASE_DIR
 PLOTS_DIR = "/plots/"
 
-session = database.session()
-FormulaDb = database.FormulaDb(session)
-CategoryDb = database.CategoryDb(session)
-ScienceDb = database.ScienceDb(session)
-
-templates = Jinja2Templates(directory=os.getcwd() + '/public/templates/science/')
-
-
-@science_router.on_event("startup")
-async def create_formulas():
-    """Перед запуском сервера формируется кэш-словарь формул и категорий из БД."""
-    await FormulaDb.update_data()
-    logger.info("Updated formulas database info!")
+templates = Jinja2Templates('app/public/templates/science/')
 
 
 # ================================= PLOTS ================================ #
@@ -44,10 +24,10 @@ async def plots_view(request: Request,
                     *_, **__):
     context = {"request": request,
                "current_science": science_slug}
-    user = await get_current_user(request)
+    user = request.user
     if user is not None:
         plot_path = STATIC_DIR + PLOTS_DIR + f'/{user.id}.png'
-        if os.path.exists(os.getcwd() + plot_path):
+        if os.path.exists(plot_path):
             context.update(image_url=plot_path)
     return templates.TemplateResponse(f"plots.html", context=context)
 
@@ -62,7 +42,7 @@ async def plots_view_post(request: Request,
     data = await request.form()
     context = dict(request=request, current_science=science_slug)
     message = ""
-    user = await get_current_user(request)
+    user = request.user
     if user is not None:
         functions_list = [data[f"function{i}"] for i in range(1, 5) if data[f"function{i}"]]
         x_lim = data['xmin'], data['xmax']
@@ -94,8 +74,7 @@ async def plots_view_post(request: Request,
 
 
 @science_router.post('/download_plot')
-@permission(permissions=("user", ))
-async def download_plot(request: Request, user=None):
+async def download_plot(request: Request):
     """Скачать график (только для авторизованных пользователей)."""
     data = await request.form()
     filename, filesurname = data['filename'], data['filesurname']
@@ -135,7 +114,6 @@ async def equations_view_post(request: Request,
     return templates.TemplateResponse("equations.html", context=context)
 
 
-
 SPECIAL_CATEGORIES_GET = {
     "plots": plots_view,
     "equations": equations_view
@@ -151,7 +129,7 @@ SPECIAL_CATEGORIES_POST = {
 
 async def science_basic(
         science_slug: ScienceEnum = Path(),
-    ):
+):
     """Зависимость для науки."""
     return {
         "science_slug": science_slug.value,
@@ -161,7 +139,7 @@ async def science_basic(
 async def formula_basic(
         science_slug: ScienceEnum = Path(),
         formula_slug: str = Path()
-    ):
+):
     """Зависимость для формулы."""
     formula = await FormulaDb.get_formula(formula_slug)
     category = await CategoryDb.get_category(formula.category_id)
@@ -181,7 +159,7 @@ async def formula_basic(
 async def science_main( 
         request: Request, 
         science_slug: str = Path(),
-    ):
+):
     """
     Главная страница науки. Для всех пользователей.
     SQL: science; categories on science.
@@ -201,7 +179,7 @@ async def science_category(
         request: Request,
         params: dict = Depends(science_basic),
         cat_slug: str = Path()
-    ):
+):
     """
     Category page. For all sciences. Available for everyone.
     SQL: - category; formulas on category;
@@ -218,13 +196,11 @@ async def science_category(
 
 
 @science_router.post('/{science_slug}/category/{cat_slug}/')
-@permission(permissions=('user', ))
 async def science_category_post(
         request: Request,
         params: dict = Depends(science_basic),
-        user=None,
         cat_slug: str = Path()
-    ):
+):
     """
     Маршрут необходим только для одностраничных специальных категорий. Для всех пользователей.
     SQL: _.
@@ -261,18 +237,17 @@ async def science_formula(
 
 
 @science_router.post('/{science_slug}/formula/{formula_slug}/')
-@permission(permissions=("token",))
 async def science_formula_post(
         request: Request,
         context: dict = Depends(formula_basic),
-        user=None,
         nums_comma: int = Form(),
-        find_mark: str = Form()):
+        find_mark: str = Form()
+):
     """
      Форма в формулой после отправки формы впервые. Для всех пользователей.
      SQL: category; formula on category.
      """
-    user = await get_current_user(request)
+    user = request.user
     data = await request.form()
     requestSchema = RequestSchema(
         url=request.url.path,
@@ -289,4 +264,3 @@ async def science_formula_post(
         )
     context.update(built_context, request=request)
     return templates.TemplateResponse("template_formula.html", context=context)
-
