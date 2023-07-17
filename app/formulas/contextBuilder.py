@@ -2,21 +2,11 @@ import datetime
 import numpy as np
 import logging
 
-from formulas.metadata import storage
-from package import database
-from package import schema
+from app.formulas.metadata import storage
+from app.models.schemas import RequestSchema
 
 
-ses = database.session()
-formulaDB = database.FormulaDb(ses)
-historyDB = database.HistoryDb(ses)
-
-
-# логирование
-logger = logging.getLogger(__name__)
-
-
-async def build_template(request: schema.RequestSchema, formula_slug: str, science_slug: str):
+async def build_template(request: RequestSchema, formula_slug: str):
     # получение параметров
     formula_obj = storage[formula_slug]
     params = formula_obj.literals
@@ -25,8 +15,6 @@ async def build_template(request: schema.RequestSchema, formula_slug: str, scien
     _history = 'Вы не зарегистрированы'
     result = ''
     message = ""
-
-    logger.debug(f"Getting formula params by name: {formula_slug}")
 
     try:
         # переменные, которые могут поменяться если будет POST метод
@@ -42,14 +30,12 @@ async def build_template(request: schema.RequestSchema, formula_slug: str, scien
             for arg in find_args:
                 nums = np.append(nums, eval(request.data[arg]))
                 si = np.append(si, float(params[arg].si[request.data[f"{arg}si"]]))
-            logger.debug("Setting calculation data SUCCESS")
 
             # считать результат
             result = formula_obj.match(
                 **dict(zip(find_args, nums * si))
             )[0]
             result = round(result, nums_comma)
-            logger.debug(f"Calculating SUCCESS with result: {result}")
         # заносить результат в историю
             if request.user_id is not None:
                 history_schema = schema.HistorySchema(
@@ -69,9 +55,6 @@ async def build_template(request: schema.RequestSchema, formula_slug: str, scien
         message = "На ноль делить нет смысла."
     except ArithmeticError:
         message = "Вычислительно невозможное выражение"
-
-    logger.debug("Forming history SUCCESS")
-    logger.debug("Building context SUCCESS")
 
     tab_div, tab_content_div = await build_html(
         params=params,
