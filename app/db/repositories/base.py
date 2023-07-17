@@ -26,6 +26,7 @@ class BaseRepository:
             await self.save(new_obj)
             return new_obj
         except IntegrityError:
+            await self._session.rollback()
             return None
 
     async def get(self, id_: int) -> Model | None:
