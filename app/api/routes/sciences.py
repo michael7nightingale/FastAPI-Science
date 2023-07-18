@@ -124,6 +124,24 @@ SPECIAL_CATEGORIES_POST = {
 }
 
 
+@science_router.get('/science')
+async def sciences_get(
+        request: Request,
+        science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
+):
+    """
+    Главная страница науки. Для всех пользователей.
+    SQL: science; categories on science.
+    """
+    sciences = await science_repo.all()
+
+    context = {
+        "sciences": sciences,
+        "request": request
+    }
+    return templates.TemplateResponse("main.html", context=context)
+
+
 @science_router.get('/science/{science_slug}')
 async def science_get(
         request: Request,
@@ -141,7 +159,7 @@ async def science_get(
         "categories": categories,
         "request": request
     }
-    return templates.TemplateResponse("main.html", context=context)
+    return templates.TemplateResponse("science.html", context=context)
 
 
 @science_router.get('/category/{category_slug}/')

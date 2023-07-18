@@ -46,6 +46,9 @@ class CategoryRepository(SlugGetMixin, BaseRepository):
             # .where(self._model.slug == slug)
         )
         result = (await self._session.execute(query)).all()
+        print(result)
+        if not result:
+            return None
         category = result[0][0]
         science = result[0][1]
         formulas = [i[-1] for i in result]
