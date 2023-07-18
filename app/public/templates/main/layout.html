@@ -22,13 +22,11 @@
                 <img alt="" src="{{ url_for('static', path='images/github.png') }}" class="nav-logo" width=10% height="10%">
             </a>
 
-            {% if request.cookies['access-token'] %}
+            {% if request.user %}
             <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Главная</a>
             <a class="p-2 text-dark" href="{{ url_for('homepage') }}">Поиск</a>
             <a class="p-2 text-dark" href="{{ url_for('logout') }}">Выйти</a>
-            {% if user %}
-            <a class="p-2 text-dark" href="{{ url_for('cabinet', username=user.username) }}">Кабинет</a>
-            {% endif %}
+            <a class="p-2 text-dark" href="{{ url_for('cabinet') }}">Кабинет</a>
             {% else %}
             <a class="p-2 text-dark" href="{{ url_for('login_get') }}">Войти</a>
             <a class="p-2 text-dark" href="{{ url_for('register_get') }}">Зарегистрироваться</a>
@@ -38,7 +36,7 @@
 
 <style>
     .background{
-        background-image: url("/images/main_bg.jpg");
+        background-image: url("/static/images/main_bg.jpg");
         min-height: 700px;
     }
     .white_text{

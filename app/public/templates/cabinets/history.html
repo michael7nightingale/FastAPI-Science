@@ -1,24 +1,33 @@
-{% extends '../layout.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 <div class="jumbotron">
     <h2>Журнал вычислений</h2>
     <p class="lead">Скачать или удалить историю вычислений.</p>
-    <a href="{{ url_for('cabinet', username=user.username) }}" class="btn btn-primary btn-large">назад к кабинету &raquo;</a>
+    <a href="{{ url_for('cabinet') }}" class="btn btn-primary btn-large">назад к кабинету &raquo;</a>
 </div>
-           <form method="post" action="{{ url_for('history_download') }}">
-        <input class="white_text" type="text" name="filename" placeholder="Скачать как:">
-        <input type="submit" value="Скачать">
 
+<div class="container">
+    <form method="post" action="{{ url_for('history_download') }}">
+        <div class="row">
+        <label class="white_text" for="filename-input">Название файла</label>
+        </div>
+        <div class="row">
+            <input class="white_text form-control" style="width: 30%" id='filename-input' type="text" name="filename" placeholder="Скачать как:">
+            <h3 class="white_text">.csv</h3>
+        </div>
+        <div class="row">
+            <button class="btn btn-large" style="background-color: dodgerblue" type="submit">Download</button>
+        </div>
     </form>
-    <form method="post" action="{{ url_for('history_delete') }}">
-        <button class="btn-link" type="submit">Удалить историю</button>
-    </form>
+{#    <form method="post" action="{{ url_for('history_delete') }}">#}
+{#        <button class="btn-link" type="submit">Удалить историю</button>#}
+{#    </form>#}
             {% for i in history %}
                 <div class="u-layout-horizontal">
                     <h4 class="leqn white_text">{{ i.history_view()|safe }} </h4>
 
                 </div>
             {% endfor %}
-
+</div>
 {% endblock %}
