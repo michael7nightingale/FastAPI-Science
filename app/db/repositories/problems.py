@@ -16,6 +16,7 @@ class ProblemRepository(BaseRepository):
             .join(Science, Science.id == self.model.science_id)
         )
         result = (await self.session.execute(query)).all()
+        print(result)
         return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result]
     
     async def filter_custom(self, sciences: list = [], is_closed: bool = True):
@@ -35,9 +36,18 @@ class ProblemRepository(BaseRepository):
             .where(self.model.id == id_)
         )
         result = (await self.session.execute(query)).all()
-        problem = result[0][0]
-        medias = [i[1] for i in result]
-        return problem, medias
+        if not result:
+            problem = self.get(id_)
+            if problem is None:
+                return [None]
+            else:
+                media_query = select(ProblemMedia)
+                medias = (await self.session.execute(media_query)).scalars().all()
+                return problem, media_query
+        else:
+            problem = result[0][0]
+            medias = [i[1] for i in result]
+            return problem, medias
 
 
 class ProblemMediaRepository(BaseRepository):
