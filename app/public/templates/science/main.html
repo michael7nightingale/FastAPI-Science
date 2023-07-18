@@ -1,18 +1,26 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+{% block content %}
 
- {% block content %}
-     <div class="jumbotron">
-         <h2>{{ science.title }}</h2>
-         <p class="lead">&nbsp;{{ science.content }}</p>
-    <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-large">назад на главную &raquo;</a>
+<div class="jumbotron">
+    <h1>Раздел наук</h1>
 </div>
 
-    <div class="container">
-        <ul>{% for i in categories %}
-                <li>
-                <h5><a href="{{ url_for('category_get', category_slug=i.slug) }}" class="white_text">{{ i.title  }}</a></h5>
-                </li>
-            {% endfor %}
-          </ul>
-      </div>
-    {% endblock %}
+
+<div class="row">
+    {% for i in sciences %}
+    <div class="col-md-4" style="background-color: dodgerblue; padding: 20px; border-radius: 10px; margin-left: 5%">
+        {% if i.image_path %}
+        <img src="{{ url_for('static', path=i.image_path) }}" width=30% height=60%>
+        {% endif %}
+        <h2>{{ i.title }}</h2>
+        <p>
+            {{ i.content|truncate(50) }}
+        </p>
+        <p><a class="btn btn-outline-primary text" href="{{ url_for('science_get', science_slug=i.slug)  }}">перейти &raquo;</a></p>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
