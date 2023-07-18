@@ -1,7 +1,11 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
+from fastapi_authtools import login_required
 import os
+
+from app.api.dependencies import get_repository
+from app.db.repositories import HistoryRepository
 
 
 cabinets_router = APIRouter(prefix="/cabinet")
@@ -10,6 +14,7 @@ HISTORY_DIR = 'app/public/static/data/'
 
 
 @cabinets_router.get('/')
+@login_required
 async def cabinet(request: Request):
     """Personal cabinet main page view."""
     context = {"request": request}
@@ -17,10 +22,13 @@ async def cabinet(request: Request):
 
 
 @cabinets_router.get('/history')
-async def history(request: Request):
-    """History view"""
-    delete_history_csv(request.user.id)
-    history_list = []
+@login_required
+async def history(
+        request: Request,
+        history_repo: HistoryRepository = Depends(get_repository(HistoryRepository))
+):
+    """History view."""
+    history_list = await history_repo.filter(user_id=request.user.id)
     context = {
         "title": "История вычислений",
         "history": history_list,
@@ -30,6 +38,7 @@ async def history(request: Request):
 
 
 @cabinets_router.post('/download-history')
+@login_required
 async def history_download(request: Request, filename: str = Form()):
     history_list = []
     tables = []
@@ -57,5 +66,6 @@ def delete_history_csv(user_id: int):
 
 
 @cabinets_router.post('/delete_history')
+@login_required
 async def history_delete(request: Request):
     return RedirectResponse(url=cabinets_router.url_path_for('history'), status_code=303)
