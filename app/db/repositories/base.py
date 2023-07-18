@@ -17,6 +17,14 @@ class BaseRepository:
         self._model = model
         self._session = session
 
+    @property
+    def model(self):
+        return self._model
+
+    @property
+    def session(self):
+        return self._session
+
     async def create(self, **kwargs) -> Model | None:
         """Create new object in the table"""
         try:
