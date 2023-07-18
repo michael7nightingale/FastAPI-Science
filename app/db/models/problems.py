@@ -12,6 +12,7 @@ class Problem(TableMixin, Base):
     time_asked = Column(DateTime(timezone=True), server_default=func.now())
     time_answered = Column(DateTime(timezone=True), nullable=True)
     is_closed = Column(Boolean, default=False)
+    science_id = Column(String(100), ForeignKey("sciences.id"))
 
     user_id = Column(String(100), ForeignKey("users.id"))
 

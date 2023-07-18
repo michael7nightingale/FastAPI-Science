@@ -37,7 +37,7 @@ class BaseRepository:
             await self._session.rollback()
             return None
 
-    async def get(self, id_: int) -> Model | None:
+    async def get(self, id_: int | str) -> Model | None:
         """Get object by pk (id)"""
         query = select(self._model).where(self._model.id == id_)
         return (await self._session.execute(query)).scalar_one_or_none()
