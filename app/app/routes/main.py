@@ -1,19 +1,22 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 
 
 main_router = APIRouter(
     prefix=''
 )
+templates = Jinja2Templates('app/public/templates/main/')
 
 
 @main_router.get("/")
 async def homepage(request: Request):
     """Main page."""
-    return {"detail": "Application is started."}
+    context = {"request": request}
+    return templates.TemplateResponse("main.html", context=context)
 
 
-@main_router.get("/github")
+@main_router.get("/github/")
 async def github_redirect(request: Request):
     """Redirect to the GitHub project repository."""
     return RedirectResponse(

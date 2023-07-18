@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from starlette.staticfiles import StaticFiles
 
 from app.core.config import get_app_settings
-from app.api.routes import __routers__
+from app.app.routes import __routers__
+from app.api.routes import __api_routers__
 from app.models.schemas import UserCustomModel
 from app.db import create_engine, create_pool
 
@@ -39,6 +40,9 @@ class Server:
         self.app.state.pool = self.pool
         for router in __routers__:
             self.app.include_router(router)
+
+        for api_router in __api_routers__:
+            self.app.include_router(api_router, prefix="/api/v1")
 
         self.app.add_event_handler(event_type="startup", func=self._on_startup_event)
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
