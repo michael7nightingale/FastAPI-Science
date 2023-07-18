@@ -1,6 +1,4 @@
-import datetime
 import numpy as np
-import logging
 
 from app.db.repositories import HistoryRepository
 from app.formulas.metadata import storage
@@ -141,3 +139,52 @@ async def build_html(
                                  "</form></div>")
         tab_content_divs += find_tab_content
     return tab_div, tab_content_divs
+
+
+async def count_result(request: RequestSchema, formula_slug: str, history_repo: HistoryRepository | None = None):
+    formula_obj = storage[formula_slug]
+    params = formula_obj.literals
+    args = formula_obj.args
+    find_mark = args[0]
+    _history = 'Вы не зарегистрированы'
+    result = ''
+    message = ""
+
+    try:
+        # переменные, которые могут поменяться если будет POST метод
+        if request.method == "POST":
+            # параметры для шаблона
+            find_mark = request.find_mark
+            # параметры для вычисления
+            nums_comma = int(request.nums_comma)
+            nums = np.array([], dtype='float16')
+            si = np.array([], dtype='float16')
+            find_args = tuple(filter(lambda x: x != find_mark, formula_obj.args))
+
+            for arg in find_args:
+                nums = np.append(nums, eval(request.data[arg]))
+                si = np.append(si, float(params[arg].si[request.data[f"{arg}si"]]))
+
+            # считать результат
+            result = formula_obj.match(
+                **dict(zip(find_args, nums * si))
+            )[0]
+            result = round(result, nums_comma)
+            if request.user_id is not None:
+                await history_repo.create(
+                    user_id=request.user_id,
+                    result=str(result),
+                    formula_id=request.formula_id,
+                    formula_url=request.url,
+                )
+
+    except (SyntaxError, NameError):
+        message = "Невалидные данные."
+    except TypeError:
+        message = "Ожидаются рациональные числа."
+    except ZeroDivisionError:
+        message = "На ноль делить нет смысла."
+    except ArithmeticError:
+        message = "Вычислительно невозможное выражение"
+
+    return result if result else message
