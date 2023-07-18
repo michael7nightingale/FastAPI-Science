@@ -5,6 +5,7 @@ from enum import Enum
 class RequestSchema(BaseModel):
     data: dict | None = None
     url: str
+    formula_id: str
     method: str = "GET"
     result: str | None = None
     find_mark: str = "x"

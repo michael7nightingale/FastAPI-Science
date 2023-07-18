@@ -128,15 +128,14 @@ SPECIAL_CATEGORIES_POST = {
 async def science_main(
         request: Request,
         science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
-        category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         science_slug: str = Path()
 ):
     """
     Главная страница науки. Для всех пользователей.
     SQL: science; categories on science.
     """
-    science = await science_repo.get(science_slug)
-    categories = await category_repo.filter(science_id=science.id)
+    science, categories = await science_repo.get_with_categories(science_slug)
+
     context = {
         "science": science,
         "categories": categories,
@@ -148,9 +147,7 @@ async def science_main(
 @science_router.get('/category/{category_slug}/')
 async def science_category(
         request: Request,
-        science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
         category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
-        formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
         category_slug: str = Path(),
 ):
     """
@@ -160,10 +157,7 @@ async def science_category(
     if category_slug in SPECIAL_CATEGORIES_GET:
         return await SPECIAL_CATEGORIES_GET[category_slug](request, category_slug=category_slug)
     else:
-        category = await category_repo.get(category_slug)
-        science = await science_repo.get_by(id=category.science_id)
-        formulas = await formula_repo.filter(category_id=category.id)
-        # formulas = [i.as_dict() for i in formulas_objects]
+        category, science, formulas = await category_repo.get_with_formulas_and_science(category_slug)
         context = {
             'formulas': formulas,
             "title": category.title,
@@ -193,19 +187,18 @@ async def science_category_post(
 async def science_formula(
         request: Request,
         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
-        category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         formula_slug: str = Path()
 ):
     """
-     Форма c формулой при первом открытии или обновлении страницы. Для всех пользователей.
-     SQL: category; formula on category.
+    Форма c формулой при первом открытии или обновлении страницы. Для всех пользователей.
+    SQL: category; formula on category.
     """
-    request_schema = RequestSchema(
-        url=request.url.path,
-    )
     try:
-        formula = await formula_repo.get(formula_slug)
-        category = await category_repo.get_by(id=formula.category_id)
+        formula, category = await formula_repo.get_with_category(formula_slug)
+        request_schema = RequestSchema(
+            formula_id=formula.id,
+            url=request.url.path
+        )
         context = await contextBuilder.build_template(
             request=request_schema,
             formula_slug=formula_slug
@@ -232,7 +225,9 @@ async def science_formula_post(
      SQL: category; formula on category.
      """
     data = await request.form()
+    formula = await formula_repo.get(formula_slug)
     request_schema = RequestSchema(
+        formula_id=formula.id,
         url=request.url.path,
         method=request.method,
         find_mark=find_mark,
@@ -240,12 +235,12 @@ async def science_formula_post(
         data=data,
         nums_comma=nums_comma
     )
-    formula = await formula_repo.get(formula_slug)
     category = await category_repo.get_by(id=formula.category_id)
     context = await contextBuilder.build_template(
         request=request_schema,
-        formula_slug=formula_slug
-        )
+        formula_slug=formula_slug,
+        history_repo=history_repo
+    )
     context.update(formula=formula, request=request,  category=category)
     return templates.TemplateResponse("template_formula.html", context=context)
 

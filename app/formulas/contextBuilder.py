@@ -2,11 +2,12 @@ import datetime
 import numpy as np
 import logging
 
+from app.db.repositories import HistoryRepository
 from app.formulas.metadata import storage
 from app.models.schemas import RequestSchema
 
 
-async def build_template(request: RequestSchema, formula_slug: str):
+async def build_template(request: RequestSchema, formula_slug: str, history_repo: HistoryRepository | None = None):
     # получение параметров
     formula_obj = storage[formula_slug]
     params = formula_obj.literals
@@ -36,16 +37,13 @@ async def build_template(request: RequestSchema, formula_slug: str):
                 **dict(zip(find_args, nums * si))
             )[0]
             result = round(result, nums_comma)
-        # заносить результат в историю
             if request.user_id is not None:
-                history_schema = schema.HistorySchema(
-                    formula_url=request.url, 
-                    date_time=str(datetime.datetime.now()),
-                    formula=formula_obj.formula,
+                await history_repo.create(
+                    user_id=request.user_id,
                     result=str(result),
-                    user_id=request.user_id
+                    formula_id=request.formula_id,
+                    formula_url=request.url,
                 )
-                await historyDB.form_history(history_schema)
 
     except (SyntaxError, NameError):
         message = "Невалидные данные."
@@ -88,9 +86,9 @@ async def build_html(
         # если это обычный литерал
         if not params[find_].is_constant:
             if find_ == find_mark:
-                tab_div += f"""<button class="tablinks active" onclick="openCity(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
+                tab_div += f"""<button class="tablinks active" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
             else:
-                tab_div += f"""<button class="tablinks" onclick="openCity(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
+                tab_div += f"""<button class="tablinks" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
         # формирование форм для каждого таб контента
         style = "style=\"display: none;\"" if find_ != find_mark else ""
         find_tab_content = (f"<div id=\"tab_{find_}\" class=\"tabcontent white_text\" {style}>\n"
@@ -133,13 +131,13 @@ async def build_html(
         # закрываем тег таб контента для данного искомого аргумента
         if find_ == find_mark:
             find_tab_content += (f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
-                                 "<input type=\"submit\">\n"
-                                 f"<h4 class=\"text\" style='color: green'>{params[find_].literal} = {result}</h4>\n"
+                                "<button class=\"btn btn-primary\" type=\"submit\">Считать</button>\n"
+                                 f"<h4 class=\"text\" style='color: darkseagreen'>{params[find_].literal} = {result}</h4>\n"
                                  "</form></div>")
         else:
             find_tab_content += (f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
-                                 "<input type=\"submit\">\n"
-                                 f"<h4 class=\"text\">{params[find_].literal} = ...</h4>\n"
+                                 "<button class=\"btn btn-primary\" type=\"submit\">Считать</button>\n"
+                                 f"<h3 class=\"text\">{params[find_].literal} = ...</h4>\n"
                                  "</form></div>")
         tab_content_divs += find_tab_content
     return tab_div, tab_content_divs
