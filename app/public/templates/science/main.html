@@ -10,13 +10,9 @@
     <div class="container">
         <ul>{% for i in categories %}
                 <li>
-                <h5><a href="{{ url_for('science_category', category_slug=i.slug) }}" class="white_text">{{ i.title  }}</a></h5>
+                <h5><a href="{{ url_for('category_get', category_slug=i.slug) }}" class="white_text">{{ i.title  }}</a></h5>
                 </li>
             {% endfor %}
           </ul>
       </div>
     {% endblock %}
-
-<script type="text/javascript" id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
-</script>

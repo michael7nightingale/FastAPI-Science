@@ -8,7 +8,7 @@
         <h4 style="color: indianred">{{ message }}</h4>
     {% endif %}
     <p class="lead">{{ category.title }}</p>
-    <a href="{{ url_for('science_category', category_slug=category.slug) }}" class="btn btn-primary btn-large">
+    <a href="{{ url_for('category_get', category_slug=category.slug) }}" class="btn btn-primary btn-large">
         назад к  &raquo;
         {{ category.title }}
     </a>

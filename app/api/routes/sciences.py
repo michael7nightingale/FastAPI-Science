@@ -125,7 +125,7 @@ SPECIAL_CATEGORIES_POST = {
 
 
 @science_router.get('/science/{science_slug}')
-async def science_main(
+async def science_get(
         request: Request,
         science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
         science_slug: str = Path()
@@ -145,15 +145,12 @@ async def science_main(
 
 
 @science_router.get('/category/{category_slug}/')
-async def science_category(
+async def category_get(
         request: Request,
         category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         category_slug: str = Path(),
 ):
-    """
-    Category page. For all sciences. Available for everyone.
-    SQL: - category; formulas on category;
-    """
+    """Category GET view."""
     if category_slug in SPECIAL_CATEGORIES_GET:
         return await SPECIAL_CATEGORIES_GET[category_slug](request, category_slug=category_slug)
     else:
@@ -169,14 +166,11 @@ async def science_category(
 
 
 @science_router.post('/category/{category_slug}/')
-async def science_category_post(
+async def category_post(
         request: Request,
         category_slug: str = Path()
 ):
-    """
-    Маршрут необходим только для одностраничных специальных категорий. Для всех пользователей.
-    SQL: _.
-    """
+    """Category POST view."""
     if category_slug in SPECIAL_CATEGORIES_POST:
         return await SPECIAL_CATEGORIES_POST[category_slug](request, category_slug=category_slug)
     else:
@@ -184,15 +178,12 @@ async def science_category_post(
 
 
 @science_router.get('/formula/{formula_slug}/')
-async def science_formula(
+async def formula_get(
         request: Request,
         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
         formula_slug: str = Path()
 ):
-    """
-    Форма c формулой при первом открытии или обновлении страницы. Для всех пользователей.
-    SQL: category; formula on category.
-    """
+    """Science GET view."""
     try:
         formula, category = await formula_repo.get_with_category(formula_slug)
         request_schema = RequestSchema(
@@ -211,21 +202,17 @@ async def science_formula(
 
 @science_router.post('/formula/{formula_slug}/')
 @login_required
-async def science_formula_post(
+async def formula_post(
         request: Request,
         formula_slug: str = Path(),
         nums_comma: int = Form(),
-        category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
         history_repo: HistoryRepository = Depends(get_repository(HistoryRepository)),
         find_mark: str = Form()
 ):
-    """
-     Форма в формулой после отправки формы впервые. Для всех пользователей.
-     SQL: category; formula on category.
-     """
+    """Request form to calculate."""
     data = await request.form()
-    formula = await formula_repo.get(formula_slug)
+    formula, category = await formula_repo.get_with_category(formula_slug)
     request_schema = RequestSchema(
         formula_id=formula.id,
         url=request.url.path,
@@ -235,7 +222,6 @@ async def science_formula_post(
         data=data,
         nums_comma=nums_comma
     )
-    category = await category_repo.get_by(id=formula.category_id)
     context = await contextBuilder.build_template(
         request=request_schema,
         formula_slug=formula_slug,

@@ -4,11 +4,11 @@
      <div class="jumbotron">
     <h2>{{ category.title }}</h2>
     <p class="lead">{{ category.content }}</p>
-    <a href="{{ url_for('science_main', science_slug=science_slug) }}" class="btn btn-primary btn-large">назад к {{ science_slug }} &raquo;</a>
+    <a href="{{ url_for('science_get', science_slug=science_slug) }}" class="btn btn-primary btn-large">назад к {{ science_slug }} &raquo;</a>
 </div>
              <div class="">
                  {% for f in formulas %}
-                 <a class="" href="{{ url_for('science_formula', formula_slug=f.slug) }}">
+                 <a class="" href="{{ url_for('formula_get', formula_slug=f.slug) }}">
 
                      <h3 class="">{{ f.title }}</h3>
                  </a>
