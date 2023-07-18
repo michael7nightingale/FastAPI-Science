@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+ {% block content %}
+     <link rel="stylesheet" href="{{ url_for('static', path='css/problems.css') }}">
+     <div class="jumbotron">
+         <h2>Creating problem</h2>
+         <p class="lead">Solve science problems together.</p>
+         <div class="row">
+             <div class="col-2">
+                 <a href="{{ url_for('problems_get') }}" class="btn btn-primary btn-large">back to problems &raquo;</a>
+             </div>
+             <div class="col-2">
+-             </div>
+
+         </div>
+
+</div>
+
+<div class="container">
+<form method="post">
+    <label for="title" class="white_text">Title</label>
+    <input type="text" class="form-control" placeholder="Title" name="title" id="title">
+    <label for="text" class="white_text">Text</label>
+    <textarea class="form-control" placeholder="Text" name="text" id="text"></textarea>
+    <label for="science" class="white_text">Science</label>
+    <select name="science" id="science">
+        {% for s in sciences %}
+        <option value="{{ s.id }}">{{ s.title }}</option>
+        {% endfor %}
+    </select>
+    <div class="row">
+
+        <button class="btn btn-primary btn-large">Create</button>
+    </div>
+</form>
+
+</div>
+
+
+{% endblock %}

@@ -10,7 +10,7 @@
                  <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-large">назад на главную &raquo;</a>
              </div>
              <div class="col-2">
-                 <a href="{{ url_for('problems_post') }}" class="btn btn-primary btn-large">create &raquo;</a>
+                 <a href="{{ url_for('problem_create_get') }}" class="btn btn-primary btn-large">create &raquo;</a>
              </div>
 
          </div>
@@ -35,10 +35,50 @@
                 </div>
             <button type="submit" class="btn btn-primary btn-large">filter</button>
             </form>
+        </div>
+
+        <div class="col">
+            <table width="100%" style="background-color: gainsboro" cellspacing="1">
+                <tbody>
+                <tr>
+                    <td>Solved</td>
+                    <td>Title</td>
+                    <td>Solutions</td>
+                    <td>Science</td>
+                    <td>User</td>
+                    <td>Time Asked</td>
+                    <td>Time Answered</td>
+                </tr>
+                {% for p in problems %}
+                 <tr>
+                 {% if p.problem.is_closed %}
+                    <td>Yes</td>
+                  {% else %}
+                     <td>Noe</td>
+                  {% endif %}
+                    <td>{{ p.problem.title }}</td>
+                    <td>{{ p.solutions }}</td>
+                    <td>{{ p.science.title }}</td>
+                    <td>{{ p.user.username }}</td>
+                    <td>{{ p.problem.time_asked }}</td>
+                 {% if p.problem.is_closed %}
+                    <td>{{ p.problem.time_answered }}</td>
+                 {% else %}
+                     <td>-</td>
+                 {% endif %}
+                    <td>
+                        <button>
+                            <a href="{{ url_for('problem_get', problem_id=p.problem.id) }}">Go</a>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
         </div>
-        {% for i in categories %}
-            <h5><a href="{{ url_for('category_get', category_slug=i.slug) }}" class="white_text">{{ i.title  }}</a></h5>
-        {% endfor %}
+
       </div>
-    {% endblock %}
+
+
+{% endblock %}
