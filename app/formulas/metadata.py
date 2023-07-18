@@ -77,6 +77,13 @@ class BaseFormula(ABC):
     def get_formulas(self) -> Iterable[Literal]:
         pass
 
+    def as_dict(self) -> dict:
+        return {
+            "formula": self.formula,
+            "args": self.args,
+            "literals": {k: v.dict() for k, v in self.literals.items()}
+        }
+
 
 class Formula(BaseFormula):
     __slots__ = ()
@@ -133,3 +140,7 @@ impulse = Formula(name='impulse', formula="p = m * V", p=Impulse, m=Mass, V=Spee
 pressure_liquid = Formula(name='pressure_liquid', formula="p = r * g * h", p=Pressure, r=Density, h=Height, g=G)
 newton2 = Formula(name="newton2", formula="F = m * a", F=Force, m=Mass, a=Acceleration)
 moving_proection = Formula(name='moving_proection', formula="s = x - x_0", s=Way, x=Coordinate, x_0=Coordinate)
+
+
+def get_formula(slug: str):
+    return storage.get(slug)
