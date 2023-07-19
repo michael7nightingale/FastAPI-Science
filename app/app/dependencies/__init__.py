@@ -13,3 +13,4 @@ from .repository import (
     get_solution_media_repository,
 
 )
+from  .cabinets import get_table_filepath
