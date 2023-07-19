@@ -29,7 +29,6 @@
     <img src="{{ url_for('static', path=image_url) }}">
     <form method="post" action="{{ url_for('download_plot') }}">
         <input class="white_text" type="text" name="filesurname" placeholder="Скачать как:">
-        <input class="white_text" type="text" hidden="hidden" name="filename" value="{{ image_url }}">
         <input type="submit" value="Скачать">
     </form>
     {% else %}

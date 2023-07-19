@@ -7,7 +7,7 @@
     {% if message %}
         <h4 style="color: indianred">{{ message }}</h4>
     {% endif %}
-    <a href="{{ url_for('science_main', science_slug=science_slug) }}" class="btn btn-primary btn-large">назад к Математике &raquo;</a>
+    <a href="{{ url_for('science_get', science_slug=science.slug) }}" class="btn btn-primary btn-large">назад к Математике &raquo;</a>
 </div>
         <form method="post">
                 <input class='form-control' type="text" name="eq1" placeholder="Уравнение 1:">

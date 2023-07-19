@@ -5,8 +5,9 @@ from fastapi_authtools import login_required
 from starlette.exceptions import HTTPException
 import os
 
+from app.formulas.plots import Plot
 from app.models.schemas import RequestSchema
-from app.formulas import contextBuilder, plots, mathem_extra_counter
+from app.formulas import contextBuilder, mathem_extra_counter
 from app.db.repositories import ScienceRepository, CategoryRepository, FormulaRepository, HistoryRepository
 from app.app.dependencies import (
     get_science_repository,
@@ -32,6 +33,7 @@ async def plots_view(
         category_slug: str,
         category_repo: CategoryRepository
 ):
+    """Plot category GET view."""
     category, science = await category_repo.get_with_science(category_slug)
     context = {
         "request": request,
@@ -51,10 +53,7 @@ async def plots_view_post(
         category_slug: str,
         category_repo: CategoryRepository
 ):
-    """
-    Создание графика функции. Отображание только для авторизованных пользователей.
-    SQL: _.
-    """
+    """Plot image creation. Watch for authorized only."""
     data = await request.form()
     category, science = await category_repo.get_with_science(category_slug)
     context = {
@@ -70,7 +69,7 @@ async def plots_view_post(
             y_lim = data['ymin'], data['ymax']
             y_lim = y_lim if all(y_lim) else None
             try:
-                plot = plots.Plot(functions_list, x_lim, y_lim)
+                plot = Plot(functions_list, x_lim, y_lim)
                 plot_path = PLOTS_DIR + f'/{request.user.id}.png'
                 full_plot_path = request.app.state.STATIC_DIR + plot_path
                 plot.save_plot(full_plot_path)
@@ -96,24 +95,32 @@ async def plots_view_post(
 
 @science_router.post('/download_plot')
 @login_required
-async def download_plot(request: Request):
-    """Скачать график (только для авторизованных пользователей)."""
-    data = await request.form()
-    filename, filesurname = data['filename'], data['filesurname']
-    return FileResponse(path=os.getcwd() + filename, filename=filesurname + '.png')
+async def download_plot(request: Request, filesurname: str = Form()):
+    """Plot download view."""
+    plot_path = PLOTS_DIR + f'/{request.user.id}.png'
+    full_plot_path = request.app.state.STATIC_DIR + plot_path
+    if os.path.exists(full_plot_path):
+        return FileResponse(path=full_plot_path, filename=filesurname + '.png')
 
 
 # ======================================= EQUATIONS ===================================== #
 
 async def equations_view(request: Request, category_slug: str, category_repo: CategoryRepository):
+    category, science = await category_repo.get_with_science(category_slug)
+    message = ""
+    result = "Здесь появится решение."
     context = {
         "request": request,
-        "result": ""
+        "science": science,
+        "category": category,
+        "result": result,
+        "message": message,
+
     }
     return templates.TemplateResponse("equations.html", context=context)
 
 
-async def equations_view_post(request: Request):
+async def equations_view_post(request: Request, category_slug: str, category_repo: CategoryRepository):
     form_data = await request.form()
     message = ""
     result = "Здесь появится решение."
@@ -122,10 +129,14 @@ async def equations_view_post(request: Request):
         result = mathem_extra_counter.equation_system(equations)
     else:
         message = "Данные не предоставлены."
+    category, science = await category_repo.get_with_science(category_slug)
     context = {
-        "message": "",
         "request": request,
-        "result": result
+        "science": science,
+        "category": category,
+        "result": result,
+        "message": message,
+
     }
     return templates.TemplateResponse("equations.html", context=context)
 

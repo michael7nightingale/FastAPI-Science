@@ -29,6 +29,7 @@ science_router = APIRouter(
 )
 PLOTS_DIR = "/files/plots/"
 
+
 # ================================= PLOTS ================================ #
 
 async def plots_view(
@@ -91,7 +92,7 @@ async def equations_view(
         category_repo: CategoryRepository
 ):
     category, science = await category_repo.get_with_science(category_slug)
-    context = {
+    return {
         "request": request,
         "science": science,
         "category": category
@@ -101,17 +102,15 @@ async def equations_view(
 async def equations_view_post(request: Request):
     form_data = await request.form()
     message = ""
-    result = "Здесь появится решение."
+    result = ""
     equations = list(filter(bool, form_data.values()))
     if len(equations) > 0:
         result = mathem_extra_counter.equation_system(equations)
     else:
         message = "Данные не предоставлены."
-    context = {
-        "message": "",
-        "request": request,
-        "result": result
-    }
+    if not message:
+        return {"result": result}
+    return {"detail": message}
 
 
 SPECIAL_CATEGORIES_GET = {
