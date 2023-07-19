@@ -37,11 +37,24 @@
 {#    <form method="post" action="{{ url_for('history_delete') }}">#}
 {#        <button class="btn-link" type="submit">Удалить историю</button>#}
 {#    </form>#}
-            {% for i in history %}
-                <div class="u-layout-horizontal">
-                    <h4 class="leqn white_text">{{ i.history_view()|safe }} </h4>
+<table style="background-color: white; margin-top: 100px; width:100%" border=1 frame=void >
+    <tbody >
+        <tr>
+            <td>Result</td>
+            <td>Date Time</td>
+            <td>Url</td>
+        </tr>
+    {% for h in history %}
+        <tr>
+            <td>{{ h.result }}</td>
+            <td>{{ h.date_time }}</td>
+            <td>
+                <a href="{{ h.formula_url }}">{{ h.formula_url }}</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-                </div>
-            {% endfor %}
 </div>
 {% endblock %}
