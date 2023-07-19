@@ -10,11 +10,25 @@
 <div class="container">
     <form method="post" action="{{ url_for('history_download') }}">
         <div class="row">
-        <label class="white_text" for="filename-input">Название файла</label>
+            <div class="col">
+                <label class="white_text" for="filename-input">Название файла</label>
+            </div>
+            <div class="col">
+                <label class="white_text" for="extension-input">Extension</label>
+            </div>
         </div>
         <div class="row">
-            <input class="white_text form-control" style="width: 30%" id='filename-input' type="text" name="filename" placeholder="Скачать как:">
-            <h3 class="white_text">.csv</h3>
+            <div class="col">
+                <input class="white_text form-control" style="width: 30%" id='filename-input' type="text" name="filename" placeholder="Скачать как:">
+            </div>
+            <div class="col">
+                <select class="white_text form-control" style="width: 30%" id='extension-input' name="extension">
+                    <option value="csv">.csv</option>
+                    <option value="xls">.xls</option>
+                    <option value="xlsx">.xlsx</option>
+                    <option value="odt">.odt</option>
+                </select>
+            </div>
         </div>
         <div class="row">
             <button class="btn btn-large" style="background-color: dodgerblue" type="submit">Download</button>
