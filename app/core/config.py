@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings
 from socket import gethostbyname
 
@@ -9,6 +11,10 @@ class Settings(BaseSettings):
     db_host: str
     db_port: str
     db_name: str
+
+    superuser_username: str
+    superuser_password: str
+    superuser_email: str
 
     algorithm: str
     secret_key: str
@@ -27,7 +33,10 @@ class Settings(BaseSettings):
         return f"https://github.com/login/oauth/authorize?client_id={self.github_client_id}"
 
     class Config:
-        env_file = ".dev.env"
+        if os.getenv("DOCKER"):
+            env_file = ".docker.env"
+        else:
+            env_file = ".dev.env"
 
 
 def get_app_settings() -> Settings:
