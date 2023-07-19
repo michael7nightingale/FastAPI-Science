@@ -1,2 +1,0 @@
-"id","username","email","hash_psw","last_login","joined","is_stuff","is_superuser"
-1,"admin","suslanchikmopl@gmail.com","pbkdf2_sha256$29000$hzljxcxhmn47$jkfc+/Ao3Ub2gE9ct59yKHVpFziRYa8B4hmSMgthpmI=","2023-05-29 09:53:35","2023-05-29 09:53:15",True,True
