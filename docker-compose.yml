@@ -1,6 +1,18 @@
 version: "5"
 
 services:
+  fastapi_app:
+    build: .
+    environment:
+      - DOCKER=1
+    env_file:
+      - .docker.env
+    command: >
+      sh -c "alembic upgrade head &&
+            uvicorn app.main:create_app --host 0.0.0.0"
+    ports:
+      - "8000:8000"
+
   db:
     image: postgres:15-alpine
 #    volumes:
