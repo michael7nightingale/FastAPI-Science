@@ -7,10 +7,6 @@ class Error(Exception):
         super().__init__(self.message)
 
 
-class NotAuthenticatedException(Error):
-    pass
-
-
 class DeletingModeException(Error):
     """Для работы в режиме удаления установите delete_mode = True"""
 
@@ -46,7 +42,3 @@ class FileExtensionError(Error):
 
 class EmptyDataError(Error):
     """Отсутствуют данные в таблице"""
-
-
-
-
