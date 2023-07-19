@@ -1,29 +1,31 @@
-# FastAPI версия веб-приложения для физико-математических вычислений.
+# FastAPI Science.
 
-Вариант разветвленной архитектуры, настроен на удобство чтения и редактирования.
+I found my old project and decided to make it more interesting. So the fact is I restructured the project to change its architecture.
+Some new features are coming. The web-app is both fullstack and API.
 
-
-
-## Установка зависимостей
-
-Python >= 3.10
-> __!!!__ requirements.txt с зависимостями находится в корневой директории проекта
-
-```
- pip install -r requirements.txt
- ```
-
-
-## Запуск
-
-Запуск приложения без переменных окружения бессмысленнен. В проетке используется PosgreSQL 15 и GitHub Oauth, так что для 
-запуска проекта необходимо разобраться сначала с ними.
+## Stack
+- `Python`;
+- `FastAPI`;
+- `fastapi_authtools` (my authentication library);
+- `Pydantic`;
+- `SQLAlchemy`;
+- `Asyncpg`;
+- `numpy` / `pandas` / `sympy` / `matplotlib` for calculations;
+- `Docker`;
+- `HTML` / `CSS` / `js` for fullstack;
 
 
-> __!!!__ main.py для запуска находится в корневой директории проекта
+## Requirements
+I use `Python 3.11` as the project language.
+The environment variables seem to be nice, but you can change it with ones you need
+(.dev.env for developing, .docker.env for running application in Docker).  
 
 
+## Running application
+You can run it using `Docker`. Run this command in the project root directory.
+
+The server is default running at `localhost:8000`.
 
 ```commandline
-uvicorn app.main:create_app
+docker-compose up -d --build
 ```
