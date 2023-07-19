@@ -257,7 +257,7 @@ async def formula_post(
 #         formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
 # ):
 #     import csv
-#     with open("app/data/categories.csv") as file:
+#     with open("fullstack/data/categories.csv") as file:
 #         lines = list(csv.DictReader(file))
 #
 #     # for l in lines:

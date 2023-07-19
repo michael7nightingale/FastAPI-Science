@@ -3,8 +3,20 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from fastapi_authtools import login_required
 
-from app.db.repositories import ProblemRepository, ProblemMediaRepository, SolutionMediaRepository, SolutionRepository
-from app.app.dependencies import get_repository, get_all_sciences
+from app.db.repositories import (
+    ProblemRepository,
+    ProblemMediaRepository,
+    SolutionMediaRepository,
+    SolutionRepository,
+
+)
+from app.app.dependencies import (
+    get_solution_repository,
+    get_all_sciences,
+    get_problem_repository,
+    get_problem_media_repository,
+    get_solution_media_repository
+)
 
 
 problems_router = APIRouter(prefix="/problems")
@@ -15,7 +27,7 @@ templates = Jinja2Templates(directory="app/public/templates/problems/")
 async def problems_get(
         request: Request,
         sciences: list = Depends(get_all_sciences),
-        problems_repo: ProblemRepository = Depends(get_repository(ProblemRepository))
+        problems_repo: ProblemRepository = Depends(get_problem_repository)
 ):
     if request.query_params:
         sciences_filters = []
@@ -55,8 +67,8 @@ async def problem_create_get(request: Request, sciences: list = Depends(get_all_
 async def problem_create_post(
         request: Request,
         # ... Query()
-        problems_repo: ProblemRepository = Depends(get_repository(ProblemRepository)),
-        problems_media_repo: ProblemMediaRepository = Depends(get_repository(ProblemMediaRepository)),
+        problems_repo: ProblemRepository = Depends(get_problem_repository),
+        problems_media_repo: ProblemMediaRepository = Depends(get_problem_media_repository),
 ):
     data = await request.form()
     await problems_repo.create(
@@ -72,7 +84,7 @@ async def problem_create_post(
 async def problem_get(
         request: Request,
         problem_id: str = Path(),
-        problems_repo: ProblemRepository = Depends(get_repository(ProblemRepository)),
+        problems_repo: ProblemRepository = Depends(get_problem_repository),
 ):
     problem, *problem_medias = await problems_repo.get_with_medias(problem_id)
     if problem is None:

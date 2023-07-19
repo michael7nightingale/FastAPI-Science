@@ -14,7 +14,7 @@ from app.app.dependencies import get_repository
 science_router = APIRouter(
     prefix='/science'
 )
-STATIC_DIR = "app/public/static/"       # appends to BASE_DIR
+STATIC_DIR = "fullstack/public/static/"       # appends to BASE_DIR
 PLOTS_DIR = "/plots/"
 
 

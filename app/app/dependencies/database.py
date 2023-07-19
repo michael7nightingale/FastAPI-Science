@@ -7,7 +7,7 @@ from app.db.repositories.base import BaseRepository
 
 
 def _get_pool(request: Request) -> async_sessionmaker:
-    """Session maker pool is placed in app`s state on app`s startapp"""
+    """Session maker pool is placed in fullstack`s state on fullstack`s startapp"""
     return request.app.state.pool
 
 

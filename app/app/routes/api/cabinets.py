@@ -8,7 +8,7 @@ from app.db.repositories import HistoryRepository
 
 
 cabinets_router = APIRouter(prefix="/cabinet")
-HISTORY_DIR = 'app/public/static/data/'
+HISTORY_DIR = 'fullstack/public/static/data/'
 
 
 @cabinets_router.get('/history')

@@ -8,7 +8,7 @@ from app.app.dependencies import get_repository, get_all_sciences
 
 
 problems_router = APIRouter(prefix="/problems")
-templates = Jinja2Templates(directory="app/public/templates/problems/")
+templates = Jinja2Templates(directory="fullstack/public/templates/problems/")
 
 
 @problems_router.get("/")
