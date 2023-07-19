@@ -59,6 +59,7 @@ class Server:
         )
         self.app.state.auth_manager = auth_manager
         self.app.mount("/static", StaticFiles(directory="app/public/static/"), name='static')
+        self.app.state.STATIC_DIR = "app/public/static/"
 
     def _configurate_db(self) -> None:
         self._engine = create_engine(self.settings.db_uri)

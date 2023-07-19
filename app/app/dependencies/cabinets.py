@@ -6,7 +6,7 @@ from app.db.repositories import HistoryRepository
 from app.services.tables import CsvTableManager, PandasTableManager
 
 
-FILEPATH = "app/public/files/"
+HISTORY_DIR = '/files/history/'
 
 
 async def get_table_filepath(
@@ -19,7 +19,7 @@ async def get_table_filepath(
         i.as_dict() for i in await history_repo.filter(user_id=request.user.id)
     ]
     if history_list:
-        filepath = FILEPATH + request.user.id + '.' + extension
+        filepath = request.app.state.STATIC_DIR + HISTORY_DIR + request.user.id + '.' + extension
 
         if extension == 'csv':
             table = CsvTableManager(filepath)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, Depends
+from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi_authtools import login_required
@@ -6,12 +6,10 @@ import os
 
 from app.app.dependencies import get_history_repository, get_table_filepath
 from app.db.repositories import HistoryRepository
-from app.services.tables import CsvTableManager, PandasTableManager
 
 
 cabinets_router = APIRouter(prefix="/cabinet")
 templates = Jinja2Templates('app/public/templates/cabinets/')
-HISTORY_DIR = 'app/public/static/data/'
 
 
 @cabinets_router.get('/')
@@ -49,15 +47,6 @@ async def history_download(
         return FileResponse(path=filepath, filename=filename)
     else:
         return RedirectResponse(url=cabinets_router.url_path_for('history'), status_code=303)
-
-
-def delete_history_csv(user_id: int):
-    """Delete .csv file with history."""
-    path = HISTORY_DIR + f'{user_id}.csv'
-    if os.path.exists(path):
-        os.remove(path)
-    else:
-        return None
 
 
 @cabinets_router.post('/delete_history')

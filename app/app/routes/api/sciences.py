@@ -4,145 +4,142 @@ from fastapi_authtools import login_required
 from starlette.exceptions import HTTPException
 import os
 
-from app.formulas import contextBuilder
+from app.formulas import contextBuilder, mathem_extra_counter
+from app.formulas.plots import Plot
 from app.models.schemas import RequestSchema
 from app.formulas.metadata import get_formula
-from app.db.repositories import ScienceRepository, CategoryRepository, FormulaRepository, HistoryRepository
-from app.app.dependencies import get_repository
+from app.db.repositories import (
+    ScienceRepository,
+    CategoryRepository,
+    FormulaRepository,
+    HistoryRepository,
+
+)
+from app.app.dependencies import (
+    get_science_repository,
+    get_category_repository,
+    get_formula_repository,
+    get_history_repository,
+
+)
 
 
 science_router = APIRouter(
     prefix='/science'
 )
-STATIC_DIR = "fullstack/public/static/"       # appends to BASE_DIR
-PLOTS_DIR = "/plots/"
-
+PLOTS_DIR = "/files/plots/"
 
 # ================================= PLOTS ================================ #
 
-# async def plots_view(request: Request, science_slug: str):
-#     context = {"request": request,
-#                "current_science": science_slug}
-#     user = request.user
-#     if user is not None:
-#         plot_path = STATIC_DIR + PLOTS_DIR + f'/{user.id}.png'
-#         if os.path.exists(plot_path):
-#             context.update(image_url=plot_path)
-#     return templates.TemplateResponse(f"plots.html", context=context)
+async def plots_view(
+        request: Request,
+        category_slug: str,
+        category_repo: CategoryRepository
+):
+    """Plot get endpoint."""
+    category, science = await category_repo.get_with_science(category_slug)
+    response = {
+        "science": science,
+        "category": category
+    }
+    plot_path = PLOTS_DIR + f'/{request.user.id}.png'
+    full_plot_path = request.app.state.STATIC_DIR + plot_path
+    if request.user is not None:
+        if os.path.exists(full_plot_path):
+            response.update(image_url=plot_path)
+    return response
 
 
-# async def plots_view_post(request: Request, science_slug: str):
-#     """
-#     Создание графика функции. Отображание только для авторизованных пользователей.
-#     SQL: _.
-#     """
-#     data = await request.form()
-#     context = dict(request=request, current_science=science_slug)
-#     message = ""
-#     user = request.user
-#     if user is not None:
-#         functions_list = [data[f"function{i}"] for i in range(1, 5) if data[f"function{i}"]]
-#         x_lim = data['xmin'], data['xmax']
-#         if all(x_lim) and functions_list:
-#             y_lim = data['ymin'], data['ymax']
-#             y_lim = y_lim if all(y_lim) else None
-#             try:
-#                 plot = plots.Plot(functions_list, x_lim, y_lim)
-#                 plot_path = os.getcwd() + STATIC_DIR + PLOTS_DIR + f"{user.id}.png"
-#                 plot.save_plot(plot_path)
-#                 context.update(image_url=plot_path.replace(os.getcwd(), ''))
-#             except (SyntaxError, NameError):
-#                 message = "Невалидные данные."
-#             except TypeError:
-#                 message = "Ожидаются рациональные числа."
-#             except ZeroDivisionError:
-#                 message = "На ноль делить нет смысла."
-#             except ArithmeticError:
-#                 message = "Вычислительно невозможное выражение"
-#             except ValueError as e:     # raises from Plot class
-#                 message = str(e)
-#
-#         else:
-#             message = "Неполные данные."
-#     else:
-#         message = "Авторизуйтесь, чтобы увидеть график"
-#     context.update(message=message)
-#     return templates.TemplateResponse(f"plots.html", context=context)
-
-
-@science_router.post('/download_plot')
-async def download_plot(request: Request):
-    """Скачать график (только для авторизованных пользователей)."""
+@login_required
+async def plots_view_post(request: Request):
+    """Plot file view"""
     data = await request.form()
-    filename, filesurname = data['filename'], data['filesurname']
-    return FileResponse(path=os.getcwd() + filename, filename=filesurname + '.png')
+    message = ""
+    functions_list = [data[f"function{i}"] for i in range(1, 5) if data[f"function{i}"]]
+    x_lim = data['xmin'], data['xmax']
+    if all(x_lim) and functions_list:
+        y_lim = data['ymin'], data['ymax']
+        y_lim = y_lim if all(y_lim) else None
+        try:
+            plot = Plot(functions_list, x_lim, y_lim)
+            plot_path = PLOTS_DIR + f'/{request.user.id}.png'
+            full_plot_path = request.app.state.STATIC_DIR + plot_path
+            plot.save_plot(full_plot_path)
+        except (SyntaxError, NameError):
+            message = "Невалидные данные."
+        except TypeError:
+            message = "Ожидаются рациональные числа."
+        except ZeroDivisionError:
+            message = "На ноль делить нет смысла."
+        except ArithmeticError:
+            message = "Вычислительно невозможное выражение"
+        except ValueError as e:     # raises from Plot class
+            message = str(e)
+    else:
+        message = "Неполные данные."
+    if not message:
+        return FileResponse(filename=f"{request.user.id}.png", path=full_plot_path)
+    else:
+        return {"detail": message}
 
 
 # ======================================= EQUATIONS ===================================== #
 
-# async def equations_view(request: Request,
-#                          science_slug: str,
-#                          *_, **__):
-#     context = {
-#         "request": request,
-#         "science_slug": science_slug,
-#         "result": ""
-#     }
-#     return templates.TemplateResponse("equations.html", context=context)
+async def equations_view(
+        request: Request,
+        category_slug: str,
+        category_repo: CategoryRepository
+):
+    category, science = await category_repo.get_with_science(category_slug)
+    context = {
+        "request": request,
+        "science": science,
+        "category": category
+    }
 
 
-# async def equations_view_post(request: Request,
-#                               science_slug: str,
-#                               *_, **__):
-#     form_data = await request.form()
-#     message = ""
-#     result = "Здесь появится решение."
-#     equations = list(filter(bool, form_data.values()))
-#     if len(equations) > 0:
-#         result = mathem_extra_counter.equation_system(equations)
-#     else:
-#         message = "Данные не предоставлены."
-#     context = {
-#         "message": "",
-#         "request": request,
-#         "science_slug": science_slug,
-#         "result": result
-#     }
-#     return templates.TemplateResponse("equations.html", context=context)
+async def equations_view_post(request: Request):
+    form_data = await request.form()
+    message = ""
+    result = "Здесь появится решение."
+    equations = list(filter(bool, form_data.values()))
+    if len(equations) > 0:
+        result = mathem_extra_counter.equation_system(equations)
+    else:
+        message = "Данные не предоставлены."
+    context = {
+        "message": "",
+        "request": request,
+        "result": result
+    }
 
 
 SPECIAL_CATEGORIES_GET = {
-    # "plots": plots_view,
-    # "equations": equations_view
+    "plots": plots_view,
+    "equations": equations_view
 }
 
 SPECIAL_CATEGORIES_POST = {
-    # "plots": plots_view_post,
-    # "equations": equations_view_post
+    "plots": plots_view_post,
+    "equations": equations_view_post
 }
 
 
 @science_router.get('/science')
 async def sciences_get(
-        science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
+        science_repo: ScienceRepository = Depends(get_science_repository),
 ):
-    """
-    Главная страница науки. Для всех пользователей.
-    SQL: science; categories on science.
-    """
+    """All sciences list endpoint."""
     sciences = await science_repo.all()
     return sciences
 
 
 @science_router.get('/science/{science_slug}')
 async def science_get(
-        science_repo: ScienceRepository = Depends(get_repository(ScienceRepository)),
+        science_repo: ScienceRepository = Depends(get_science_repository),
         science_slug: str = Path()
 ):
-    """
-    Главная страница науки. Для всех пользователей.
-    SQL: science; categories on science.
-    """
+    """Science detail endpoint."""
     science, categories = await science_repo.get_with_categories(science_slug)
     return {
         "science": science,
@@ -153,12 +150,16 @@ async def science_get(
 @science_router.get('/category/{category_slug}/')
 async def category_get(
         request: Request,
-        category_repo: CategoryRepository = Depends(get_repository(CategoryRepository)),
+        category_repo: CategoryRepository = Depends(get_category_repository),
         category_slug: str = Path(),
 ):
     """Category GET view."""
     if category_slug in SPECIAL_CATEGORIES_GET:
-        return await SPECIAL_CATEGORIES_GET[category_slug](request, category_slug=category_slug)
+        return await SPECIAL_CATEGORIES_GET[category_slug](
+            request,
+            category_slug=category_slug,
+            category_repo=category_repo
+        )
     else:
         category, science, formulas = await category_repo.get_with_formulas_and_science(category_slug)
         return {
@@ -171,18 +172,23 @@ async def category_get(
 @science_router.post('/category/{category_slug}/')
 async def category_post(
         request: Request,
-        category_slug: str = Path()
+        category_slug: str = Path(),
+        category_repo: CategoryRepository = Depends(get_category_repository)
 ):
     """Category POST view."""
     if category_slug in SPECIAL_CATEGORIES_POST:
-        return await SPECIAL_CATEGORIES_POST[category_slug](request, category_slug=category_slug)
+        return await SPECIAL_CATEGORIES_GET[category_slug](
+            request,
+            category_slug=category_slug,
+            category_repo=category_repo
+        )
     else:
         raise HTTPException(status_code=404)
 
 
 @science_router.get('/formula/{formula_slug}/')
 async def formula_get(
-        formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
+        formula_repo: FormulaRepository = Depends(get_formula_repository),
         formula_slug: str = Path()
 ):
     """Science GET view."""
@@ -203,8 +209,8 @@ async def formula_post(
         formula_slug: str = Path(),
         data: dict = Body(),
         nums_comma: int = Form(),
-        formula_repo: FormulaRepository = Depends(get_repository(FormulaRepository)),
-        history_repo: HistoryRepository = Depends(get_repository(HistoryRepository)),
+        formula_repo: FormulaRepository = Depends(get_formula_repository),
+        history_repo: HistoryRepository = Depends(get_history_repository),
         find_mark: str = Form()
 ):
     """Request form to calculate."""

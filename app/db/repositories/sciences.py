@@ -46,13 +46,21 @@ class CategoryRepository(SlugGetMixin, BaseRepository):
             # .where(self._model.slug == slug)
         )
         result = (await self._session.execute(query)).all()
-        print(result)
         if not result:
             return None
         category = result[0][0]
         science = result[0][1]
         formulas = [i[-1] for i in result]
         return category, science, formulas
+
+    async def get_with_science(self, slug: str):
+        query = (
+            select(self.model, Science)
+            .join(Science, Science.id == self.model.science_id)
+            .where(self.model.slug == slug)
+        )
+        result = (await self.session.execute(query)).all()
+        return result[0]
 
 
 class FormulaRepository(SlugGetMixin, BaseRepository):
