@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+     <link rel="stylesheet" href="{{ url_for('static', path='css/problems.css') }}">
+     <div class="jumbotron">
+         <h2>{{ problem.title }}</h2>
+         <p class="lead">Time asked: {{ problem.time_asked }}</p>
+         {% if problem.time_answered %}
+         <p class="lead">Status: solved ({{ poblem.time_answered }})</p>
+         {% else %}
+         <p class="lead">Status: opened</p>
+         {% endif %}
+         <div class="row">
+             <div class="col-2">
+                 <a href="{{ url_for('problems_get') }}" class="btn btn-primary btn-large">back to problems &raquo;</a>
+             </div>
+             <div class="col-2">
+             </div>
+        </div>
+    </div>
+
+
+    <div class="science-container" style="background-color: #f8f6f6">
+        <h3 align="center">Content</h3>
+        <p class="lead">{{ problem.text }}</p>
+
+        <h3 align="center">Media</h3>
+        {% if problem_medias|length > 0 %}
+            <ul>    
+            {% for m in problem_medias %}
+                <li>
+                    <img src="{{ url_for('static', path=m.media_path) }}" alt="">
+                </li>
+        
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="lead">There is no media supplied</p>
+        {% endif %} 
+       
+    </div>
+
+
+{% endblock %}
+
