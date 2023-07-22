@@ -33,4 +33,4 @@ async def get_table_filepath(
         yield filepath, filename
         os.remove(filepath)
     else:
-        return
+        yield None
