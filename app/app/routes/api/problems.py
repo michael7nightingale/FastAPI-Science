@@ -67,7 +67,7 @@ async def problem_get(
         problem_id: str = Path(),
         problems_repo: ProblemRepository = Depends(get_problem_repository),
 ):
-    problem, *problem_medias = await problems_repo.get_with_medias(problem_id)
+    problem, problem_medias = await problems_repo.get_with_medias(problem_id)
     if problem is None:
         return {"detail": 404}
     return {

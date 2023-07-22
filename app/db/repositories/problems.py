@@ -16,7 +16,6 @@ class ProblemRepository(BaseRepository):
             .join(Science, Science.id == self.model.science_id)
         )
         result = (await self.session.execute(query)).all()
-        print(result)
         return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result]
     
     async def filter_custom(self, sciences: list = [], is_closed: bool = True):
@@ -27,7 +26,9 @@ class ProblemRepository(BaseRepository):
             .where(self.model.is_closed == is_closed)
         )
         result = (await self.session.execute(query)).all()
-        return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result if i[2] in sciences]
+        print(result)
+        print(sciences)
+        return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result if i[2].slug in sciences]
 
     async def get_with_medias(self, id_: str):
         query = (
@@ -37,13 +38,13 @@ class ProblemRepository(BaseRepository):
         )
         result = (await self.session.execute(query)).all()
         if not result:
-            problem = self.get(id_)
+            problem = await self.get(id_)
             if problem is None:
                 return [None]
             else:
                 media_query = select(ProblemMedia)
                 medias = (await self.session.execute(media_query)).scalars().all()
-                return problem, media_query
+                return problem, medias
         else:
             problem = result[0][0]
             medias = [i[1] for i in result]
