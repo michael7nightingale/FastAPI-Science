@@ -56,6 +56,29 @@ async def problems_all(
     }
 
 
+@problems_router.get("/detail/{problem_id}/my-solutions")
+@login_required
+async def problem_my_solutions(
+        request: Request,
+        problem=Depends(get_problem),
+        solution_repo: SolutionRepository = Depends(get_solution_repository),
+        solution_media_repo: SolutionMediaRepository = Depends(get_solution_media_repository)
+):
+    my_solutions_ = await solution_repo.filter(
+        problem_id=problem.id,
+        author_id=request.user.id
+    )
+    my_solutions = []
+    for ms in my_solutions_:
+        my_solutions.append(
+            {
+                "solution": ms,
+                "medias": await solution_media_repo.filter(solution_id=ms.id)
+            }
+        )
+    return my_solutions
+
+
 @problems_router.post("/create")
 @login_required
 async def problem_create(
