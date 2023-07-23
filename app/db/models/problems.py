@@ -12,7 +12,7 @@ class Problem(TableMixin, Base):
     time_asked = Column(DateTime(timezone=True), server_default=func.now())
     time_answered = Column(DateTime(timezone=True), nullable=True)
     is_solved = Column(Boolean, default=False)
-    solution_id = Column(String(100), ForeignKey("solutions.id", ondelete="SETNULL"), nullable=True)
+    solution_id = Column(String(100), ForeignKey("solutions.id", ondelete="SET NULL"), nullable=True)
     science_id = Column(String(100), ForeignKey("sciences.id", ondelete="CASCADE"))
 
     user_id = Column(String(100), ForeignKey("users.id"))
