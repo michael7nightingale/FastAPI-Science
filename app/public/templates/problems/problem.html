@@ -3,6 +3,7 @@
 
 {% block content %}
      <link rel="stylesheet" href="{{ url_for('static', path='css/problems.css') }}">
+    <script src="{{ url_for('static', path='js/problems.js') }}"></script>
      <div class="jumbotron">
          <h2>{{ problem.title }}</h2>
          <p class="lead">Time asked: {{ problem.time_asked }}</p>
@@ -13,7 +14,7 @@
          {% endif %}
          <div class="row">
              <div class="col-2">
-                 <a href="{{ url_for('problems_get') }}" class="btn btn-primary btn-large">back to problems &raquo;</a>
+                 <a href="{{ url_for('problems_all') }}" class="btn btn-primary btn-large">back to problems &raquo;</a>
              </div>
              <div class="col-2">
              </div>
@@ -21,25 +22,99 @@
     </div>
 
 
-    <div class="science-container" style="background-color: #f8f6f6">
-        <h3 align="center">Content</h3>
-        <p class="lead">{{ problem.text }}</p>
 
-        <h3 align="center">Media</h3>
-        {% if problem_medias|length > 0 %}
-            <ul>    
-            {% for m in problem_medias %}
-                <li>
-                    <img src="{{ url_for('static', path=m.media_path) }}" alt="">
-                </li>
-        
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p class="lead">There is no media supplied</p>
-        {% endif %} 
-       
-    </div>
+<div class="container problem">
+<div class="tabs">
+  <input type="radio" name="tab-btn" id="tab-btn-1" value="" checked>
+  <label for="tab-btn-1">Problem</label>
+  <input type="radio" name="tab-btn" id="tab-btn-2" value="">
+  <label for="tab-btn-2">Media</label>
+    <input type="radio" name="tab-btn" id="tab-btn-3" value="">
+  <label for="tab-btn-3">Solutions</label>
+    <input type="radio" name="tab-btn" id="tab-btn-4" value="">
+  <label for="tab-btn-4">My solutions</label>
+  <input type="radio" name="tab-btn" id="tab-btn-5" value="">
+  <label for="tab-btn-5">Create solution</label>
+
+
+  <div id="content-1">
+        <h5 align="center">Content</h5>
+          <p>{{ problem.text }}</p>
+  </div>
+
+
+  <div id="content-2">
+            {% if problem_medias|length > 0 %}
+                <ul>
+                {% for m in problem_medias %}
+                    <li>
+                        <img src="{{ url_for('static', path=m.media_path) }}" alt="" width="100%">
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>There is no media supplied</p>
+            {% endif %}
+  </div>
+
+
+     <div id="content-3">
+      {% for s in solutions %}
+          <div class="solution">
+
+          </div>
+          <p>{{ s.solution.text }}</p>
+           {% if s.medias|length > 0 %}
+                <ul>
+                {% for m in s.medias %}
+{#                    <li>#}
+{#                        <img src="{{ url_for('static', path=m.media_path) }}" alt="" width="100%">#}
+{#                    </li>#}
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>There is no media supplied</p>
+            {% endif %}
+      {% endfor %}
+  </div>
+
+
+    <div id="content-4">
+     {% for ms in my_solutions %}
+         <div class="container" style="border-radius: 10px">
+         </div>
+      {% endfor %}
+  </div>
+
+
+  <div id="content-5">
+      <form method="post" enctype="multipart/form-data" action="{{ url_for('solution_create', problem_id=problem.id) }}">
+            <div class="row">
+                <div class="col">
+                    <label for="text" class="white_text">Text</label>
+                    <textarea class="form-control" placeholder="Text" name="text" id="text"></textarea>
+                </div>
+
+            </div>
+           <button type="button" class="btn btn-primary btn-large margin-top margin-bottom" onclick="addMedia(event)">+Add media</button>
+          <div id="medias">
+              <div class="row">
+              <div class="col">
+                  <input class="form-control" type="file" name="media1" id="input-media-1">
+              </div>
+                  <button type="button" class="delete-button" id="button-delete-1" onclick="deleteMedia(event)">Delete</button>
+              </div>
+           </div>
+            <div class="row">
+                <button type="submit" class="btn btn-primary btn-large margin-top margin-bottom">Create</button>
+            </div>
+        </form>
+  </div>
+</div>
+
+
+</div>
+
 
 
 {% endblock %}

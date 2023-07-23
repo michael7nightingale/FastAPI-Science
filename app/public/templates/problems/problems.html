@@ -6,12 +6,8 @@
          <h2>Problems</h2>
          <p class="lead">Solve science problems together.</p>
          <div class="row">
-             <div class="col-2">
                  <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-large">назад на главную &raquo;</a>
-             </div>
-             <div class="col-2">
                  <a href="{{ url_for('problem_create_get') }}" class="btn btn-primary btn-large">create &raquo;</a>
-             </div>
 
          </div>
 
@@ -30,15 +26,15 @@
                 </div>
             <label for="sciences-cell-status">Problem status</label>
               <div id="sciences-cell-status" class="sidebar-cell">
-                  <label for="is_closed">Is closed</label>
-                  <input type="checkbox" id="is_closed" name="is_closed">
+                  <label for="is_solved">Is closed</label>
+                  <input type="checkbox" id="is_solved" name="is_solved">
                 </div>
             <button type="submit" class="btn btn-primary btn-large">filter</button>
             </form>
         </div>
 
-        <div class="col">
-            <table width="100%" style="background-color: gainsboro" cellspacing="1">
+        <div class="col" style="background-color: white">
+            <table>
                 <tbody>
                 <tr>
                     <td>Solved</td>
