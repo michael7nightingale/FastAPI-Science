@@ -88,8 +88,8 @@ async def build_html(
             else:
                 tab_div += f"""<button class="tablinks" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
         # формирование форм для каждого таб контента
-        style = "style=\"display: none;\"" if find_ != find_mark else ""
-        find_tab_content = (f"<div id=\"tab_{find_}\" class=\"tabcontent white_text\" {style}>\n"
+        style = "display: none; min-height: 400px" if find_ != find_mark else "min-height: 400px"
+        find_tab_content = (f"<div id=\"tab_{find_}\" class=\"tabcontent white_text\" style=\"{style}\">\n"
                             f"<form method=\"post\" action=\"{url}\">\n"
                             "<label for=\"nums_comma\">Цифр после запятой: </label>\n"
                             "<select title=\"nums_comma\" name=\"nums_comma\" id=\"nums_comma\" >\n"
@@ -112,13 +112,13 @@ async def build_html(
                 options_tab += f"<option value=\"{ed}\">{ed}</option>\n"
             if params[formula_argument].is_constant:
                 formula_argument_value = params[formula_argument].value
-                find_tab_content += ("<div class=\"form\">\n"
+                find_tab_content += ("<div class=\"form\" style={min-height: 400px}>\n"
                                      f"<input type=\"text\" placeholder=\"{formula_argument_literal}= {formula_argument_value}\" value=\"{formula_argument_value}\" name=\"{formula_argument}\" class=\"form-control\" >\n"
                                      f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
                                      f"{options_tab}"
                                      "</select></div>\n")
             else:
-                find_tab_content += ("<div class=\"form\">\n"
+                find_tab_content += ("<div class=\"form\"  style={min-height: 400px}>\n"
                                      f"<input type=\"text\" placeholder=\"{formula_argument_literal} = \"  name=\"{formula_argument}\" class=\"form-control\" >\n"
                                      f"<label for=\"{formula_argument}si\">Ед.измерения:</label>\n"
                                      f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
