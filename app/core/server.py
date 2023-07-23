@@ -3,7 +3,7 @@ from starlette.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi_authtools import AuthManager
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from app.core.config import get_app_settings
@@ -55,7 +55,7 @@ class Server:
         # auth manager settings
         self.app.state.auth_manager = AuthManager(
             app=self.app,
-            use_cookies=True,
+            # use_cookies=True,
             user_model=UserCustomModel,
             algorithm=self.settings.algorithm,
             secret_key=self.settings.secret_key,
@@ -97,9 +97,12 @@ class ErrorHandler:
         )
 
     @classmethod
-    def http_exception_handler(cls, request: Request, exc):
+    async def http_exception_handler(cls, request: Request, exc):
         if "api" in request.url.path:
-            return {"detail": exc}
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"detail": exc.detail}
+            )
         else:
             if exc.status_code == 401:
                 return RedirectResponse(request.app.url_path_for("login_get"), status_code=303)
