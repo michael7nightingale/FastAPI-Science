@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -26,8 +28,6 @@ class ProblemRepository(BaseRepository):
             .where(self.model.is_closed == is_closed)
         )
         result = (await self.session.execute(query)).all()
-        print(result)
-        print(sciences)
         return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result if i[2].slug in sciences]
 
     async def get_with_medias(self, id_: str):
@@ -40,15 +40,20 @@ class ProblemRepository(BaseRepository):
         if not result:
             problem = await self.get(id_)
             if problem is None:
-                return [None]
-            else:
-                media_query = select(ProblemMedia)
-                medias = (await self.session.execute(media_query)).scalars().all()
-                return problem, medias
+                return None, []
+            return problem, []
         else:
             problem = result[0][0]
             medias = [i[1] for i in result]
             return problem, medias
+
+    async def set_solved(self, problem_id, solution_id) -> None:
+        await self.update(
+            problem_id,
+            solve_solution_id=solution_id,
+            is_solved=True,
+            time_answered=datetime.now(tz=timezone.utc)
+        )
 
 
 class ProblemMediaRepository(BaseRepository):
@@ -59,6 +64,23 @@ class ProblemMediaRepository(BaseRepository):
 class SolutionRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(Solution, session)
+
+    async def get_with_medias_by_problem(self, problem_id: str):
+        query = (
+            select(self.model, SolutionMedia)
+            .join(SolutionMedia, SolutionMedia.solution_id == self.model.id)
+            .where(self.model.problem_id == problem_id)
+        )
+        result = (await self.session.execute(query)).all()
+        if not result:
+            solutions = await self.filter(problem_id=problem_id)
+            if not solutions:
+                return [], []
+            return solutions, []
+        else:
+            solutions = result[0][0]
+            medias = [i[1] for i in result]
+            return solutions, medias
 
 
 class SolutionMediaRepository(BaseRepository):
