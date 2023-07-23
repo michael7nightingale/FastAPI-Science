@@ -2,6 +2,7 @@
 
  {% block content %}
      <link rel="stylesheet" href="{{ url_for('static', path='css/problems.css') }}">
+     <script src="{{ url_for('static', path='js/problems.js') }}"></script>
      <div class="jumbotron">
          <h2>Problems</h2>
          <p class="lead">Solve science problems together.</p>
@@ -13,28 +14,41 @@
 
 </div>
 
-    <div class="container row">
-        <div class="col-3 sidebar">
-            <h3>Filters</h3>
+     <div class="row">
+     <div class="col">
+         <button class="btn btn-primary btn-large" id="filters-button" onclick="moveFilters(event)">Open filters >></button>
+     </div>
+     </div>
+
+    <div class="filters" style="display:none;" id="filters">
+         <h3 align="center">Filters</h3>
             <form method="get">
-                <label for="sciences-cell-titles">Sciences</label>
-              <div id="sciences-cell-titles" class="sidebar-cell">
-                  {% for i in sciences %}
-                  <label for="{{ i.slug }}">{{ i.title }}</label>
-                  <input type="checkbox" id="{{ i.slug }}" name="{{ i.slug }}">
-                  {% endfor %}
+            <div class="row">
+                <div class="col">
+                      <label for="sciences-cell-titles ">Sciences</label>
+                  <div id="sciences-cell-titles margin-top">
+                      {% for i in sciences %}
+                      <label for="{{ i.slug }}">{{ i.title }}</label>
+                      <input type="checkbox" id="{{ i.slug }}" name="{{ i.slug }}">
+                      {% endfor %}
+                    </div>
                 </div>
-            <label for="sciences-cell-status">Problem status</label>
-              <div id="sciences-cell-status" class="sidebar-cell">
+                <div class="col">
+                    <label for="sciences-cell-status margin-top">Problem status</label>
+              <div id="sciences-cell-status">
                   <label for="is_solved">Is closed</label>
                   <input type="checkbox" id="is_solved" name="is_solved">
                 </div>
-            <button type="submit" class="btn btn-primary btn-large">filter</button>
-            </form>
-        </div>
+                </div>
+            </div>
 
-        <div class="col" style="background-color: white">
-            <table>
+
+            <button type="submit" class="btn btn-primary btn-large button">filter</button>
+            </form>
+    </div>
+
+
+            <table style="background-color: white; margin-top: 100px; width:100%" border=1 frame=void>
                 <tbody>
                 <tr>
                     <td>Solved</td>
@@ -71,10 +85,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-
-        </div>
-
-      </div>
 
 
 {% endblock %}

@@ -1,6 +1,6 @@
-.sidebar{
+.filters{
     background-color: #e9f1f5;
-    min-height: 500px;
+    padding: 20px;
 }
 
 td {
@@ -39,7 +39,7 @@ tr {
 }
 
 
-button {
+.button {
     margin:0 auto;
     display:block;
 }

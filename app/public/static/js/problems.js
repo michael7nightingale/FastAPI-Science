@@ -33,11 +33,25 @@ function addMedia(event){
 }
 
 
-
 function deleteMedia(event){
     let mediaNumber = event.currentTarget.id.split("-")[2];
     let medias = document.getElementById("medias");
     let child = medias.children[mediaNumber - 1];
     medias.removeChild(child);
+
+}
+
+
+function moveFilters(event){
+    let filters = document.getElementById("filters");
+    let filtersButton = document.getElementById("filters-button");
+    if (filters.style.display === "none"){
+        filters.style.display = "block";
+        filtersButton.innerText = "Hide filters <<";
+    }
+    else {
+        filters.style.display = "none";
+        filtersButton.innerText = "Open filters >>";
+    }
 
 }
