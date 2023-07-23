@@ -12,8 +12,14 @@ class UserCustomModel(BaseModel):
     is_authenticated: bool = True
 
 
-
 class UserRegister(BaseModel):
     username: str
     email: str
     password: str
+
+
+class UserRepresent(BaseModel):
+    username: str
+    email: str
+    first_name: str | None = None
+    last_name: str | None = None

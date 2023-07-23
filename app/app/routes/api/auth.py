@@ -37,6 +37,7 @@ async def get_token(
     user = await user_repo.login(
         **user_token_data.dict()
     )
+    print(user)
     if user is None:
         raise_invalid_credentials()
     user_model = UserCustomModel(**user.as_dict())
@@ -46,7 +47,7 @@ async def get_token(
 
 @auth_router.post("/register")
 async def register(
-        user_data: UserRegister = Depends(get_user_register_data),
+        user_data: UserRegister = Body(),
         user_repo: UserRepository = Depends(get_user_repository)
 ):
     """Registration POST view."""
