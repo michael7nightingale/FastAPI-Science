@@ -55,7 +55,7 @@ class Server:
         # auth manager settings
         self.app.state.auth_manager = AuthManager(
             app=self.app,
-            # use_cookies=True,
+            use_cookies=True,
             user_model=UserCustomModel,
             algorithm=self.settings.algorithm,
             secret_key=self.settings.secret_key,
