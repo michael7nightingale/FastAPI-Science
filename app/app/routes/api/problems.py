@@ -43,8 +43,8 @@ async def problems_all(
             if v == "on":
                 sciences_filters.append(k)
 
-        is_closed = bool(request.query_params.get("is_closed", False))
-        problems = await problems_repo.filter_custom(sciences_filters, is_closed)
+        is_solved = bool(request.query_params.get("is_solved", False))
+        problems = await problems_repo.filter_custom(sciences_filters, is_solved)
 
     else:
         problems = await problems_repo.all_with_users()
@@ -110,7 +110,6 @@ async def problem_get(
         "problem": problem,
         "problem_medias": problem_medias
     }
-
 
 @problems_router.delete('/detail/{problem_id}')
 @login_required

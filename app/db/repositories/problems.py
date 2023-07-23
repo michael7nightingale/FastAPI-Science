@@ -20,12 +20,12 @@ class ProblemRepository(BaseRepository):
         result = (await self.session.execute(query)).all()
         return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result]
     
-    async def filter_custom(self, sciences: list = [], is_closed: bool = True):
+    async def filter_custom(self, sciences: list = [], is_solved: bool = True):
         query = (
             select(self.model, User, Science)
             .join(User, User.id == self.model.user_id)
             .join(Science, Science.id == self.model.science_id)
-            .where(self.model.is_closed == is_closed)
+            .where(self.model.is_solved == is_solved)
         )
         result = (await self.session.execute(query)).all()
         return [{"problem": i[0], "user": i[1], "science": i[2]} for i in result if i[2].slug in sciences]
@@ -64,6 +64,19 @@ class ProblemMediaRepository(BaseRepository):
 class SolutionRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(Solution, session)
+
+    async def get_with_users_by_problem_and_user(self, problem_id: str, user = None):
+        query = (
+            select(self.model, User)
+            .join(User, User.id == self.model.author_id)
+            .where(self.model.problem_id == problem_id)
+        )
+        if user is not None:
+            query = query.where(self.model.author_id == user.id)
+        result = (await self.session.execute(query)).all()
+        return [
+            {"user": r[1], "solution": r[0]} for r in result
+        ]
 
     async def get_with_medias_by_problem(self, problem_id: str):
         query = (
