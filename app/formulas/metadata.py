@@ -1,13 +1,15 @@
-import dataclasses
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from copy import deepcopy
 from typing import Iterable
 
 import numpy as np
-from pydantic import BaseModel, Field
+from numpy import cos, sin
+from pydantic import BaseModel
 import sympy as sp
 from functools import wraps
 from sympy.abc import *
+from sympy.abc import S
 
 
 class Literal(BaseModel):
@@ -30,6 +32,9 @@ class Literal(BaseModel):
                 self.ed = opt
         if self.ed is None:
             raise ValueError("There is no main measure option~!")
+
+    def __hash__(self):
+        return hash(self.formula)
 
 
 class Constant(Literal):
@@ -103,6 +108,8 @@ class Formula(BaseFormula):
 
     def match(self, **nums):
         expr = self.pattern.subs(nums)
+        print(expr, nums, self.pattern)
+        print(sp.solve(expr))
         return sp.solve(expr)
 
 
@@ -124,6 +131,16 @@ Acceleration = Literal(si={"m/s^2": 1, "km/s^2": 1000}, name="Acceleration", lit
 Coordinate = Literal(si={"_": 1}, name="Coordinate", literal="")
 
 
+def coordinate(literal: str) -> Literal:
+    return Literal(si={"_": 1}, name="Coordinate", literal=literal)
+
+
+def literal_rename(literal: Literal, literal_symbol: str) -> Literal:
+    new_literal = deepcopy(literal)
+    new_literal.literal = literal_symbol
+    return new_literal
+
+
 # ======================================= CONSTANTS ================================== #
 
 G = Constant(si={"m/s^2": 1}, name="Free fall acceleration", literal='g', value=9.813)
@@ -133,13 +150,17 @@ K = Constant(si={"_": 1}, name="Dielectric constant", literal='k', value=9*10**(
 
 # ======================================= FUNCTIONS ================================== #
 
+cos_ = Function(si={"radians": 1, "degrees": 0.017453293}, name="Cosinus", literal="cos", py_name='cos')
 
 # ======================================= FORMULAS ================================== #
 
 impulse = Formula(name='impulse', formula="p = m * V", p=Impulse, m=Mass, V=Speed)
 pressure_liquid = Formula(name='pressure_liquid', formula="p = r * g * h", p=Pressure, r=Density, h=Height, g=G)
 newton2 = Formula(name="newton2", formula="F = m * a", F=Force, m=Mass, a=Acceleration)
-moving_proection = Formula(name='moving_proection', formula="s = x - x_0", s=Way, x=Coordinate, x_0=Coordinate)
+peremeshenie = Formula(name='peremeshenie', formula="s = x - x_0",
+                       s=Way, x=coordinate("x"), x_0=coordinate("x_0"))
+moving_proection = Formula(name="moving_proection", formula="s_x = s * cos(a)",
+                           s_x=literal_rename(Way, "S_x"), s=Way, a=cos_)
 
 
 def get_formula(slug: str):
