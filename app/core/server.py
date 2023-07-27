@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from starlette.responses import RedirectResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
-from app.core.config import get_app_settings
+from app.core.config import get_app_settings, get_test_app_settings
 from app.app.routes import __routers__, __api_routers__
 from app.models.schemas import UserCustomModel
 from app.db import create_engine, create_pool
@@ -15,9 +15,14 @@ from app.data.load_data import load_all_data
 
 
 class Server:
-    def __init__(self):
+    def __init__(self, test: bool = False, use_cookies: bool = True):
+        self.test = test
+        self.use_cookies = use_cookies
         self._app = FastAPI()
-        self._settings = get_app_settings()
+        if test:
+            self._settings = get_test_app_settings()
+        else:
+            self._settings = get_app_settings()
         self._engine: AsyncEngine
         self._pool: async_sessionmaker
 
@@ -55,11 +60,11 @@ class Server:
         # auth manager settings
         self.app.state.auth_manager = AuthManager(
             app=self.app,
-            use_cookies=True,
+            use_cookies=self.use_cookies,
             user_model=UserCustomModel,
-            algorithm=self.settings.algorithm,
-            secret_key=self.settings.secret_key,
-            expire_minutes=self.settings.expire_minutes,
+            algorithm=self.settings.ALGORITHM,
+            secret_key=self.settings.SECRET_KEY,
+            expire_minutes=self.settings.EXPIRE_MINUTES,
         )
         # static files settings
         self.app.mount("/static", StaticFiles(directory="app/public/static/"), name='static')

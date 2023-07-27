@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Request, Depends
 from fastapi.responses import RedirectResponse
+from fastapi_authtools import login_required
 from fastapi_authtools.models import UsernamePasswordToken
 from fastapi_authtools.exceptions import raise_invalid_credentials
 
@@ -36,7 +37,6 @@ async def get_token(
     user = await user_service.login(
         **user_token_data.dict()
     )
-    print(user)
     if user is None:
         raise_invalid_credentials()
     user_model = UserCustomModel(**user.as_dict())
@@ -52,3 +52,9 @@ async def register(
     """Registration POST view."""
     new_user = await user_service.register(user_data)
     return new_user
+
+
+@auth_router.get("/me")
+@login_required
+async def me(request: Request):
+    return request.user

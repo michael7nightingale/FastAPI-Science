@@ -17,7 +17,14 @@ class UserService(SQLAlchemyAsyncService):
     async def register(self, user_data: dict | BaseModel):
         if isinstance(user_data, BaseModel):
             user_data = user_data.dict()
-
+        else:
+            user_data = user_data.copy()
         user_data.update(password=hash_password(user_data['password']))
         new_user = await self.repository.create(**user_data)
         return new_user
+
+    async def activate(self, user_id: str, email: str):
+        user = await self.get(user_id)
+        if user is not None and user.email == email:
+            await self.update(user_id, is_active=True)
+            return True

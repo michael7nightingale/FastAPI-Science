@@ -14,3 +14,4 @@ class User(Base, TableMixin):
     joined = Column(String(50))
     is_stuff = Column(Boolean, default=False)
     is_superuser = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
