@@ -8,9 +8,9 @@ from app.services.hash import hash_password
 async def create_superuser(session: AsyncSession, settings):
     try:
         user = User(
-            username=settings.superuser_username,
-            password=hash_password(settings.superuser_password),
-            email=settings.superuser_email
+            username=settings.SUPERUSER_USERNAME,
+            password=hash_password(settings.SUPERUSER_PASSWORD),
+            email=settings.SUPERUSER_EMAIL
         )
         session.add(user)
         await session.commit()
