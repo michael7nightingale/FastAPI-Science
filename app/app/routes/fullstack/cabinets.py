@@ -2,11 +2,9 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi_authtools import login_required
-import os
 
-from app.app.dependencies import get_history_repository, get_table_filepath
-from app.db.repositories import HistoryRepository
-
+from app.app.dependencies import get_history_service, get_table_filepath
+from app.db.services import HistoryService
 
 cabinets_router = APIRouter(prefix="/cabinet")
 templates = Jinja2Templates('app/public/templates/cabinets/')
@@ -24,10 +22,10 @@ async def cabinet(request: Request):
 @login_required
 async def history(
         request: Request,
-        history_repo: HistoryRepository = Depends(get_history_repository)
+        history_service: HistoryService = Depends(get_history_service)
 ):
     """History view."""
-    history_list = await history_repo.filter(user_id=request.user.id)
+    history_list = await history_service.filter(user_id=request.user.id)
     context = {
         "title": "История вычислений",
         "history": history_list,

@@ -1,12 +1,12 @@
 from fastapi import Depends, Request
 
-from app.db.repositories import ScienceRepository
-from app.app.dependencies import get_repository
+from app.db.services import ScienceService
+from app.app.dependencies.services import get_science_service
 
 
 async def get_all_sciences(
         request: Request,
-        science_repo: ScienceRepository = Depends(get_repository(ScienceRepository))
+        science_service: ScienceService = Depends(get_science_service)
 ):
-    sciences = await science_repo.all()
+    sciences = await science_service.all()
     return sciences

@@ -3,10 +3,9 @@ from fastapi.responses import RedirectResponse
 from fastapi_authtools.models import UsernamePasswordToken
 from fastapi_authtools.exceptions import raise_invalid_credentials
 
-from app.app.dependencies import get_user_register_data
-from app.app.dependencies import get_user_repository
+from app.app.dependencies import get_user_service
 from app.models.schemas import UserRegister, UserCustomModel
-from app.db.repositories import UserRepository
+from app.db.services import UserService
 from app.core.config import get_app_settings
 
 
@@ -31,10 +30,10 @@ async def github_get(code: str):
 async def get_token(
         request: Request,
         user_token_data: UsernamePasswordToken = Body(),
-        user_repo: UserRepository = Depends(get_user_repository)
+        user_service: UserService = Depends(get_user_service)
 ):
     """Token get view."""
-    user = await user_repo.login(
+    user = await user_service.login(
         **user_token_data.dict()
     )
     print(user)
@@ -48,8 +47,8 @@ async def get_token(
 @auth_router.post("/register")
 async def register(
         user_data: UserRegister = Body(),
-        user_repo: UserRepository = Depends(get_user_repository)
+        user_service: UserService = Depends(get_user_service)
 ):
     """Registration POST view."""
-    new_user = await user_repo.register(user_data)
+    new_user = await user_service.register(user_data)
     return new_user

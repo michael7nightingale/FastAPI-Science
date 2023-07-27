@@ -8,18 +8,18 @@ from app.formulas import contextBuilder, mathem_extra_counter
 from app.formulas.plots import Plot
 from app.models.schemas import RequestSchema
 from app.formulas.metadata import get_formula
-from app.db.repositories import (
-    ScienceRepository,
-    CategoryRepository,
-    FormulaRepository,
-    HistoryRepository,
+from app.db.services import (
+    ScienceService,
+    CategoryService,
+    FormulaService,
+    HistoryService,
 
 )
 from app.app.dependencies import (
-    get_science_repository,
-    get_category_repository,
-    get_formula_repository,
-    get_history_repository,
+    get_science_service,
+    get_category_service,
+    get_formula_service,
+    get_history_service,
 
 )
 
@@ -35,10 +35,10 @@ PLOTS_DIR = "/files/plots/"
 async def plots_view(
         request: Request,
         category_slug: str,
-        category_repo: CategoryRepository
+        category_service: CategoryService
 ):
     """Plot get endpoint."""
-    category, science = await category_repo.get_with_science(category_slug)
+    category, science = await category_service.get_with_science(category_slug)
     response = {
         "science": science,
         "category": category
@@ -89,9 +89,9 @@ async def plots_view_post(request: Request):
 async def equations_view(
         request: Request,
         category_slug: str,
-        category_repo: CategoryRepository
+        category_service: CategoryService
 ):
-    category, science = await category_repo.get_with_science(category_slug)
+    category, science = await category_service.get_with_science(category_slug)
     return {
         "request": request,
         "science": science,
@@ -126,20 +126,20 @@ SPECIAL_CATEGORIES_POST = {
 
 @science_router.get('/science')
 async def sciences_get(
-        science_repo: ScienceRepository = Depends(get_science_repository),
+        science_service: ScienceService = Depends(get_science_service),
 ):
     """All sciences list endpoint."""
-    sciences = await science_repo.all()
+    sciences = await science_service.all()
     return sciences
 
 
 @science_router.get('/science/{science_slug}')
 async def science_get(
-        science_repo: ScienceRepository = Depends(get_science_repository),
+        science_service: ScienceService = Depends(get_science_service),
         science_slug: str = Path()
 ):
     """Science detail endpoint."""
-    science, categories = await science_repo.get_with_categories(science_slug)
+    science, categories = await science_service.get_with_categories(science_slug)
     return {
         "science": science,
         "categories": categories
@@ -149,7 +149,8 @@ async def science_get(
 @science_router.get('/category/{category_slug}/')
 async def category_get(
         request: Request,
-        category_repo: CategoryRepository = Depends(get_category_repository),
+        category_service: CategoryService = Depends(get_category_service),
+        formula_service: FormulaService = Depends(get_formula_service),
         category_slug: str = Path(),
 ):
     """Category GET view."""
@@ -157,10 +158,11 @@ async def category_get(
         return await SPECIAL_CATEGORIES_GET[category_slug](
             request,
             category_slug=category_slug,
-            category_repo=category_repo
+            category_service=category_service
         )
     else:
-        category, science, formulas = await category_repo.get_with_formulas_and_science(category_slug)
+        category, science = await category_service.get_with_science(category_slug)
+        formulas = await formula_service.filter(category_id=category.id)
         return {
             "category": category,
             "science": science,
@@ -172,14 +174,14 @@ async def category_get(
 async def category_post(
         request: Request,
         category_slug: str = Path(),
-        category_repo: CategoryRepository = Depends(get_category_repository)
+        category_service: CategoryService = Depends(get_category_service)
 ):
     """Category POST view."""
     if category_slug in SPECIAL_CATEGORIES_POST:
         return await SPECIAL_CATEGORIES_GET[category_slug](
             request,
             category_slug=category_slug,
-            category_repo=category_repo
+            category_service=category_service
         )
     else:
         raise HTTPException(status_code=404)
@@ -187,11 +189,11 @@ async def category_post(
 
 @science_router.get('/formula/{formula_slug}/')
 async def formula_get(
-        formula_repo: FormulaRepository = Depends(get_formula_repository),
+        formula_service: FormulaService = Depends(get_formula_service),
         formula_slug: str = Path()
 ):
     """Science GET view."""
-    formula, category = await formula_repo.get_with_category(formula_slug)
+    formula, category = await formula_service.get_with_category(formula_slug)
     formula_obj = get_formula(formula_slug)
     if formula_obj is not None:
         return {
@@ -208,12 +210,12 @@ async def formula_post(
         formula_slug: str = Path(),
         data: dict = Body(),
         nums_comma: int = Form(),
-        formula_repo: FormulaRepository = Depends(get_formula_repository),
-        history_repo: HistoryRepository = Depends(get_history_repository),
+        formula_service: FormulaService = Depends(get_formula_service),
+        history_service: HistoryService = Depends(get_history_service),
         find_mark: str = Form()
 ):
     """Request form to calculate."""
-    formula, category = await formula_repo.get_with_category(formula_slug)
+    formula, category = await formula_service.get_with_category(formula_slug)
     request_schema = RequestSchema(
         formula_id=formula.id,
         url=request.url.path,
@@ -226,6 +228,6 @@ async def formula_post(
     result = await contextBuilder.count_result(
         request=request_schema,
         formula_slug=formula_slug,
-        history_repo=history_repo
+        history_service=history_service
     )
     return result

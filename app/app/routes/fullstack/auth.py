@@ -2,9 +2,9 @@ from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 
-from app.app.dependencies import get_repository, get_user_register_data
+from app.app.dependencies import get_user_register_data, get_user_service
 from app.models.schemas import UserRegister, UserCustomModel
-from app.db.repositories import UserRepository
+from app.db.services import UserService
 from app.core.config import get_app_settings
 
 
@@ -39,10 +39,10 @@ async def login_post(
         request: Request,
         username: str = Form(),
         password: str = Form(),
-        user_repo: UserRepository = Depends(get_repository(UserRepository))
+        user_service: UserService = Depends(get_user_service)
 ):
     """Login POST view."""
-    user = await user_repo.login(username, password)
+    user = await user_service.login(username, password)
     if user is None:
         return login_redirect()
     response = RedirectResponse("/", status_code=303)
@@ -66,10 +66,10 @@ async def register_get(request: Request):
 async def register_post(
         request: Request,
         user_data: UserRegister = Depends(get_user_register_data),
-        user_repo: UserRepository = Depends(get_repository(UserRepository))
+        user_service: UserService = Depends(get_user_service)
 ):
     """Registration POST view."""
-    new_user = await user_repo.register(user_data)
+    new_user = await user_service.register(user_data)
     if new_user is None:
         return RedirectResponse(auth_router.url_path_for("register_get"), status_code=303)
     return login_redirect()

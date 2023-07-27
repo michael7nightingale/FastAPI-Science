@@ -8,12 +8,18 @@ import os
 from app.formulas.plots import Plot
 from app.models.schemas import RequestSchema
 from app.formulas import contextBuilder, mathem_extra_counter
-from app.db.repositories import ScienceRepository, CategoryRepository, FormulaRepository, HistoryRepository
+from app.db.services import (
+    ScienceService,
+    CategoryService,
+    FormulaService,
+    HistoryService,
+
+)
 from app.app.dependencies import (
-    get_science_repository,
-    get_category_repository,
-    get_formula_repository,
-    get_history_repository,
+    get_science_service,
+    get_category_service,
+    get_formula_service,
+    get_history_service,
 
 )
 
@@ -31,10 +37,10 @@ templates = Jinja2Templates('app/public/templates/science/')
 async def plots_view(
         request: Request,
         category_slug: str,
-        category_repo: CategoryRepository
+        category_service: CategoryService
 ):
     """Plot category GET view."""
-    category, science = await category_repo.get_with_science(category_slug)
+    category, science = await category_service.get_with_science(category_slug)
     context = {
         "request": request,
         "science": science,
@@ -45,17 +51,17 @@ async def plots_view(
     if request.user is not None:
         if os.path.exists(full_plot_path):
             context.update(image_url=plot_path)
-    return templates.TemplateResponse(f"plots.html", context=context)
+    return templates.TemplateResponse("plots.html", context=context)
 
 
 async def plots_view_post(
         request: Request,
         category_slug: str,
-        category_repo: CategoryRepository
+        category_service: CategoryService
 ):
     """Plot image creation. Watch for authorized only."""
     data = await request.form()
-    category, science = await category_repo.get_with_science(category_slug)
+    category, science = await category_service.get_with_science(category_slug)
     context = {
         "request": request,
         "science": science,
@@ -90,7 +96,7 @@ async def plots_view_post(
     else:
         message = "Авторизуйтесь, чтобы увидеть график"
     context.update(message=message)
-    return templates.TemplateResponse(f"plots.html", context=context)
+    return templates.TemplateResponse("plots.html", context=context)
 
 
 @science_router.post('/download_plot')
@@ -105,8 +111,8 @@ async def download_plot(request: Request, filesurname: str = Form()):
 
 # ======================================= EQUATIONS ===================================== #
 
-async def equations_view(request: Request, category_slug: str, category_repo: CategoryRepository):
-    category, science = await category_repo.get_with_science(category_slug)
+async def equations_view(request: Request, category_slug: str, category_service: CategoryService):
+    category, science = await category_service.get_with_science(category_slug)
     message = ""
     result = "Здесь появится решение."
     context = {
@@ -120,7 +126,7 @@ async def equations_view(request: Request, category_slug: str, category_repo: Ca
     return templates.TemplateResponse("equations.html", context=context)
 
 
-async def equations_view_post(request: Request, category_slug: str, category_repo: CategoryRepository):
+async def equations_view_post(request: Request, category_slug: str, category_service: CategoryService):
     form_data = await request.form()
     message = ""
     result = "Здесь появится решение."
@@ -129,7 +135,7 @@ async def equations_view_post(request: Request, category_slug: str, category_rep
         result = mathem_extra_counter.equation_system(equations)
     else:
         message = "Данные не предоставлены."
-    category, science = await category_repo.get_with_science(category_slug)
+    category, science = await category_service.get_with_science(category_slug)
     context = {
         "request": request,
         "science": science,
@@ -152,17 +158,13 @@ SPECIAL_CATEGORIES_POST = {
 }
 
 
-@science_router.get('/science')
-async def sciences_get(
+@science_router.get('/all')
+async def sciences_all(
         request: Request,
-        science_repo: ScienceRepository = Depends(get_science_repository),
+        science_service: ScienceService = Depends(get_science_service),
 ):
-    """
-    Главная страница науки. Для всех пользователей.
-    SQL: science; categories on science.
-    """
-    sciences = await science_repo.all()
-
+    """Science list view."""
+    sciences = await science_service.all()
     context = {
         "sciences": sciences,
         "request": request
@@ -170,18 +172,14 @@ async def sciences_get(
     return templates.TemplateResponse("main.html", context=context)
 
 
-@science_router.get('/science/{science_slug}')
+@science_router.get('/{science_slug}')
 async def science_get(
         request: Request,
-        science_repo: ScienceRepository = Depends(get_science_repository),
+        science_service: ScienceService = Depends(get_science_service),
         science_slug: str = Path()
 ):
-    """
-    Главная страница науки. Для всех пользователей.
-    SQL: science; categories on science.
-    """
-    science, categories = await science_repo.get_with_categories(science_slug)
-
+    """Science detail view."""
+    science, categories = await science_service.get_with_categories(science_slug)
     context = {
         "science": science,
         "categories": categories,
@@ -193,7 +191,8 @@ async def science_get(
 @science_router.get('/category/{category_slug}/')
 async def category_get(
         request: Request,
-        category_repo: CategoryRepository = Depends(get_category_repository),
+        category_service: CategoryService = Depends(get_category_service),
+        formula_service: FormulaService = Depends(get_formula_service),
         category_slug: str = Path(),
 ):
     """Category GET view."""
@@ -201,10 +200,11 @@ async def category_get(
         return await SPECIAL_CATEGORIES_GET[category_slug](
             request,
             category_slug=category_slug,
-            category_repo=category_repo
+            category_repo=category_service
         )
     else:
-        category, science, formulas = await category_repo.get_with_formulas_and_science(category_slug)
+        category, science = await category_service.get_with_science(category_slug)
+        formulas = await formula_service.filter(category_id=category.id)
         context = {
             'formulas': formulas,
             "title": category.title,
@@ -218,7 +218,7 @@ async def category_get(
 @science_router.post('/category/{category_slug}/')
 async def category_post(
         request: Request,
-        category_repo: CategoryRepository = Depends(get_category_repository),
+        category_service: CategoryService = Depends(get_category_service),
         category_slug: str = Path(),
 ):
     """Category POST view."""
@@ -226,7 +226,7 @@ async def category_post(
         return await SPECIAL_CATEGORIES_POST[category_slug](
             request,
             category_slug=category_slug,
-            category_repo=category_repo
+            category_repo=category_service
         )
     else:
         raise HTTPException(status_code=404)
@@ -235,12 +235,12 @@ async def category_post(
 @science_router.get('/formula/{formula_slug}/')
 async def formula_get(
         request: Request,
-        formula_repo: FormulaRepository = Depends(get_formula_repository),
+        formula_service: FormulaService = Depends(get_formula_service),
         formula_slug: str = Path()
 ):
     """Science GET view."""
     try:
-        formula, category = await formula_repo.get_with_category(formula_slug)
+        formula, category = await formula_service.get_with_category(formula_slug)
         request_schema = RequestSchema(
             formula_id=formula.id,
             url=request.url.path
@@ -261,13 +261,13 @@ async def formula_post(
         request: Request,
         formula_slug: str = Path(),
         nums_comma: int = Form(),
-        formula_repo: FormulaRepository = Depends(get_formula_repository),
-        history_repo: HistoryRepository = Depends(get_history_repository),
+        formula_service: FormulaService = Depends(get_formula_service),
+        history_service: HistoryService = Depends(get_history_service),
         find_mark: str = Form()
 ):
     """Request form to calculate."""
     data = await request.form()
-    formula, category = await formula_repo.get_with_category(formula_slug)
+    formula, category = await formula_service.get_with_category(formula_slug)
     request_schema = RequestSchema(
         formula_id=formula.id,
         url=request.url.path,
@@ -280,7 +280,7 @@ async def formula_post(
     context = await contextBuilder.build_template(
         request=request_schema,
         formula_slug=formula_slug,
-        history_repo=history_repo
+        history_service=history_service
     )
     context.update(formula=formula, request=request,  category=category)
     return templates.TemplateResponse("template_formula.html", context=context)
