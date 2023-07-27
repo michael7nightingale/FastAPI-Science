@@ -1,9 +1,7 @@
-import os
-from typing import Optional
-
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import cos, sin, tan, pi, e, power, sqrt
+from numpy import cos, sin, tan, pi, e, power, sqrt    # noqa: F401
+from typing import Optional
 from abc import ABC, abstractmethod
 import re
 
@@ -106,4 +104,3 @@ class Plot:
         print(path)
         plt.savefig(path)
         print('saved')
-

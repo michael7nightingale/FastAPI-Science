@@ -1,6 +1,5 @@
 from smtplib import SMTP_SSL
 from app.core.config import get_app_settings
-from app.services.token import generate_token
 
 
 def create_server() -> SMTP_SSL:

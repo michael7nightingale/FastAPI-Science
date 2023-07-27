@@ -1,11 +1,10 @@
-from numpy import (cos, tan,
-                   sin, sqrt,
-                   max, min,
-                   pi, e,
-                   arcsin,arctan,
-                   arccos, array,
-                   ndarray)
-from typing import Sequence
+from numpy import (cos, tan,    # noqa: F401
+                   sin, sqrt,   # noqa: F401
+                   max, min,   # noqa: F401
+                   pi, e,   # noqa: F401
+                   arcsin, arctan,   # noqa: F401
+                   arccos, array,   # noqa: F401
+                   ndarray)   # noqa: F401
 
 
 FUNCTIONS: dict
@@ -33,4 +32,3 @@ def function_counter(num: float, f_name: str):
     return str(
         FUNCTIONS[f_name](num)
                )
-

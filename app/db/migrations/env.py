@@ -9,7 +9,7 @@ from alembic import context
 
 from app.core.config import get_app_settings
 from app.db import Base
-from app.db.models import User, Science, Category, Formula, History
+from app.db.models import User, Science, Category, Formula, History   # noqa: F401
 
 
 # this is the Alembic Config object, which provides

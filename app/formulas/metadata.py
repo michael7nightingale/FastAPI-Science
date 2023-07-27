@@ -4,12 +4,11 @@ from copy import deepcopy
 from typing import Iterable
 
 import numpy as np
-from numpy import cos, sin
+from numpy import cos, sin  # noqa: F401
 from pydantic import BaseModel
 import sympy as sp
-from functools import wraps
-from sympy.abc import *
-from sympy.abc import S
+from sympy.abc import *  # noqa: F401, F403
+from sympy.abc import S  # noqa: F401
 
 
 class Literal(BaseModel):
@@ -93,16 +92,16 @@ class BaseFormula(ABC):
 class Formula(BaseFormula):
     __slots__ = ()
     _template = "Eq(?)"
-    
+
     def get_constants(self) -> Iterable[Literal]:
         return filter(
-            lambda x: x.is_constant, 
+            lambda x: x.is_constant,
             self.literals.values()
             )
 
     def get_formulas(self) -> Iterable[Literal]:
         return filter(
-            lambda x: x.is_function, 
+            lambda x: x.is_function,
             self.literals.values()
             )
 
@@ -114,14 +113,14 @@ class Formula(BaseFormula):
 
 
 # define storage
-storage: dict[str, Formula] = {}    
+storage: dict[str, Formula] = {}
 
 
 # ======================================= LITERALS ================================== #
 
-Impulse = Literal(si={"kg*m/s": 1, "g*m/s": 0.001}, name = "Impulse", literal="p")
-Speed = Literal(si={"m/s": 1, "km/s": 1000}, name = "Speed", literal="V")
-Mass = Literal(si={"kg": 1, "g": 0.001}, name = "Mass", literal="m")
+Impulse = Literal(si={"kg*m/s": 1, "g*m/s": 0.001}, name="Impulse", literal="p")
+Speed = Literal(si={"m/s": 1, "km/s": 1000}, name="Speed", literal="V")
+Mass = Literal(si={"kg": 1, "g": 0.001}, name="Mass", literal="m")
 Way = Literal(si={"m": 1, "km": 1000, "sm": 0.01}, name='Way', literal="S")
 Height = Literal(si={"m": 1, "km": 1000, "sm": 0.01}, name='Height', literal="h")
 Density = Literal(si={"kg/m^3": 1}, literal="p", name="Density")

@@ -1,11 +1,11 @@
 import numpy as np
 
-from app.db.repositories import HistoryRepository
+from app.db.services import HistoryService
 from app.formulas.metadata import storage
 from app.models.schemas import RequestSchema
 
 
-async def build_template(request: RequestSchema, formula_slug: str, history_repo: HistoryRepository | None = None):
+async def build_template(request: RequestSchema, formula_slug: str, history_service: HistoryService | None = None):
     # получение параметров
     formula_obj = storage[formula_slug]
     params = formula_obj.literals
@@ -36,7 +36,7 @@ async def build_template(request: RequestSchema, formula_slug: str, history_repo
             )[0]
             result = round(result, nums_comma)
             if request.user_id is not None:
-                await history_repo.create(
+                await history_service.create(
                     user_id=request.user_id,
                     result=str(result),
                     formula_id=request.formula_id,
@@ -75,7 +75,7 @@ async def build_html(
         url: str,
         find_mark: str,
         result: str = ""
-    ):
+):
     tab_div = ""
     tab_content_divs = ""
     # формирование шаблона в питончике удобнее
@@ -84,9 +84,9 @@ async def build_html(
         # если это обычный литерал
         if not params[find_].is_constant:
             if find_ == find_mark:
-                tab_div += f"""<button class="tablinks active" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
+                tab_div += f"""<button class="tablinks active" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""       # noqa: E501
             else:
-                tab_div += f"""<button class="tablinks" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""
+                tab_div += f"""<button class="tablinks" onclick="openTab(event, 'tab_{find_}')">Найти {params[find_].literal}</button>"""      # noqa: E501
         # формирование форм для каждого таб контента
         style = "display: none; min-height: 400px" if find_ != find_mark else "min-height: 400px"
         find_tab_content = (f"<div id=\"tab_{find_}\" class=\"tabcontent white_text\" style=\"{style}\">\n"
@@ -112,41 +112,48 @@ async def build_html(
                 options_tab += f"<option value=\"{ed}\">{ed}</option>\n"
             if params[formula_argument].is_constant:
                 formula_argument_value = params[formula_argument].value
-                find_tab_content += ("<div class=\"form\" style={min-height: 400px}>\n"
-                                     f"<input type=\"text\" placeholder=\"{formula_argument_literal}= {formula_argument_value}\" value=\"{formula_argument_value}\" name=\"{formula_argument}\" class=\"form-control\" >\n"
-                                     f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
-                                     f"{options_tab}"
-                                     "</select></div>\n")
+                find_tab_content += (
+                    "<div class=\"form\" style={min-height: 400px}>\n"
+                    f"<input type=\"text\" placeholder=\"{formula_argument_literal}= {formula_argument_value}\" value=\"{formula_argument_value}\" name=\"{formula_argument}\" class=\"form-control\" >\n"   # noqa: E501
+                    f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
+                    f"{options_tab}"
+                    "</select></div>\n"
+                )
             else:
-                find_tab_content += ("<div class=\"form\"  style={min-height: 400px}>\n"
-                                     f"<input type=\"text\" placeholder=\"{formula_argument_literal} = \"  name=\"{formula_argument}\" class=\"form-control\" >\n"
-                                     f"<label for=\"{formula_argument}si\">Ед.измерения:</label>\n"
-                                     f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
-                                     f"{options_tab}"
-                                     "</select>\n"
-                                     "</div>")
-                
+                find_tab_content += (
+                    "<div class=\"form\"  style={min-height: 400px}>\n"
+                    f"<input type=\"text\" placeholder=\"{formula_argument_literal} = \"  name=\"{formula_argument}\" class=\"form-control\" >\n"   # noqa: E501
+                    f"<label for=\"{formula_argument}si\">Ед.измерения:</label>\n"
+                    f"<select name=\"{formula_argument}si\" id=\"{formula_argument}si\">\n"
+                    f"{options_tab}"
+                    "</select>\n"
+                    "</div>"
+                )
+
         # закрываем тег таб контента для данного искомого аргумента
         if find_ == find_mark:
-            find_tab_content += (f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
-                                "<button class=\"btn btn-primary\" type=\"submit\">Считать</button>\n"
-                                 f"<h4 class=\"text\" style='color: darkseagreen'>{params[find_].literal} = {result}</h4>\n"
-                                 "</form></div>")
+            find_tab_content += (
+                f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
+                "<button class=\"btn btn-primary\" type=\"submit\">Считать</button>\n"
+                f"<h4 class=\"text\" style='color: darkseagreen'>{params[find_].literal} = {result}</h4>\n"
+                "</form></div>"
+            )
         else:
-            find_tab_content += (f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
-                                 "<button class=\"btn btn-primary\" type=\"submit\">Считать</button>\n"
-                                 f"<h3 class=\"text\">{params[find_].literal} = ...</h4>\n"
-                                 "</form></div>")
+            find_tab_content += (
+                f"<input type=\"text\" hidden=\"hidden\" name=\"find_mark\" value=\"{find_}\">\n"
+                "<button class=\"btn btn-primary\" type=\"submit\">Считать</button>\n"
+                f"<h3 class=\"text\">{params[find_].literal} = ...</h4>\n"
+                "</form></div>"
+            )
         tab_content_divs += find_tab_content
     return tab_div, tab_content_divs
 
 
-async def count_result(request: RequestSchema, formula_slug: str, history_repo: HistoryRepository | None = None):
+async def count_result(request: RequestSchema, formula_slug: str, history_service: HistoryService | None = None):
     formula_obj = storage[formula_slug]
     params = formula_obj.literals
     args = formula_obj.args
     find_mark = args[0]
-    _history = 'Вы не зарегистрированы'
     result = ''
     message = ""
 
@@ -171,7 +178,7 @@ async def count_result(request: RequestSchema, formula_slug: str, history_repo: 
             )[0]
             result = round(result, nums_comma)
             if request.user_id is not None:
-                await history_repo.create(
+                await history_service.create(
                     user_id=request.user_id,
                     result=str(result),
                     formula_id=request.formula_id,
