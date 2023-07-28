@@ -35,7 +35,7 @@ async def get_token(
 ):
     """Token get view."""
     user = await user_service.login(
-        **user_token_data.dict()
+        **user_token_data.model_dump()
     )
     if user is None:
         raise_invalid_credentials()

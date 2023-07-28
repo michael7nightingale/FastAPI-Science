@@ -78,6 +78,8 @@ class SQLAlchemyAsyncRepository(BaseRepository):
         )
         query = query.where(*expected)
         result = (await self.session.execute(query)).all()
+        if not result:
+            return [None] * (len(models) + 1)
         return result[0]
 
     async def all_with_parents(self, models: dict) -> list:

@@ -16,7 +16,7 @@ class UserService(SQLAlchemyAsyncService):
 
     async def register(self, user_data: dict | BaseModel):
         if isinstance(user_data, BaseModel):
-            user_data = user_data.dict()
+            user_data = user_data.model_dump()
         else:
             user_data = user_data.copy()
         user_data.update(password=hash_password(user_data['password']))

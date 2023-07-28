@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI, Request
 from starlette.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates
@@ -76,14 +78,17 @@ class Server:
         self._pool = create_pool(self.engine)
         self.app.state.pool = self.pool
 
-    async def _on_startup_event(self):
-        """Startup handler."""
+    async def _load_data(self):
         async with self.pool() as session:
             await create_superuser(
                 session=session,
                 settings=self.settings
             )
         await load_all_data(self.pool)
+
+    async def _on_startup_event(self):
+        """Startup handler."""
+        await self._load_data()
 
     async def _on_shutdown_event(self):
         """Shutdown handler."""
