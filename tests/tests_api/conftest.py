@@ -1,6 +1,5 @@
 import os.path
 from shutil import rmtree
-from uuid import uuid4
 
 import pytest_asyncio
 from httpx import AsyncClient

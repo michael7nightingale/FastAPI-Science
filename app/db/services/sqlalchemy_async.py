@@ -22,7 +22,7 @@ class SQLAlchemyAsyncService(BaseService):
 
     async def get(self, *args, **kwargs):
         """Get object."""
-        return await self.repository.get( *args, **kwargs)
+        return await self.repository.get(*args, **kwargs)
 
     async def delete(self, id_: str):
         """Delete object."""

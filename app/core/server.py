@@ -1,5 +1,3 @@
-import asyncio
-
 from fastapi import FastAPI, Request
 from starlette.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates

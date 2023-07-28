@@ -1,8 +1,7 @@
 from fastapi import Depends, Request
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from typing import Type
 
-from app.core.config import get_app_settings
 from app.db.repositories.base import BaseRepository
 
 

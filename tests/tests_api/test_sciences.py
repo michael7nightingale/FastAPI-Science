@@ -1,5 +1,3 @@
-import json
-
 from fastapi import status
 
 from .conftest import get_science_router
