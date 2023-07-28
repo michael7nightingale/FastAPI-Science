@@ -9,6 +9,9 @@ from fastapi import FastAPI, APIRouter
 from app.app.routes.api import (
     main_router,
     auth_router,
+    science_router,
+    cabinets_router,
+    problems_router,
 
 )
 from app.core.server import Server
@@ -21,6 +24,7 @@ async def app() -> FastAPI:
     server = Server(test=True, use_cookies=False)
     async with server.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await server._load_data()
     yield server.app
     async with server.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -124,3 +128,6 @@ def url_for(router: APIRouter):
 
 get_main_url = url_for(main_router)
 get_auth_url = url_for(auth_router)
+get_science_router = url_for(science_router)
+get_cabinet_router = url_for(cabinets_router)
+get_problem_router = url_for(problems_router)
