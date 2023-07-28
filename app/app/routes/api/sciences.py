@@ -6,7 +6,7 @@ import os
 
 from app.formulas import contextBuilder, mathem_extra_counter
 from app.formulas.plots import Plot
-from app.models.schemas import RequestSchema
+from app.models.schemas import RequestSchema, RequestData
 from app.formulas.metadata import get_formula
 from app.db.services import (
     ScienceService,
@@ -125,7 +125,7 @@ SPECIAL_CATEGORIES_POST = {
 
 
 @science_router.get('/science')
-async def sciences_get(
+async def sciences_all(
         science_service: ScienceService = Depends(get_science_service),
 ):
     """All sciences list endpoint."""
@@ -140,6 +140,11 @@ async def science_get(
 ):
     """Science detail endpoint."""
     science, categories = await science_service.get_with_categories(science_slug)
+    if science is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Science is not found."
+        )
     return {
         "science": science,
         "categories": categories
@@ -162,6 +167,11 @@ async def category_get(
         )
     else:
         category, science = await category_service.get_with_science(category_slug)
+        if category is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Category is not found."
+            )
         formulas = await formula_service.filter(category_id=category.id)
         return {
             "category": category,
@@ -184,7 +194,10 @@ async def category_post(
             category_service=category_service
         )
     else:
-        raise HTTPException(status_code=404)
+        raise HTTPException(
+            status_code=404,
+            detail="Category is not found."
+        )
 
 
 @science_router.get('/formula/{formula_slug}/')
@@ -194,6 +207,11 @@ async def formula_get(
 ):
     """Science GET view."""
     formula, category = await formula_service.get_with_category(formula_slug)
+    if formula is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Formula is not found."
+        )
     formula_obj = get_formula(formula_slug)
     if formula_obj is not None:
         return {
@@ -208,26 +226,27 @@ async def formula_get(
 async def formula_post(
         request: Request,
         formula_slug: str = Path(),
-        data: dict = Body(),
-        nums_comma: int = Form(),
+        request_data: RequestData = Body(),
         formula_service: FormulaService = Depends(get_formula_service),
         history_service: HistoryService = Depends(get_history_service),
-        find_mark: str = Form()
 ):
     """Request form to calculate."""
     formula, category = await formula_service.get_with_category(formula_slug)
+    if formula is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Formula is not found."
+        )
     request_schema = RequestSchema(
         formula_id=formula.id,
         url=request.url.path,
         method=request.method,
-        find_mark=find_mark,
         user_id=request.user.id,
-        data=data,
-        nums_comma=nums_comma
+        **request_data.model_dump()
     )
     result = await contextBuilder.count_result(
         request=request_schema,
         formula_slug=formula_slug,
         history_service=history_service
     )
-    return result
+    return {"result": result}

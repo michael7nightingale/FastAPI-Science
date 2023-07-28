@@ -169,14 +169,17 @@ async def count_result(request: RequestSchema, formula_slug: str, history_servic
             find_args = tuple(filter(lambda x: x != find_mark, formula_obj.args))
 
             for arg in find_args:
-                nums = np.append(nums, eval(request.data[arg]))
+                if isinstance(request.data[arg], int):
+                    nums = np.append(nums, request.data[arg])
+                else:
+                    nums = np.append(nums, eval(request.data[arg]))
                 si = np.append(si, float(params[arg].si[request.data[f"{arg}si"]]))
 
             # считать результат
             result = formula_obj.match(
                 **dict(zip(find_args, nums * si))
             )[0]
-            result = round(result, nums_comma)
+            result = round(float(result), nums_comma)
             if request.user_id is not None:
                 await history_service.create(
                     user_id=request.user_id,
@@ -187,8 +190,8 @@ async def count_result(request: RequestSchema, formula_slug: str, history_servic
 
     except (SyntaxError, NameError):
         message = "Невалидные данные."
-    except TypeError:
-        message = "Ожидаются рациональные числа."
+    # except TypeError:
+    #     message = "Ожидаются рациональные числа."
     except ZeroDivisionError:
         message = "На ноль делить нет смысла."
     except ArithmeticError:

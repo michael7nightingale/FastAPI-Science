@@ -85,7 +85,7 @@ class BaseFormula(ABC):
         return {
             "formula": self.formula,
             "args": self.args,
-            "literals": {k: v.dict() for k, v in self.literals.items()}
+            "literals": {k: v.model_dump() for k, v in self.literals.items()}
         }
 
 

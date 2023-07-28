@@ -13,6 +13,12 @@ class RequestSchema(BaseModel):
     nums_comma: int = 10
 
 
+class RequestData(BaseModel):
+    data: dict | None = None
+    find_mark: str = "x"
+    nums_comma: int = 10
+
+
 class ScienceEnum(Enum):
     physics = "physics"
     mathem = "mathem"
