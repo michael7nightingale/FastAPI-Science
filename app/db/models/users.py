@@ -7,8 +7,8 @@ from app.db.models.base import TableMixin
 class User(Base, TableMixin):
     __tablename__ = 'users'
 
-    username = Column(String(40), unique=True)
-    email = Column(String(40), unique=True)
+    username = Column(String(40), unique=True, index=True)
+    email = Column(String(40), unique=True, index=True)
     password = Column(String(100))
     last_login = Column(String(50))
     joined = Column(String(50))

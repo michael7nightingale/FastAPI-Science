@@ -10,7 +10,7 @@ class Science(Base, TableMixin):
     title = Column(String(40), unique=True)
     content = Column(Text)
     image_path = Column(String(100), nullable=True)
-    slug = Column(String(40), unique=True)
+    slug = Column(String(40), unique=True, index=True)
 
 
 class Category(Base, TableMixin):
@@ -20,7 +20,7 @@ class Category(Base, TableMixin):
     content = Column(Text)
     image_path = Column(String(100), nullable=True)
     science_id = Column(String(100), ForeignKey("sciences.id"))
-    slug = Column(String(40), unique=True)
+    slug = Column(String(40), unique=True, index=True)
 
 
 class Formula(Base, TableMixin):
@@ -31,4 +31,4 @@ class Formula(Base, TableMixin):
     content = Column(Text)
     image_path = Column(String(100), nullable=True)
     category_id = Column(String(100), ForeignKey("categories.id"))
-    slug = Column(String(40), unique=True)
+    slug = Column(String(40), unique=True, index=True)
