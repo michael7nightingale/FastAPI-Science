@@ -12,6 +12,11 @@ class BaseAppSettings(BaseSettings):
     SECRET_KEY: str
     EXPIRE_MINUTES: int
 
+    EMAIL_PORT: str
+    EMAIL_HOST:  str
+    EMAIL_USER: str
+    EMAIL_PASSWORD: str
+
     github_redirect_url: str = "https://github.com/michael7nightingale/Calculations-FastAPI"
     github_client_id: str = "asdasd"
 
