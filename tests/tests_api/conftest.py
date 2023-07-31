@@ -91,9 +91,9 @@ async def users_test_data(app: FastAPI, user1: dict, user2: dict):
     async with app.state.pool() as session:
         users_repo = UserService(session)
         user1_ = await users_repo.register(user1)
-        await users_repo.activate(user1_.id, user1_.email)
+        await users_repo.activate(user1_.id)
         user2_ = await users_repo.register(user2)
-        await users_repo.activate(user2_.id, user2_.email)
+        await users_repo.activate(user2_.id)
         users = user1_, user2_
         yield users
         users_paths = tuple((os.path.join(app.state.STATIC_DIR, user.id) for user in users))
