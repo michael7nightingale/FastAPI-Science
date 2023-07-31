@@ -30,7 +30,7 @@ class SQLAlchemyAsyncService(BaseService):
 
     async def update(self, id_: str, **kwargs):
         """Update object."""
-        return await self.repository.get(id_, **kwargs)
+        return await self.repository.update(id_, **kwargs)
 
     async def all(self):
         """Get all objects."""
