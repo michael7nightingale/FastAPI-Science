@@ -2,11 +2,33 @@ from smtplib import SMTP_SSL
 from app.core.config import get_app_settings
 
 
-def create_server() -> SMTP_SSL:
+class SMTPServer(SMTP_SSL):
+
+    def __init__(self, host: str, port: int, from_addr: str, *args, **kwargs):
+        super().__init__(host, port, *args, **kwargs)
+        self._from_addr = from_addr
+
+    def send_message(self, subject: str, to_addrs: list, body: str) -> None:
+        email_text = """\
+            From: %s
+            To: %s
+            Subject: %s
+    
+            %s
+            """ % (self._from_addr, ", ".join(to_addrs), subject, body)
+        super().sendmail(
+            from_addr="suslanchikmopl@gmail.com",
+            to_addrs=to_addrs,
+            msg=email_text
+        )
+
+
+def create_server() -> SMTPServer:
     settings = get_app_settings()
-    server_ = SMTP_SSL(
+    server_ = SMTPServer(
         port=settings.EMAIL_PORT,
-        host=settings.EMAIL_HOST
+        host=settings.EMAIL_HOST,
+        from_addr=settings.EMAIL_USER,
     )
     server_.ehlo()
     server_.login(
@@ -16,19 +38,15 @@ def create_server() -> SMTP_SSL:
     return server_
 
 
-smtp_server = create_server()
+class EmailService:
 
+    def __init__(self, smtp_server: SMTPServer):
+        self._smtp_server = smtp_server
 
-def send_message(subject: str, to_addrs: list, body: str) -> None:
-    email_text = """\
-        From: %s
-        To: %s
-        Subject: %s
-
-        %s
-        """ % (get_app_settings().EMAIL_USER, ", ".join(to_addrs), subject, body)
-    smtp_server.sendmail(
-        from_addr="suslanchikmopl@gmail.com",
-        to_addrs=to_addrs,
-        msg=email_text
-    )
+    def send_activation_email(self, name, email, link):
+        message = "%s, please follow the link ro finish the registration: %s" % (name, link)
+        self._smtp_server.send_message(
+            subject="Registration",
+            to_addrs=[email],
+            body=message
+        )

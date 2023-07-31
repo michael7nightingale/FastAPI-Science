@@ -12,6 +12,7 @@ from app.models.schemas import UserCustomModel
 from app.db import create_engine, create_pool
 from app.db.events import create_superuser
 from app.data.load_data import load_all_data
+from app.services.email import create_server, EmailService
 
 
 class Server:
@@ -28,6 +29,7 @@ class Server:
 
         self._configurate_db()
         self._configurate_app()
+        self._configure_services()
 
     @property
     def app(self) -> FastAPI:
@@ -76,6 +78,10 @@ class Server:
         self._pool = create_pool(self.engine)
         self.app.state.pool = self.pool
 
+    def _configure_services(self):
+        self._smpt_server = create_server()
+        self.app.state.email_service = EmailService(smtp_server=self._smpt_server)
+
     async def _load_data(self):
         async with self.pool() as session:
             await create_superuser(
@@ -91,6 +97,7 @@ class Server:
     async def _on_shutdown_event(self):
         """Shutdown handler."""
         await self.engine.dispose()
+        self._smpt_server.close()
 
 
 class ErrorHandler:
