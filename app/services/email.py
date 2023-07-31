@@ -13,7 +13,7 @@ class SMTPServer(SMTP_SSL):
             From: %s
             To: %s
             Subject: %s
-    
+
             %s
             """ % (self._from_addr, ", ".join(to_addrs), subject, body)
         super().sendmail(

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Request, Depends
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi_authtools import login_required
 from fastapi_authtools.models import UsernamePasswordToken
 from fastapi_authtools.exceptions import raise_invalid_credentials
@@ -8,7 +8,7 @@ from app.app.dependencies import get_user_service
 from app.models.schemas import UserRegister, UserCustomModel
 from app.db.services import UserService
 from app.core.config import get_app_settings
-
+from app.services.token import confirm_token, generate_activation_link
 
 auth_router = APIRouter(
     prefix='/auth'
@@ -46,15 +46,47 @@ async def get_token(
 
 @auth_router.post("/register")
 async def register(
+        request: Request,
         user_data: UserRegister = Body(),
         user_service: UserService = Depends(get_user_service)
 ):
     """Registration POST view."""
     new_user = await user_service.register(user_data)
-    return new_user
+    if new_user is None:
+        return JSONResponse(
+            content={"detail": "Invalid data."},
+            status_code=400,
+        )
+    link = generate_activation_link(request, new_user)
+    request.app.state.email_service.send_activation_email(
+        name=new_user.username,
+        link=link,
+        email=new_user.email
+    )
+    return {"detail":  f"Activation link is sent on email {new_user.email}. Please follow the instructions."}
 
 
 @auth_router.get("/me")
 @login_required
 async def me(request: Request):
     return request.user
+
+
+@auth_router.get("/activation/{uuid}/{token}")
+async def activate_user(
+        request: Request,
+        uuid: str,
+        token: str,
+        user_service: UserService = Depends(get_user_service)
+):
+    user = await user_service.get(uuid)
+    if user is not None:
+        email = confirm_token(token)
+        if email is not None:
+            if user.email == email:
+                await user_service.activate(uuid)
+                return {"detail": "User is activated successfully."}
+    return JSONResponse(
+        content={"detail": "Activation link is invalid."},
+        status_code=400
+    )
