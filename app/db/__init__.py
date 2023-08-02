@@ -1,16 +1,12 @@
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncEngine
+from fastapi import FastAPI
+from tortoise.contrib.fastapi import register_tortoise
 
 
-def create_engine(db_uri: str) -> AsyncEngine:
-    return create_async_engine(db_uri)
-
-
-def create_pool(engine: AsyncEngine) -> async_sessionmaker:
-    return async_sessionmaker(
-        bind=engine,
-        expire_on_commit=False
+def register_db(app: FastAPI, db_uri: str, modules: list):
+    register_tortoise(
+        app=app,
+        db_url=db_uri,
+        modules={'models': modules},
+        generate_schemas=True,
+        add_exception_handlers=True
     )
-
-
-Base = declarative_base()
