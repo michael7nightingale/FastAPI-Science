@@ -1,27 +1,14 @@
-from fastapi import APIRouter, Depends, Path, Request, Body
+from fastapi import APIRouter, Path, Request, Body
 from fastapi.responses import FileResponse
 from fastapi_authtools import login_required
 from starlette.exceptions import HTTPException
 import os
 
+from app.db.models import Science, Category, Formula
 from app.formulas import contextBuilder, mathem_extra_counter
 from app.formulas.plots import Plot
 from app.models.schemas import RequestSchema, RequestData
 from app.formulas.metadata import get_formula
-from app.db.services import (
-    ScienceService,
-    CategoryService,
-    FormulaService,
-    HistoryService,
-
-)
-from app.app.dependencies import (
-    get_science_service,
-    get_category_service,
-    get_formula_service,
-    get_history_service,
-
-)
 
 
 science_router = APIRouter(
@@ -35,12 +22,11 @@ PLOTS_DIR = "/files/plots/"
 async def plots_view(
         request: Request,
         category_slug: str,
-        category_service: CategoryService
 ):
     """Plot get endpoint."""
-    category, science = await category_service.get_with_science(category_slug)
+    category = await Category.get_or_none(slug=category_slug)
     response = {
-        "science": science,
+        "science": category.science,
         "category": category
     }
     plot_path = PLOTS_DIR + f'/{request.user.id}.png'
@@ -89,12 +75,11 @@ async def plots_view_post(request: Request):
 async def equations_view(
         request: Request,
         category_slug: str,
-        category_service: CategoryService
 ):
-    category, science = await category_service.get_with_science(category_slug)
+    category = await Category.get_or_none(slug=category_slug)
     return {
         "request": request,
-        "science": science,
+        "science": category.science,
         "category": category
     }
 
@@ -125,37 +110,32 @@ SPECIAL_CATEGORIES_POST = {
 
 
 @science_router.get('/science')
-async def sciences_all(
-        science_service: ScienceService = Depends(get_science_service),
-):
+async def sciences_all():
     """All sciences list endpoint."""
-    sciences = await science_service.all()
+    sciences = await Science.all()
     return sciences
 
 
 @science_router.get('/science/{science_slug}')
 async def science_get(
-        science_service: ScienceService = Depends(get_science_service),
         science_slug: str = Path()
 ):
     """Science detail endpoint."""
-    science, categories = await science_service.get_with_categories(science_slug)
+    science = await Science.get_or_none(slug=science_slug)
     if science is None:
         raise HTTPException(
             status_code=404,
             detail="Science is not found."
         )
     return {
-        "science": science,
-        "categories": categories
+        "science": science.as_dict(),
+        "categories": [i.as_dict() for i in science.categories]
     }
 
 
 @science_router.get('/category/{category_slug}/')
 async def category_get(
         request: Request,
-        category_service: CategoryService = Depends(get_category_service),
-        formula_service: FormulaService = Depends(get_formula_service),
         category_slug: str = Path(),
 ):
     """Category GET view."""
@@ -163,20 +143,18 @@ async def category_get(
         return await SPECIAL_CATEGORIES_GET[category_slug](
             request,
             category_slug=category_slug,
-            category_service=category_service
         )
     else:
-        category, science = await category_service.get_with_science(category_slug)
+        category = await Category.get_or_none(slug=category_slug)
         if category is None:
             raise HTTPException(
                 status_code=404,
                 detail="Category is not found."
             )
-        formulas = await formula_service.filter(category_id=category.id)
         return {
-            "category": category,
-            "science": science,
-            "formulas": formulas
+            "category": category.as_dict(),
+            "science": category.science.as_dict(),
+            "formulas": [f.as_dict() for f in category.formulas]
         }
 
 
@@ -184,14 +162,12 @@ async def category_get(
 async def category_post(
         request: Request,
         category_slug: str = Path(),
-        category_service: CategoryService = Depends(get_category_service)
 ):
     """Category POST view."""
     if category_slug in SPECIAL_CATEGORIES_POST:
         return await SPECIAL_CATEGORIES_GET[category_slug](
             request,
             category_slug=category_slug,
-            category_service=category_service
         )
     else:
         raise HTTPException(
@@ -202,11 +178,10 @@ async def category_post(
 
 @science_router.get('/formula/{formula_slug}/')
 async def formula_get(
-        formula_service: FormulaService = Depends(get_formula_service),
         formula_slug: str = Path()
 ):
     """Science GET view."""
-    formula, category = await formula_service.get_with_category(formula_slug)
+    formula = await Formula.get_or_none(slug=formula_slug)
     if formula is None:
         raise HTTPException(
             status_code=404,
@@ -216,7 +191,7 @@ async def formula_get(
     if formula_obj is not None:
         return {
             "formula": formula.as_dict(),
-            "category": category.as_dict(),
+            "category": formula.category.as_dict(),
             "info": formula_obj.as_dict()
         }
 
@@ -227,18 +202,16 @@ async def formula_post(
         request: Request,
         formula_slug: str = Path(),
         request_data: RequestData = Body(),
-        formula_service: FormulaService = Depends(get_formula_service),
-        history_service: HistoryService = Depends(get_history_service),
 ):
     """Request form to calculate."""
-    formula, category = await formula_service.get_with_category(formula_slug)
+    formula = await Formula.get_or_none(slug=formula_slug)
     if formula is None:
         raise HTTPException(
             status_code=404,
             detail="Formula is not found."
         )
     request_schema = RequestSchema(
-        formula_id=formula.id,
+        formula_id=str(formula.id),
         url=request.url.path,
         method=request.method,
         user_id=request.user.id,
@@ -247,6 +220,5 @@ async def formula_post(
     result = await contextBuilder.count_result(
         request=request_schema,
         formula_slug=formula_slug,
-        history_service=history_service
     )
     return {"result": result}
