@@ -132,6 +132,7 @@ class TestFormula:
             get_science_router("formula_post", formula_slug="newton2"),
             json=data
         )
+        print(123123, response.json())
         assert response.status_code == status.HTTP_200_OK
         assert "result" in response.json()
         assert response.json()['result'] == 12300
