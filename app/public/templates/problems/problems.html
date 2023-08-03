@@ -61,24 +61,24 @@
                 </tr>
                 {% for p in problems %}
                  <tr>
-                 {% if p.problem.is_closed %}
+                 {% if p.is_closed %}
                     <td>Yes</td>
                   {% else %}
                      <td>Noe</td>
                   {% endif %}
-                    <td>{{ p.problem.title }}</td>
-                    <td>{{ p.solutions }}</td>
+                    <td>{{ p.title }}</td>
+                    <td>{{ p.title }}</td>
                     <td>{{ p.science.title }}</td>
                     <td>{{ p.user.username }}</td>
-                    <td>{{ p.problem.time_asked }}</td>
-                 {% if p.problem.is_closed %}
-                    <td>{{ p.problem.time_answered }}</td>
+                    <td>{{ p.time_asked }}</td>
+                 {% if p.is_closed %}
+                    <td>{{ p.time_solved }}</td>
                  {% else %}
                      <td>-</td>
                  {% endif %}
                     <td>
                         <button>
-                            <a href="{{ url_for('problem_get', problem_id=p.problem.id) }}">Go</a>
+                            <a href="{{ url_for('problem_get', problem_id=p.id) }}">Go</a>
                         </button>
                     </td>
                 </tr>

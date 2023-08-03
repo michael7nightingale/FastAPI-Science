@@ -22,7 +22,7 @@
                 <input class="white_text form-control" style="width: 30%" id='filename-input' type="text" name="filename" placeholder="Скачать как:">
             </div>
             <div class="col">
-                <select class="white_text form-control" style="width: 30%" id='extension-input' name="extension">
+                <select class="form-control" style="width: 30%" id='extension-input' name="extension">
                     <option value="csv">.csv</option>
                     <option value="xls">.xls</option>
                     <option value="xlsx">.xlsx</option>
@@ -34,27 +34,27 @@
             <button class="btn btn-large" style="background-color: dodgerblue" type="submit">Download</button>
         </div>
     </form>
-{#    <form method="post" action="{{ url_for('history_delete') }}">#}
-{#        <button class="btn-link" type="submit">Удалить историю</button>#}
-{#    </form>#}
 <table style="background-color: white; margin-top: 100px; width:100%" border=1 frame=void>
     <tbody >
         <tr>
             <td>Result</td>
             <td>Date Time</td>
-            <td>Url</td>
+            <td>Formula</td>
         </tr>
     {% for h in history %}
         <tr>
             <td>{{ h.result }}</td>
             <td>{{ h.date_time }}</td>
             <td>
-                <a href="{{ h.formula_url }}">{{ h.formula_url }}</a>
+                {{ h.formula_id }}
             </td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
-
+<form class="margin-top" method="post" action="{{ url_for('history_delete') }}">
+        <button class="btn-link" type="submit">Удалить историю</button>
+    </form>
 </div>
+
 {% endblock %}
