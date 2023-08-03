@@ -15,7 +15,7 @@ Some new features are coming. The web-app is both fullstack and API.
 - `PostgreSQL`;
 - `fastapi_authtools` (my authentication library);
 - `Pydantic 2.0`;
-- `SQLAlchemy`;
+- `Tortoise ORM`;
 - `Asyncpg` async engine for production and development, `aiosqlite` for testing;
 - `numpy` / `pandas` / `sympy` / `matplotlib` for calculations;
 - `Docker`;
