@@ -1,11 +1,11 @@
 import numpy as np
 
-from app.db.services import HistoryService
+from app.db.models import History
 from app.formulas.metadata import storage
 from app.models.schemas import RequestSchema
 
 
-async def build_template(request: RequestSchema, formula_slug: str, history_service: HistoryService | None = None):
+async def build_template(request: RequestSchema, formula_slug: str):
     # получение параметров
     formula_obj = storage[formula_slug]
     params = formula_obj.literals
@@ -36,9 +36,9 @@ async def build_template(request: RequestSchema, formula_slug: str, history_serv
             )[0]
             result = round(result, nums_comma)
             if request.user_id is not None:
-                await history_service.create(
-                    user_id=request.user_id,
+                await History.create(
                     result=str(result),
+                    user_id=request.user_id,
                     formula_id=request.formula_id,
                     formula_url=request.url,
                 )
@@ -149,7 +149,7 @@ async def build_html(
     return tab_div, tab_content_divs
 
 
-async def count_result(request: RequestSchema, formula_slug: str, history_service: HistoryService | None = None):
+async def count_result(request: RequestSchema, formula_slug: str):
     formula_obj = storage[formula_slug]
     params = formula_obj.literals
     args = formula_obj.args
@@ -181,11 +181,10 @@ async def count_result(request: RequestSchema, formula_slug: str, history_servic
             )[0]
             result = round(float(result), nums_comma)
             if request.user_id is not None:
-                await history_service.create(
+                await History.create(
                     user_id=request.user_id,
                     result=str(result),
                     formula_id=request.formula_id,
-                    formula_url=request.url,
                 )
 
     except (SyntaxError, NameError):

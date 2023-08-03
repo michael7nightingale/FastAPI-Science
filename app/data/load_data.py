@@ -1,53 +1,43 @@
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from tortoise.exceptions import IntegrityError
 import csv
 
 from app.db.models import Science, Category, Formula
 
 
-async def load_sciences(pool: async_sessionmaker):
+async def load_sciences():
     with open("app/data/files/sciences.csv") as file:
         lines = list(csv.DictReader(file))
 
     for line in lines:
-        async with pool() as session:
-            try:
-                science = Science(**line)
-                session.add(science)
-                await session.commit()
-            except IntegrityError:
-                pass
+        try:
+            await Science.create(**line)
+        except IntegrityError:
+            pass
 
 
-async def load_categories(pool: async_sessionmaker):
+async def load_categories():
     with open("app/data/files/categories.csv") as file:
         lines = list(csv.DictReader(file))
 
     for line in lines:
-        async with pool() as session:
-            try:
-                science = Category(**line)
-                session.add(science)
-                await session.commit()
-            except IntegrityError:
-                pass
+        try:
+            await Category.create(**line)
+        except IntegrityError:
+            pass
 
 
-async def load_formulas(pool: async_sessionmaker):
+async def load_formulas():
     with open("app/data/files/formulas.csv") as file:
         lines = list(csv.DictReader(file))
 
     for line in lines:
-        async with pool() as session:
-            try:
-                science = Formula(**line)
-                session.add(science)
-                await session.commit()
-            except IntegrityError:
-                pass
+        try:
+            await Formula.create(**line)
+        except IntegrityError:
+            pass
 
 
-async def load_all_data(pool: async_sessionmaker):
-    await load_sciences(pool)
-    await load_categories(pool)
-    await load_formulas(pool)
+async def load_all_data():
+    await load_sciences()
+    await load_categories()
+    await load_formulas()
