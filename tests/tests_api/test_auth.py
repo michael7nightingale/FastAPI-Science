@@ -51,18 +51,23 @@ class TestMain:
         )
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    async def test_register_not_active(self, client: AsyncClient, user1):
+    async def test_register_not_active(self, client: AsyncClient):
+        user = {
+            "username": "username",
+            "email": "email@gmail.com",
+            "password": "password"
+        }
         response = await client.post(
             get_auth_url("register"),
-            json=user1
+            json=user
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            "detail": f"Activation link is sent on email {user1['email']}. Please follow the instructions."
+            "detail": f"Activation link is sent on email {user['email']}. Please follow the instructions."
         }
         user_existed_data = {
-            "password": user1['password'],
-            "username": user1['username']
+            "password": user['password'],
+            "username": user['username']
         }
         response = await client.post(
             get_auth_url("get_token"),

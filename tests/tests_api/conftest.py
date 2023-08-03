@@ -1,9 +1,11 @@
-import os.path
-from shutil import rmtree
-
+import asyncio
+import pytest
 import pytest_asyncio
 from httpx import AsyncClient
 from fastapi import FastAPI, APIRouter
+from shutil import rmtree
+import os.path
+from tortoise import Tortoise
 
 from app.app.routes.api import (
     main_router,
@@ -14,19 +16,37 @@ from app.app.routes.api import (
 
 )
 from app.core.server import Server
-from app.db import Base
-from app.db.services import UserService
+from app.db.models import User
 
 
-@pytest_asyncio.fixture
+@pytest.fixture(scope="session")
+def event_loop():
+    return asyncio.new_event_loop()
+
+
+@pytest_asyncio.fixture(scope='session')
 async def app() -> FastAPI:
     server = Server(test=True, use_cookies=False)
-    async with server.engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await Tortoise.init(
+        {
+            "connections": {
+                "default": {
+                    "engine": "tortoise.backends.sqlite",
+                    "credentials": {"file_path": "example.sqlite3"},
+                }
+            },
+            "apps": {
+                "models": {"models": ["app.db.models"], "default_connection": "default"}
+            },
+        },
+        _create_db=True
+    )
+    await Tortoise.generate_schemas()
+    await clear_users()
     await server._load_data()
     yield server.app
-    async with server.engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    await clear_users()
+    await Tortoise._drop_databases()
 
 
 @pytest_asyncio.fixture
@@ -40,7 +60,7 @@ def user1():
     return {
         "username": "michael7",
         "password": "password",
-        "email": "asdasd@gmail.com"
+        "email": "asd2asd@gmail.com"
     }
 
 
@@ -51,6 +71,12 @@ def user2():
         "password": "password123",
         "email": "asdaghhksd@gmail.com"
     }
+
+
+async def clear_users():
+    users = await User.all()
+    for user in users:
+        await user.delete()
 
 
 @pytest_asyncio.fixture
@@ -67,6 +93,7 @@ async def client_user1(client: AsyncClient, users_test_data: dict, user1: dict):
     headers = {"Authorization": f"Bearer {access_token}"}
     client.headers = headers
     yield client
+    await clear_users()
 
 
 @pytest_asyncio.fixture
@@ -84,22 +111,23 @@ async def client_user2(client: AsyncClient, users_test_data: dict, user2: dict):
     client.headers = headers
     client.cookies = headers
     yield client
+    await clear_users()
 
 
 @pytest_asyncio.fixture
 async def users_test_data(app: FastAPI, user1: dict, user2: dict):
-    async with app.state.pool() as session:
-        users_repo = UserService(session)
-        user1_ = await users_repo.register(user1)
-        await users_repo.activate(user1_.id)
-        user2_ = await users_repo.register(user2)
-        await users_repo.activate(user2_.id)
-        users = user1_, user2_
-        yield users
-        users_paths = tuple((os.path.join(app.state.STATIC_DIR, user.id) for user in users))
-        for path in users_paths:
-            if os.path.exists(path):
-                rmtree(path)
+    await clear_users()
+    user1_ = await User.register(**user1)
+    await User.activate(user1_.id)
+    user2_ = await User.register(**user2)
+    await User.activate(user2_.id)
+    users = user1_, user2_
+    yield users
+    users_paths = tuple((os.path.join(app.state.STATIC_DIR, str(user.id)) for user in users))
+    for path in users_paths:
+        if os.path.exists(path):
+            rmtree(path)
+    await clear_users()
 
 
 @pytest_asyncio.fixture
@@ -113,10 +141,10 @@ def user_not_activated():
 
 @pytest_asyncio.fixture
 async def not_active_user(app: FastAPI, user_not_activated: dict):
-    async with app.state.pool() as session:
-        user_repo = UserService(session)
-        user = await user_repo.register(user_not_activated)
-        yield user
+    await clear_users()
+    user = await User.register(**user_not_activated)
+    yield user
+    await clear_users()
 
 
 def url_for(router: APIRouter):
