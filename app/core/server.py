@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from starlette.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi_authtools import AuthManager
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from starlette.responses import RedirectResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
@@ -24,8 +23,6 @@ class Server:
             self._settings = get_test_app_settings()
         else:
             self._settings = get_app_settings()
-        self._engine: AsyncEngine
-        self._pool: async_sessionmaker
 
         self._configurate_db()
         self._configurate_app()
