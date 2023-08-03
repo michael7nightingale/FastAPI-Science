@@ -1,16 +1,9 @@
-from sqlalchemy import Column, String
-from sqlalchemy.orm import DeclarativeBase
-from uuid import uuid4
+from tortoise.models import Model
 
 
-class BaseAlchemyModel(DeclarativeBase):
-    """May be useful"""
-    pass
-
-
-class TableMixin:
-    """For getting dict object of the model."""
-    id = Column(String(100), primary_key=True, default=lambda: str(uuid4()))
-
+class TortoiseModel(Model):
     def as_dict(self):
-        return {i.name: getattr(self, i.name) for i in self.__table__.columns}
+        schema = self.describe()
+        dicted = {field['name']: getattr(self, field['name']) for field in schema['data_fields']}
+        dicted[schema['pk_field']['name']] = str(getattr(self, schema['pk_field']['name']))
+        return dicted
