@@ -3,8 +3,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi_authtools import login_required
 
-from app.app.dependencies import get_history_service, get_table_filepath
-from app.db.services import HistoryService
+from app.app.dependencies import get_table_filepath
+from app.db.models import History
+
 
 cabinets_router = APIRouter(prefix="/cabinet")
 templates = Jinja2Templates('app/public/templates/cabinets/')
@@ -20,12 +21,9 @@ async def cabinet(request: Request):
 
 @cabinets_router.get('/history')
 @login_required
-async def history(
-        request: Request,
-        history_service: HistoryService = Depends(get_history_service)
-):
+async def history(request: Request):
     """History view."""
-    history_list = await history_service.filter(user_id=request.user.id)
+    history_list = await History.filter(user_id=request.user.id)
     context = {
         "title": "История вычислений",
         "history": history_list,
@@ -50,4 +48,7 @@ async def history_download(
 @cabinets_router.post('/delete_history')
 @login_required
 async def history_delete(request: Request):
+    history_list = await History.filter(user__id=request.user.id)
+    for h in history_list:
+        await h.delete()
     return RedirectResponse(url=cabinets_router.url_path_for('history'), status_code=303)

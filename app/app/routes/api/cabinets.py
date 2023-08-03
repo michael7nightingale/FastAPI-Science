@@ -2,8 +2,8 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi_authtools import login_required
 
-from app.app.dependencies import get_history_service, get_table_filepath
-from app.db.services import HistoryService
+from app.app.dependencies import get_table_filepath
+from app.db.models import History
 
 
 cabinets_router = APIRouter(prefix="/cabinet")
@@ -11,9 +11,9 @@ cabinets_router = APIRouter(prefix="/cabinet")
 
 @cabinets_router.get('/history')
 @login_required
-async def history(history_service: HistoryService = Depends(get_history_service)):
+async def history(request: Request):
     """History view."""
-    history_list = await history_service.all()
+    history_list = await History.filter(user__id=request.user.id)
     return history_list
 
 
