@@ -1,25 +1,13 @@
-from fastapi import Path, Request, Depends, HTTPException, Form
+from fastapi import Path, Request, HTTPException, Form
 
-from app.db.services import (
-    ProblemService,
-    SolutionService,
-    SolutionMediaService,
-    ProblemMediaService
-)
-
-from app.app.dependencies.services import (
-    get_problem_service,
-    get_solution_service,
-    get_problem_media_service,
-    get_solution_media_service,
-
-)
+from app.db.models import Problem, ProblemMedia, Solution, SolutionMedia
 
 
 def get_problem_data(
         title: str = Form(),
         text: str = Form(),
         science: str = Form(),
+
 ):
     return {
         "text": text,
@@ -30,18 +18,15 @@ def get_problem_data(
 
 def get_solution_data(
         text: str = Form(),
+
 ):
     return {
         "text": text,
     }
 
 
-async def get_problem(
-        request: Request,
-        problem_id: str = Path(),
-        problem_service: ProblemService = Depends(get_problem_service)
-):
-    problem = await problem_service.get(problem_id)
+async def get_problem(request: Request, problem_id: str = Path()):
+    problem = await Problem.get_or_none(id=problem_id)
     if problem is None:
         raise HTTPException(
             status_code=404,
@@ -50,43 +35,34 @@ async def get_problem(
     return problem
 
 
-async def get_problem_media(
-        request: Request,
-        problem_media_id: str = Path(),
-        problem_media_service: ProblemMediaService = Depends(get_problem_media_service)
-):
-    problem = await problem_media_service.get(problem_media_id)
-    if problem is None:
+async def get_problem_media(request: Request, problem_media_id: str = Path()):
+    problem_media = await ProblemMedia.get_or_none(id=problem_media_id)
+    if problem_media is None:
         raise HTTPException(
             status_code=404,
             detail="Problem media is not found."
         )
-    return problem
+    return problem_media
 
 
 async def get_solution(
         request: Request,
         solution_id: str = Path(),
-        solution_service: SolutionService = Depends(get_solution_service)
 ):
-    problem = await solution_service.get(solution_id)
-    if problem is None:
+    solution = await Solution.get_or_none(id=solution_id)
+    if solution is None:
         raise HTTPException(
             status_code=404,
             detail="Solution is not found."
         )
-    return problem
+    return solution
 
 
-async def get_solution_media(
-        request: Request,
-        solution_media_id: str = Path(),
-        solution_media_service: SolutionMediaService = Depends(get_solution_media_service)
-):
-    problem = await solution_media_service.get(solution_media_id)
-    if problem is None:
+async def get_solution_media(request: Request, solution_media_id: str = Path()):
+    solution_media = await SolutionMedia.get_or_none(id=solution_media_id)
+    if solution_media is None:
         raise HTTPException(
             status_code=404,
             detail="Solution media is not found."
         )
-    return problem
+    return solution_media
