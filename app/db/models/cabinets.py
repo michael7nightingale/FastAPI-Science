@@ -1,17 +1,27 @@
-from sqlalchemy import Column, String, ForeignKey, func, DateTime
+from tortoise import fields
 
-from app.db import Base
-from app.db.models.base import TableMixin
+from app.db.models.base import TortoiseModel
 
 
-class History(Base, TableMixin):
-    __tablename__ = 'history'
+class History(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    formula = fields.ForeignKeyField("models.Formula")
+    result = fields.FloatField()
+    date_time = fields.DatetimeField(auto_now=True)
+    user = fields.ForeignKeyField("models.User")
 
-    formula_id = Column(String(100), ForeignKey("formulas.id"))
-    result = Column(String(100))
-    formula_url = Column(String(50))
-    date_time = Column(DateTime(timezone=True), server_default=func.now())
-    user_id = Column(String(100), ForeignKey("users.id"))
+    @classmethod
+    async def all(cls, using_db=None):
+        return await (
+            super()
+            .all(using_db)
+            .select_related("formula")
+        )
 
-    def history_view(self) -> str:
-        return f"{self.formula_id} | {self.result} | {self.formula_url}"
+    @classmethod
+    async def get_or_none(cls, *args, using_db=None, **kwargs):
+        return await (
+            super()
+            .get_or_none(*args, using_db=using_db, **kwargs)
+            .select_related("formula")
+        )

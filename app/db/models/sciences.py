@@ -1,34 +1,70 @@
-from sqlalchemy import Column, String, Text, ForeignKey
+from tortoise import fields
 
-from app.db import Base
-from app.db.models.base import TableMixin
-
-
-class Science(Base, TableMixin):
-    __tablename__ = 'sciences'
-
-    title = Column(String(40), unique=True)
-    content = Column(Text)
-    image_path = Column(String(100), nullable=True)
-    slug = Column(String(40), unique=True, index=True)
+from app.db.models.base import TortoiseModel
 
 
-class Category(Base, TableMixin):
-    __tablename__ = 'categories'
+class Science(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    title = fields.CharField(max_length=40, unique=True, index=True)
+    content = fields.TextField()
+    image_path = fields.CharField(max_length=255, null=True)
+    slug = fields.CharField(max_length=40, unique=True, index=True)
 
-    title = Column(String(40), unique=True)
-    content = Column(Text)
-    image_path = Column(String(100), nullable=True)
-    science_id = Column(String(100), ForeignKey("sciences.id"))
-    slug = Column(String(40), unique=True, index=True)
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def get_or_none(cls, *args, using_db=None, **kwargs):
+        return (
+            super()
+            .get_or_none(*args, using_db=using_db, **kwargs)
+            .prefetch_related("categories")
+        )
 
 
-class Formula(Base, TableMixin):
-    __tablename__ = 'formulas'
+class Category(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    title = fields.CharField(max_length=40, unique=True, index=True)
+    content = fields.TextField()
+    image_path = fields.CharField(max_length=255, null=True)
+    science = fields.ForeignKeyField(
+        model_name="models.Science",
+        related_name="categories",
+    )
+    slug = fields.CharField(max_length=40, unique=True, index=True)
 
-    title = Column(String(40), unique=True)
-    formula = Column(String(40))
-    content = Column(Text)
-    image_path = Column(String(100), nullable=True)
-    category_id = Column(String(100), ForeignKey("categories.id"))
-    slug = Column(String(40), unique=True, index=True)
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def get_or_none(cls, *args, using_db=None, **kwargs):
+        return (
+            super()
+            .get_or_none(*args, using_db=using_db, **kwargs)
+            .prefetch_related("formulas")
+            .select_related("science")
+        )
+
+
+class Formula(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    title = fields.CharField(max_length=40, unique=True, index=True)
+    content = fields.TextField()
+    formula = fields.CharField(max_length=255)
+    image_path = fields.CharField(max_length=255, null=True)
+    category = fields.ForeignKeyField(
+        model_name="models.Category",
+        related_name="formulas"
+    )
+    slug = fields.CharField(max_length=40, unique=True, index=True)
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def get_or_none(cls, *args, using_db=None, **kwargs):
+        return (
+            super()
+            .get_or_none(*args, using_db=using_db, **kwargs)
+            .select_related("category", "category__science")
+        )

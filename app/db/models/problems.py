@@ -1,41 +1,71 @@
-from sqlalchemy import Column, String, ForeignKey, DateTime,  func, Boolean, Text
+from tortoise import fields
 
-from app.db import Base
-from app.db.models.base import TableMixin
-
-
-class Problem(TableMixin, Base):
-    __tablename__ = "problems"
-
-    title = Column(String(100))
-    text = Column(Text)
-    time_asked = Column(DateTime(timezone=True), server_default=func.now())
-    time_answered = Column(DateTime(timezone=True), nullable=True)
-    is_solved = Column(Boolean, default=False)
-    solution_id = Column(String(100), ForeignKey("solutions.id", ondelete="SET NULL"), nullable=True)
-    science_id = Column(String(100), ForeignKey("sciences.id", ondelete="CASCADE"))
-
-    user_id = Column(String(100), ForeignKey("users.id"))
+from app.db.models.base import TortoiseModel
 
 
-class Solution(TableMixin, Base):
-    __tablename__ = "solutions"
+class Problem(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    title = fields.CharField(max_length=255)
+    text = fields.TextField()
+    user = fields.ForeignKeyField("models.User", related_name="problems")
+    # solution = fields.OneToOneField("models.Solution", related_name="problem_solved", null=True)
+    science = fields.ForeignKeyField("models.Science", related_name="problems")
+    is_solved = fields.BooleanField(default=False)
+    time_opened = fields.DatetimeField(auto_now=True)
+    time_solved = fields.DatetimeField(null=True)
 
-    author_id = Column(String(100), ForeignKey("users.id", ondelete="CASCADE"))
-    problem_id = Column(String(100), ForeignKey("problems.id", ondelete="CASCADE"))
-    text = Column(Text)
-    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    @classmethod
+    async def all(cls, using_db=None):
+        return await (
+            super()
+            .all(using_db)
+            .prefetch_related("medias")
+            .select_related("science", "user")
+        )
+
+    @classmethod
+    async def get_or_none(cls, *args, using_db=None, **kwargs):
+        return await (
+            super()
+            .get_or_none(*args, using_db=using_db, **kwargs)
+            .prefetch_related("medias", "solutions")
+            .select_related("science", "user")
+        )
 
 
-class ProblemMedia(TableMixin, Base):
-    __tablename__ = "problemmedias"
+class ProblemMedia(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    problem = fields.ForeignKeyField("models.Problem", "medias")
+    media_path = fields.CharField(max_length=255)
 
-    problem_id = Column(String(100), ForeignKey("problems.id", ondelete="CASCADE"))
-    media_path = Column(String(255))
+
+class Solution(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    text = fields.TextField()
+    problem = fields.ForeignKeyField("models.Problem", related_name="solutions")
+    author = fields.ForeignKeyField("models.User", related_name="solutions")
+    time_created = fields.DatetimeField(auto_now=True)
+
+    @classmethod
+    async def all(cls, using_db=None):
+        return await (
+            super()
+            .all(using_db)
+            .prefetch_related("medias")
+            .select_related("author")
+        )
+
+    @classmethod
+    async def get_or_none(cls, *args, using_db=None, **kwargs):
+        return await (
+            super()
+            .get_or_none(*args, using_db=using_db, **kwargs)
+            .prefetch_related("medias")
+            .select_related("author")
+        )
 
 
-class SolutionMedia(TableMixin, Base):
-    __tablename__ = "solutionmedias"
-
-    solution_id = Column(String(100), ForeignKey("solutions.id", ondelete="CASCADE"))
-    media_path = Column(String(255))
+class SolutionMedia(TortoiseModel):
+    id = fields.UUIDField(pk=True)
+    solution = fields.ForeignKeyField("models.Solution", "medias")
+    media_path = fields.CharField(max_length=255)
