@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Body, Request, Depends
+from fastapi import APIRouter, Body, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi_authtools import login_required
 from fastapi_authtools.models import UsernamePasswordToken
 from fastapi_authtools.exceptions import raise_invalid_credentials
 
-from app.app.dependencies import get_user_service
+from app.db.models import User
 from app.models.schemas import UserRegister, UserCustomModel
-from app.db.services import UserService
 from app.core.config import get_app_settings
 from app.services.token import confirm_token, generate_activation_link
+
 
 auth_router = APIRouter(
     prefix='/auth'
@@ -28,13 +28,9 @@ async def github_get(code: str):
 
 
 @auth_router.post('/token')
-async def get_token(
-        request: Request,
-        user_token_data: UsernamePasswordToken = Body(),
-        user_service: UserService = Depends(get_user_service)
-):
+async def get_token(request: Request, user_token_data: UsernamePasswordToken = Body()):
     """Token get view."""
-    user = await user_service.login(
+    user = await User.login(
         **user_token_data.model_dump()
     )
     if user is None:
@@ -45,13 +41,9 @@ async def get_token(
 
 
 @auth_router.post("/register")
-async def register(
-        request: Request,
-        user_data: UserRegister = Body(),
-        user_service: UserService = Depends(get_user_service)
-):
+async def register(request: Request, user_data: UserRegister = Body()):
     """Registration POST view."""
-    new_user = await user_service.register(user_data)
+    new_user = await User.register(**user_data.model_dump())
     if new_user is None:
         return JSONResponse(
             content={"detail": "Invalid data."},
@@ -77,14 +69,13 @@ async def activate_user(
         request: Request,
         uuid: str,
         token: str,
-        user_service: UserService = Depends(get_user_service)
 ):
-    user = await user_service.get(uuid)
+    user = await User.get_or_none(id=uuid)
     if user is not None:
         email = confirm_token(token)
         if email is not None:
             if user.email == email:
-                await user_service.activate(uuid)
+                await User.activate(uuid)
                 return {"detail": "User is activated successfully."}
     return JSONResponse(
         content={"detail": "Activation link is invalid."},
