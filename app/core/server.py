@@ -2,14 +2,13 @@ from fastapi import FastAPI, Request
 from starlette.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi_authtools import AuthManager
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from starlette.responses import RedirectResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from app.core.config import get_app_settings, get_test_app_settings
 from app.app.routes import __routers__, __api_routers__
 from app.models.schemas import UserCustomModel
-from app.db import create_engine, create_pool
+from app.db import register_db
 from app.db.events import create_superuser
 from app.data.load_data import load_all_data
 from app.services.email import create_server, EmailService
@@ -24,8 +23,6 @@ class Server:
             self._settings = get_test_app_settings()
         else:
             self._settings = get_app_settings()
-        self._engine: AsyncEngine
-        self._pool: async_sessionmaker
 
         self._configurate_db()
         self._configurate_app()
@@ -38,14 +35,6 @@ class Server:
     @property
     def settings(self):
         return self._settings
-
-    @property
-    def engine(self) -> AsyncEngine:
-        return self._engine
-
-    @property
-    def pool(self) -> async_sessionmaker:
-        return self._pool
 
     def _configurate_app(self) -> None:
         """Configurate FastAPI application."""
@@ -74,21 +63,21 @@ class Server:
 
     def _configurate_db(self) -> None:
         """Configurate database."""
-        self._engine = create_engine(self.settings.db_uri)
-        self._pool = create_pool(self.engine)
-        self.app.state.pool = self.pool
+        register_db(
+            app=self.app,
+            modules=['app.db.models'],
+            db_uri=self.settings.db_uri
+        )
 
     def _configure_services(self):
+        """SMTP server configuration for sending email messages."""
         self._smpt_server = create_server()
         self.app.state.email_service = EmailService(smtp_server=self._smpt_server)
 
     async def _load_data(self):
-        async with self.pool() as session:
-            await create_superuser(
-                session=session,
-                settings=self.settings
-            )
-        await load_all_data(self.pool)
+        """Data loading function."""
+        await create_superuser(settings=self.settings)
+        await load_all_data()
 
     async def _on_startup_event(self):
         """Startup handler."""
@@ -96,7 +85,6 @@ class Server:
 
     async def _on_shutdown_event(self):
         """Shutdown handler."""
-        await self.engine.dispose()
         self._smpt_server.close()
 
 

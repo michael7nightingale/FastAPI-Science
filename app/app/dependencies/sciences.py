@@ -1,12 +1,8 @@
-from fastapi import Depends, Request
+from fastapi import Request
 
-from app.db.services import ScienceService
-from app.app.dependencies.services import get_science_service
+from app.db.models import Science
 
 
-async def get_all_sciences(
-        request: Request,
-        science_service: ScienceService = Depends(get_science_service)
-):
-    sciences = await science_service.all()
+async def get_all_sciences(request: Request):
+    sciences = await Science.all()
     return sciences

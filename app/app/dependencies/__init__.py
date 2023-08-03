@@ -12,18 +12,6 @@ from .problems import (
     get_problem_media,
 
 )
-from .services import (
-    get_history_service,
-    get_user_service,
-    get_science_service,
-    get_formula_service,
-    get_category_service,
-    get_problem_service,
-    get_solution_service,
-    get_problem_media_service,
-    get_solution_media_service,
-
-)
 
 
 def check_object_permissions(obj, user, field_name):

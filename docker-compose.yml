@@ -8,8 +8,7 @@ services:
     env_file:
       - .docker.env
     command: >
-      sh -c "alembic upgrade head &&
-            uvicorn app.main:create_app --host 0.0.0.0"
+      sh -c "uvicorn app.main:create_app --host 0.0.0.0"
     ports:
       - "8000:8000"
 

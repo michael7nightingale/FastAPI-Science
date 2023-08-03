@@ -2,11 +2,12 @@ from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 
-from app.app.dependencies import get_user_register_data, get_user_service
+from app.app.dependencies import get_user_register_data
+from app.db.models import User
 from app.models.schemas import UserRegister, UserCustomModel
-from app.db.services import UserService
 from app.core.config import get_app_settings
 from app.services.token import confirm_token, generate_activation_link
+
 
 auth_router = APIRouter(
     prefix='/auth'
@@ -39,13 +40,13 @@ async def login_post(
         request: Request,
         username: str = Form(),
         password: str = Form(),
-        user_service: UserService = Depends(get_user_service)
 ):
     """Login POST view."""
-    user = await user_service.login(username, password)
+    user = await User.login(username, password)
     if user is None:
         return login_redirect()
     response = RedirectResponse("/", status_code=303)
+    print(user.describe())
     user_model = UserCustomModel(**user.as_dict())
     request.app.state.auth_manager.login(response, user_model)
     return response
@@ -66,10 +67,9 @@ async def register_get(request: Request):
 async def register_post(
         request: Request,
         user_data: UserRegister = Depends(get_user_register_data),
-        user_service: UserService = Depends(get_user_service)
 ):
     """Registration POST view."""
-    new_user = await user_service.register(user_data)
+    new_user = await User.register(**user_data.model_dump())
     if new_user is None:
         return RedirectResponse(auth_router.url_path_for("register_get"), status_code=303)
     # message = f"Activation link is sent on email {new_user.email}. Please follow the instructions."
@@ -95,13 +95,12 @@ async def activate_user(
         request: Request,
         uuid: str,
         token: str,
-        user_service: UserService = Depends(get_user_service)
 ):
-    user = await user_service.get(uuid)
+    user = await User.get_or_none(id=uuid)
     if user is not None:
         email = confirm_token(token)
         if email is not None:
             if user.email == email:
-                await user_service.activate(uuid)
+                await User.activate(uuid)
                 return login_redirect()
     return RedirectResponse(url=request.app.url_path_for('login_get'), status_code=303)
