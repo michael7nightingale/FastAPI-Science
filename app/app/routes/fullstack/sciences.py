@@ -21,6 +21,7 @@ templates = Jinja2Templates('app/public/templates/science/')
 
 # ================================= PLOTS ================================ #
 
+@login_required
 async def plots_view(
         request: Request,
         category_slug: str,
