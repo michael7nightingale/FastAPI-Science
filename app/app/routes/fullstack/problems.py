@@ -36,10 +36,11 @@ async def problems_all(request: Request, sciences: list = Depends(get_all_scienc
         for k, v in request.query_params.items():
             if v == "on":
                 sciences_filters.append(k)
-
-        is_solved = bool(request.query_params.get("is_solved", False))
-        problems = await Problem.filter(science__slug__in=[sciences_filters], is_solved=is_solved)
-
+        conditions = {"science__slug__in": sciences_filters}
+        is_solved = request.query_params.get("is_solved")
+        if is_solved:
+            conditions["is_solved"] = bool(is_solved)
+        problems = await Problem.filter(**conditions)
     else:
         problems = await Problem.all()
     context = {
