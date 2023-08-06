@@ -36,7 +36,7 @@ async def app() -> FastAPI:
                 }
             },
             "apps": {
-                "models": {"models": ["app.db.models"], "default_connection": "default"}
+                "models": {"models": ["src.db.models"], "default_connection": "default"}
             },
         },
         _create_db=True

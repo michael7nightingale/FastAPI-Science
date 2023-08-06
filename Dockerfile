@@ -1,7 +1,7 @@
 FROM python:3.11
 
 COPY requirements.txt ./requirements.txt
-COPY app ./app
+COPY src ./app
 COPY .docker.env ./.docker.env
 COPY alembic.ini ./alembic.ini
 
