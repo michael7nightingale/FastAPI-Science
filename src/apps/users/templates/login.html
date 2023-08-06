@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/login.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='users/css/login.css') }}">
 <h2 class="white_text">{{ title }}</h2>
 
 
@@ -9,25 +9,22 @@
 <div class="logo">
 
 </div>
-    <h3 align="center">Registration</h3>
+    <h3 align="center">Log in</h3>
     <form method="post">
     <div class="form-item">
-      <input type="email" name="email" placeholder="Email" id="email" class="form-style" autocomplete="off"/>
-    </div>
-        <div class="form-item">
-      <input type="text" placeholder="Username" name="username" id="username" class="form-style" />
+      <input type="text" name="username" placeholder="Username" id="username" class="form-style" autocomplete="off"/>
     </div>
     <div class="form-item">
       <input type="password" placeholder="Password" name="password" id="password" class="form-style" />
     </div>
     <div class="form-item">
-        <p class="pull-left"><a href="{{ url_for("login_get") }}"><small>log in</small></a></p>
+        <p class="pull-left"><a href="{{ url_for("register_get") }}"><small>Register</small></a></p>
         <input type="submit" class="login pull-right" value="Log In" >
         <div class="clear-fix"></div>
     </div>
     </form>
     <a href="{{ url_for('github_login') }}">
-            <img src="{{ url_for('static', path='images/github.png') }}" alt="" width="8%" height="8%">
+            <img src="{{ url_for('static', path='users/images/github.png') }}" alt="" width="8%" height="8%">
             Войти с помощью GitHub
         </a>
 </div>
