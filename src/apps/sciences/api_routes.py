@@ -5,10 +5,10 @@ from starlette.exceptions import HTTPException
 import os
 
 from .models import Science, Category, Formula
-from src.formulas import contextBuilder, mathem_extra_counter
-from src.formulas.plots import Plot
+from ...services.formulas import contextBuilder, mathem_extra_counter
+from src.services.formulas.plots import Plot
 from .schemas import RequestSchema, RequestData
-from src.formulas.metadata import get_formula
+from src.services.formulas.metadata import get_formula
 
 
 science_router = APIRouter(
