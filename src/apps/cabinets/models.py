@@ -12,15 +12,23 @@ class History(TortoiseModel):
 
     @classmethod
     async def all(cls, using_db=None):
-        return await (
+        return (
             super()
             .all(using_db)
             .select_related("formula")
         )
 
     @classmethod
+    def filter(cls, *args, **kwargs):
+        return (
+            super()
+            .filter(*args, **kwargs)
+            .select_related("formula", "user")
+        )
+
+    @classmethod
     async def get_or_none(cls, *args, using_db=None, **kwargs):
-        return await (
+        return (
             super()
             .get_or_none(*args, using_db=using_db, **kwargs)
             .select_related("formula")
