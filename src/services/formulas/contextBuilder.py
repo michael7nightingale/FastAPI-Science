@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.apps.cabinets.models import History
-from src.formulas.metadata import storage
+from src.services.formulas.metadata import storage
 from src.apps.sciences.schemas import RequestSchema
 
 
