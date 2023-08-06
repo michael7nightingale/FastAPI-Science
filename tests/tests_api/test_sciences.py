@@ -20,7 +20,7 @@ class TestScience:
         response = await client.get(get_science_router("science_get", science_slug="physics"))
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert "categories" in data and "science" in data
+        assert "categories" in data and "sciences" in data
         assert len(data['categories'])
         assert any(1 for i in data['categories'] if i['title'] == "Динамика")
 

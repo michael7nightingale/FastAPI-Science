@@ -1,7 +1,7 @@
 from fastapi import status
 from httpx import AsyncClient
 
-from app.services.token import generate_token
+from src.services.token import generate_token
 from tests_api.conftest import get_auth_url
 
 

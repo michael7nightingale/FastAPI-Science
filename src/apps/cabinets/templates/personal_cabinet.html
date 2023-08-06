@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', path='cabinets/css/cabinets.css') }}">
+
+     <div class="jumbotron">
+        <h2>Личный кабинет - {{ request.user.username }}</h2>
+        <p class="lead">Смотрите журнал вычислений и многое другое.</p>
+        <a href="{{ url_for("homepage") }}" class="btn btn-primary btn-large">назад на главную &raquo;</a>
+        {% if request.user.is_superuser or request.user.is_stuff %}
+            <a href="/docs/" class="btn btn-primary btn-large">документация &raquo;</a>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+            <button class="btn btn-primary btn-large">
+                      <a class="white_text" href="{{ url_for('history') }}"><h4>История вычислений</h4></a>
+            </button>
+            </div>
+            <div class="col">
+            <button class="btn btn-primary btn-large">
+                <a class="white_text" href="{{ url_for('history') }}"><h4>Предложить формулу</h4></a>
+            </button>
+             </div>
+        </div>
+
+        {% if request.user.is_superuser or request.user.is_stuff  %}
+            <div class="row">
+                <div class="col">
+                <button class="btn btn-primary btn-large">
+                    <a class="white_text" href="{{ url_for('history') }}"><h4>Предложенные формулы</h4></a>
+                </button>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

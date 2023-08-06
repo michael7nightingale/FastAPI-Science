@@ -7,16 +7,13 @@ from shutil import rmtree
 import os.path
 from tortoise import Tortoise
 
-from app.app.routes.api import (
-    main_router,
-    auth_router,
-    science_router,
-    cabinets_router,
-    problems_router,
-
-)
-from app.core.server import Server
-from app.db.models import User
+from src.apps.users.api_routes import auth_router
+from src.apps.sciences.api_routes import science_router
+from src.apps.main.api_routes import main_router
+from src.apps.cabinets.api_routes import cabinets_router
+from src.apps.problems.api_routes import problems_router
+from src.core.server import Server
+from src.apps.users.models import User
 
 
 @pytest.fixture(scope="session")
@@ -36,7 +33,13 @@ async def app() -> FastAPI:
                 }
             },
             "apps": {
-                "models": {"models": ["app.db.models"], "default_connection": "default"}
+                "models": {"models": [
+                    'src.apps.users.models',
+                    'src.apps.main.models',
+                    'src.apps.sciences.models',
+                    'src.apps.problems.models',
+                    'src.apps.cabinets.models',
+                ], "default_connection": "default"}
             },
         },
         _create_db=True

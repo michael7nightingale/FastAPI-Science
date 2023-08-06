@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+ {% block content %}
+     <link rel="stylesheet" href="{{ url_for('static', path='sciences/css/sciences.css') }}">
+     <div class="jumbotron">
+         <h2>{{ science.title }}</h2>
+         <p class="lead">&nbsp;{{ science.content }}</p>
+    <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-large">назад на главную &raquo;</a>
+</div>
+
+    <div class="container">
+        {% for i in categories %}
+            <div class="row" style="background-color: #ececec; padding: 20px; border-radius: 10px; margin-bottom: 5%">
+            <div class="col-3">
+                <div class="row">
+                    {% if i.image_path %}
+                   <img src="{{ url_for('static', path=i.image_path) }}" width="130">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <h4 align="center">
+                    <a href="{{ url_for('category_get', category_slug=i.slug) }}">{{ i.title  }}</a>
+                    </h4>
+                </div>
+
+                <div class="row">
+                    <p>{{ i.content|truncate(200) }}</p>
+                </div>
+            </div>
+
+            </div>
+            {% endfor %}
+      </div>
+    {% endblock %}
