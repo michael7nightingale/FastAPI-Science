@@ -7,16 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', path='css/category.css') }}">
     <a href="{{ url_for('science_get', science_slug=science_slug) }}" class="btn btn-primary btn-large">назад к {{ science_slug }} &raquo;</a>
 </div>
-<div class="container">
+{#<div class="container">#}
     <h3 align="center" class="white_text">Formulas</h3>
     <div class="row">
-      <div class="col-2" style="background-color: #b2b3b4">
+      <div class="col" style="background-color: #b2b3b4">
         <ul>
             <h4 align="center">Contains</h4>
             {% for f in formulas %}
                 <li>
                 <a class="" href="{{ url_for('formula_get', formula_slug=f.slug) }}">
-
                      <p class="">{{ f.title }}</p>
                  </a>
                 </li>
@@ -32,7 +31,7 @@
                     <div class="col">
                         <div class="formula" style="background-color: white; padding: 5px; margin-bottom: 20px">
                             <a class="" href="{{ url_for('formula_get', formula_slug=formulas[row_idx * 3 + col_idx].slug) }}">
-                                 <h4 style="color: black">{{ formulas[row_idx * 3 + col_idx].formula }}</h4>
+                                 <h5 style="color: black">{{ formulas[row_idx * 3 + col_idx].formula }}</h5>
                              </a>
                         </div>
                     </div>
@@ -46,6 +45,6 @@
         </div>
      </div>
 
-</div>
+{#</div>#}
  {% endblock %}
 
