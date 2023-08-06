@@ -4,14 +4,48 @@
      <div class="jumbotron">
     <h2>{{ category.title }}</h2>
     <p class="lead">{{ category.content }}</p>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/category.css') }}">
     <a href="{{ url_for('science_get', science_slug=science_slug) }}" class="btn btn-primary btn-large">назад к {{ science_slug }} &raquo;</a>
 </div>
-             <div class="">
-                 {% for f in formulas %}
-                 <a class="" href="{{ url_for('formula_get', formula_slug=f.slug) }}">
+<div class="container">
+    <h3 align="center" class="white_text">Formulas</h3>
+    <div class="row">
+      <div class="col-2" style="background-color: #b2b3b4">
+        <ul>
+            <h4 align="center">Contains</h4>
+            {% for f in formulas %}
+                <li>
+                <a class="" href="{{ url_for('formula_get', formula_slug=f.slug) }}">
 
-                     <h3 class="">{{ f.title }}</h3>
+                     <p class="">{{ f.title }}</p>
                  </a>
-                {% endfor %}
-                </div>
-    {% endblock %}
+                </li>
+            {% endfor %}
+        </ul>
+
+        </div>
+      <div class="col">
+             {% for row_idx in range((formulas|length // 3) + 1) %}
+                 <div class="row">
+                 {% for col_idx in range(0, 3) %}
+                    {% if row_idx * 3 + col_idx < formulas|length %}
+                    <div class="col">
+                        <div class="formula" style="background-color: white; padding: 5px; margin-bottom: 20px">
+                            <a class="" href="{{ url_for('formula_get', formula_slug=formulas[row_idx * 3 + col_idx].slug) }}">
+                                 <h4 style="color: black">{{ formulas[row_idx * 3 + col_idx].formula }}</h4>
+                             </a>
+                        </div>
+                    </div>
+                    {% else %}
+                        <div class="col"></div>
+                    {% endif %}
+
+                 {% endfor %}
+                 </div>
+            {% endfor %}
+        </div>
+     </div>
+
+</div>
+ {% endblock %}
+
