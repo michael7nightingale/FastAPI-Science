@@ -1,7 +1,7 @@
 __pycache__/
 internal/__pycache__/
 package/__pycache__/
-app/formulas/__pycache__/
+src/formulas/__pycache__/
 configuration/__pycache__/
 env/
 .idea/
