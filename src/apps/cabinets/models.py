@@ -11,7 +11,7 @@ class History(TortoiseModel):
     user = fields.ForeignKeyField("models.User")
 
     @classmethod
-    async def all(cls, using_db=None):
+    def all(cls, using_db=None):
         return (
             super()
             .all(using_db)
@@ -27,7 +27,7 @@ class History(TortoiseModel):
         )
 
     @classmethod
-    async def get_or_none(cls, *args, using_db=None, **kwargs):
+    def get_or_none(cls, *args, using_db=None, **kwargs):
         return (
             super()
             .get_or_none(*args, using_db=using_db, **kwargs)
