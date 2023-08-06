@@ -90,8 +90,8 @@ async def plots_view_post(
 @login_required
 async def download_plot(request: Request, filesurname: str = Form()):
     """Plot download view."""
-    plot_path = PLOTS_DIR + f'/{request.user.id}.png'
-    full_plot_path = static_directory + plot_path
+    plot_path = PLOTS_DIR + f'{request.user.id}.png'
+    full_plot_path = request.app.state.STATIC_DIR + plot_path
     if os.path.exists(full_plot_path):
         return FileResponse(path=full_plot_path, filename=filesurname + '.png')
 
