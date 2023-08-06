@@ -15,8 +15,8 @@ class Problem(TortoiseModel):
     time_solved = fields.DatetimeField(null=True)
 
     @classmethod
-    async def all(cls, using_db=None):
-        return await (
+    def all(cls, using_db=None):
+        return (
             super()
             .all(using_db)
             .prefetch_related("medias")
@@ -24,8 +24,8 @@ class Problem(TortoiseModel):
         )
 
     @classmethod
-    async def get_or_none(cls, *args, using_db=None, **kwargs):
-        return await (
+    def get_or_none(cls, *args, using_db=None, **kwargs):
+        return (
             super()
             .get_or_none(*args, using_db=using_db, **kwargs)
             .prefetch_related("medias", "solutions")
@@ -47,8 +47,8 @@ class Solution(TortoiseModel):
     time_created = fields.DatetimeField(auto_now=True)
 
     @classmethod
-    async def all(cls, using_db=None):
-        return await (
+    def all(cls, using_db=None):
+        return (
             super()
             .all(using_db)
             .prefetch_related("medias")
@@ -56,8 +56,8 @@ class Solution(TortoiseModel):
         )
 
     @classmethod
-    async def get_or_none(cls, *args, using_db=None, **kwargs):
-        return await (
+    def get_or_none(cls, *args, using_db=None, **kwargs):
+        return (
             super()
             .get_or_none(*args, using_db=using_db, **kwargs)
             .prefetch_related("medias")

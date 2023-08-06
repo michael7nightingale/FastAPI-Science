@@ -46,7 +46,6 @@ async def login_post(
     if user is None:
         return login_redirect()
     response = RedirectResponse("/", status_code=303)
-    print(user.describe())
     user_model = UserCustomModel(**user.as_dict())
     request.app.state.auth_manager.login(response, user_model)
     return response

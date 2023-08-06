@@ -27,7 +27,8 @@ async def plots_view(
         category_slug: str,
 ):
     """Plot category GET view."""
-    category = await Category.get(slug=category_slug)
+    category = await Category.get_or_none(slug=category_slug)
+
     context = {
         "request": request,
         "science": category.science,
