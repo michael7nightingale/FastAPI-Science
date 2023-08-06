@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi_authtools import login_required
 
-from .dependencies import get_table_filepath
+from .dependencies import HistoryParser
 from .models import History
 
 
@@ -19,7 +19,7 @@ async def history(request: Request):
 
 @cabinets_router.post('/download-history')
 @login_required
-async def history_download(filedata: str = Depends(get_table_filepath)):
+async def history_download(filedata: str = Depends(HistoryParser())):
     if filedata is not None:
         filepath, filename = filedata
         return FileResponse(path=filepath, filename=filename)

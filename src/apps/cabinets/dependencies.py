@@ -8,27 +8,44 @@ from src.services.tables import CsvTableManager, PandasTableManager
 HISTORY_DIR = '/files/history/'
 
 
-async def get_table_filepath(
-        request: Request,
-        filename: str = Form(),
-        extension: str = Form(),
-):
-    history_list = (i.as_dict() for i in await History.filter(user_id=request.user.id))
-    filepath = request.app.state.STATIC_DIR + HISTORY_DIR + request.user.id + '.' + extension
-    if extension == 'csv':
-        table = CsvTableManager(filepath)
-    else:
-        table = PandasTableManager(filepath)
-    try:
-        history_list_first = next(history_list)
-    except StopIteration:
-        yield None
-    else:
-        table.init_data(history_list_first.keys())
-        table.add_line(history_list_first.values())
-        for line in history_list:
-            table.add_line(line.values())
-        table.save_data()
-        filename = f"{filename}.{extension}"
-        yield filepath, filename
-        os.remove(filepath)
+def get_field(record, value):
+    field = record
+    for attribute in value.split("."):
+        field = getattr(field, attribute)
+        print(field, record)
+    return field
+
+
+class HistoryParser:
+    columns_match = {
+        "result": "result",
+        "formula_title": "formula.title",
+        "formula": "formula.formula",
+        "date_time": "date_time"
+    }
+
+    def parse_record(self, record):
+        return {name: get_field(record, value) for name, value in self.columns_match.items()}
+
+    async def __call__(
+            self,
+            request: Request,
+            filename: str = Form(),
+            extension: str = Form(),
+    ):
+        history_list = await History.filter(user_id=request.user.id)
+        filepath = request.app.state.STATIC_DIR + HISTORY_DIR + request.user.id + '.' + extension
+        if extension == 'csv':
+            table = CsvTableManager(filepath)
+        else:
+            table = PandasTableManager(filepath)
+        if not history_list:
+            yield None
+        else:
+            table.init_data(self.columns_match.keys())
+            for record in history_list:
+                table.add_line_dict(self.parse_record(record))
+            table.save_data()
+            filename = f"{filename}.{extension}"
+            yield filepath, filename
+            os.remove(filepath)

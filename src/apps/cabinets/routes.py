@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi_authtools import login_required
 
-from .dependencies import get_table_filepath
+from .dependencies import HistoryParser
 from .models import History
 
 
@@ -36,7 +36,7 @@ async def history(request: Request):
 @login_required
 async def history_download(
         request: Request,
-        filedata: str = Depends(get_table_filepath)
+        filedata: str = Depends(HistoryParser())
 ):
     if filedata is not None:
         filepath, filename = filedata
