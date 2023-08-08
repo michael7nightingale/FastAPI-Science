@@ -9,7 +9,7 @@
     {% for i in sciences %}
     <div class="col" style="background-color: dodgerblue; height: 100%; padding: 20px; border-radius: 10px; margin-left: 5%">
         {% if i.image_path %}
-        <img src="{{ url_for('static', path=i.image_path) }}" width=30% height=60%>
+        <img src="{{ url_for('static', path="sciences/" + i.image_path) }}" width=30% height=60%>
         {% endif %}
         <h2>{{ i.title }}</h2>
         <p>
@@ -22,4 +22,3 @@
 </div>
 
 {% endblock %}
-
