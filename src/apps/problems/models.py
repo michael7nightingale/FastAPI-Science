@@ -4,7 +4,6 @@ from src.base.models import TortoiseModel
 
 
 class Problem(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     title = fields.CharField(max_length=255)
     text = fields.TextField()
     user = fields.ForeignKeyField("models.User", related_name="problems")
@@ -34,13 +33,11 @@ class Problem(TortoiseModel):
 
 
 class ProblemMedia(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     problem = fields.ForeignKeyField("models.Problem", "medias")
     media_path = fields.CharField(max_length=255)
 
 
 class Solution(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     text = fields.TextField()
     problem = fields.ForeignKeyField("models.Problem", related_name="solutions")
     author = fields.ForeignKeyField("models.User", related_name="solutions")
@@ -66,6 +63,5 @@ class Solution(TortoiseModel):
 
 
 class SolutionMedia(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     solution = fields.ForeignKeyField("models.Solution", "medias")
     media_path = fields.CharField(max_length=255)

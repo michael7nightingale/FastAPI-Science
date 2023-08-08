@@ -5,8 +5,6 @@ from src.services.hash import hash_password, verify_password
 
 
 class User(TortoiseModel):
-
-    id = fields.UUIDField(pk=True)
     username = fields.CharField(max_length=100, unique=True)
     password = fields.CharField(max_length=255)
     email = fields.CharField(max_length=100, unique=True)

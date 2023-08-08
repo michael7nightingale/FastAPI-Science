@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class UserCustomModel(BaseModel):
     """Standard user request model."""
-    id: str
+    id: str | int
     username: str
     email: str
     first_name: str | None = None

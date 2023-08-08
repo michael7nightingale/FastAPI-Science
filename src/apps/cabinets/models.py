@@ -1,10 +1,11 @@
+from uuid import uuid4
+
 from tortoise import fields
 
 from src.base.models import TortoiseModel
 
 
 class History(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     formula = fields.ForeignKeyField("models.Formula")
     result = fields.FloatField()
     date_time = fields.DatetimeField(auto_now=True)

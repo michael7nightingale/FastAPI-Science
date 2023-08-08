@@ -4,7 +4,6 @@ from src.base.models import TortoiseModel
 
 
 class Science(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     title = fields.CharField(max_length=40, unique=True, index=True)
     content = fields.TextField()
     image_path = fields.CharField(max_length=255, null=True)
@@ -23,7 +22,6 @@ class Science(TortoiseModel):
 
 
 class Category(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     title = fields.CharField(max_length=40, unique=True, index=True)
     content = fields.TextField()
     image_path = fields.CharField(max_length=255, null=True)
@@ -47,7 +45,6 @@ class Category(TortoiseModel):
 
 
 class Formula(TortoiseModel):
-    id = fields.UUIDField(pk=True)
     title = fields.CharField(max_length=40, unique=True, index=True)
     content = fields.TextField()
     formula = fields.CharField(max_length=255)
