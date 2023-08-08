@@ -17,12 +17,12 @@ class BaseAppSettings(BaseSettings):
     EMAIL_USER: str
     EMAIL_PASSWORD: str
 
-    github_redirect_url: str = "https://github.com/michael7nightingale/Calculations-FastAPI"
-    github_client_id: str = "asdasd"
+    GITHUB_CLIENT_ID: str
+    GITHUB_CLIENT_SECRET: str
 
     @property
     def github_login_url(self) -> str:
-        return f"https://github.com/login/oauth/authorize?client_id={self.github_client_id}"
+        return f"https://github.com/login/oauth/authorize?client_id={self.GITHUB_CLIENT_ID}"
 
 
 class DevSettings(BaseAppSettings):
@@ -59,10 +59,6 @@ class TestSettings(BaseAppSettings):
     @property
     def db_uri(self) -> str:
         return f"{self.DB_DRIVER}:///{self.DB_NAME}"
-
-    @property
-    def github_login_url(self) -> str:
-        return f"https://github.com/login/oauth/authorize?client_id={self.github_client_id}"
 
     class Config:
         env_file = ".test.env"

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+import requests
 
 from .dependencies import get_user_register_data
 from .models import User
@@ -15,17 +16,46 @@ auth_router = APIRouter(
 templates = Jinja2Templates('src/apps/users/templates/')
 
 
-@auth_router.get('/github-login/')
+@auth_router.get('/github/login/')
 async def github_login(request: Request):
     """Login with GitHub."""
     return RedirectResponse(get_app_settings().github_login_url, status_code=303)
 
 
-@auth_router.get("/github-got")
+@auth_router.get("/github/callback")
 async def github_get(request: Request, code: str):
     """Add access token from GitHub to cookies"""
-    response = RedirectResponse(url='/', status_code=303)
-    request.cookies['access-token'] = code
+    settings = get_app_settings()
+    response = RedirectResponse(url=request.app.url_path_for("homepage"), status_code=303)
+    url = f"https://github.com/login/oauth/access_token?client_id={settings.GITHUB_CLIENT_ID}&client_secret={settings.GITHUB_CLIENT_SECRET}&code={code}"
+    resp = requests.post(url)
+    if not resp:
+        return response
+    resp_text = resp.text
+    access_token = resp_text.split('=')[1].split("&")[0]
+    headers = {"Authorization": f"Bearer {access_token}"}
+    user_resp = requests.get("https://api.github.com/user", headers=headers)
+    if not user_resp:
+        return response
+    user_data = user_resp.json()
+    user_data['username'] = user_data['login']
+    user_email_resp = requests.get("https://api.github.com/user/emails", headers=headers)
+    if not user_email_resp:
+        return response
+    user_email_data = user_email_resp.json()
+    email = None
+    if isinstance(user_email_data, dict):
+        email = user_email_data['email']
+    else:
+        for email_data in user_email_data:
+            if email_data['primary']:
+                email = email_data['email']
+                break
+        if email is None:
+            email = email_data[0]['email']
+    user_data['email'] = email
+    user = UserCustomModel(**user_data)
+    request.app.state.auth_manager.login(response, user)
     return response
 
 
