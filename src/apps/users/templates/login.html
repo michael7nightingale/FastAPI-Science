@@ -23,9 +23,11 @@
         <div class="clear-fix"></div>
     </div>
     </form>
-    <a href="{{ url_for('github_login') }}">
-            <img src="{{ url_for('static', path='users/images/github.png') }}" alt="" width="8%" height="8%">
-            Войти с помощью GitHub
+     <a href="{{ url_for('github_login') }}">
+            <img src="{{ url_for('static', path='users/images/github.png') }}" alt="" width="15%" height="15%">
+        </a>
+    <a href="{{ url_for('google_login') }}">
+            <img src="{{ url_for('static', path='users/images/google.png') }}" alt="" width="13%" height="13%">
         </a>
 </div>
 </div>
