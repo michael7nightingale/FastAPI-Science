@@ -19,10 +19,22 @@ class BaseAppSettings(BaseSettings):
 
     GITHUB_CLIENT_ID: str
     GITHUB_CLIENT_SECRET: str
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
 
     @property
     def github_login_url(self) -> str:
         return f"https://github.com/login/oauth/authorize?client_id={self.GITHUB_CLIENT_ID}"
+
+    @property
+    def google_login_url(self) -> str:
+        return "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}".format(
+            token_request_uri="https://accounts.google.com/o/oauth2/auth",
+            response_type="code",
+            client_id=self.GOOGLE_CLIENT_ID,
+            redirect_uri="http://localhost:8000/auth/google/callback",
+            scope="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        )
 
 
 class DevSettings(BaseAppSettings):

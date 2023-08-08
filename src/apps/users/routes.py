@@ -5,6 +5,7 @@ import requests
 
 from .dependencies import get_user_register_data
 from .models import User
+from .oauth import GithubOAuthProvider, GoogleOAuthProvider
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
@@ -23,37 +24,40 @@ async def github_login(request: Request):
 
 
 @auth_router.get("/github/callback")
-async def github_get(request: Request, code: str):
+async def github_callback(request: Request, code: str):
     """Add access token from GitHub to cookies"""
     settings = get_app_settings()
-    response = RedirectResponse(url=request.app.url_path_for("homepage"), status_code=303)
-    url = f"https://github.com/login/oauth/access_token?client_id={settings.GITHUB_CLIENT_ID}&client_secret={settings.GITHUB_CLIENT_SECRET}&code={code}"
-    resp = requests.post(url)
-    if not resp:
+    response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
+    github_provider = GithubOAuthProvider(
+        client_id=settings.GITHUB_CLIENT_ID,
+        client_secret=settings.GITHUB_CLIENT_SECRET,
+        code=code
+    )
+    user_data = github_provider()
+    await User.create(**user_data)
+    user = UserCustomModel(**user_data)
+    request.app.state.auth_manager.login(response, user)
+    return response
+
+
+@auth_router.get("/google/login")
+async def google_login(request: Request):
+    return RedirectResponse(get_app_settings().google_login_url, status_code=303)
+
+
+@auth_router.get("/google/callback")
+async def google_callback(request: Request, code: str):
+    settings = get_app_settings()
+    response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
+    google_provider = GoogleOAuthProvider(
+        client_id=settings.GOOGLE_CLIENT_ID,
+        client_secret=settings.GOOGLE_CLIENT_SECRET,
+        code=code
+    )
+    user_data = google_provider()
+    if user_data is None:
         return response
-    resp_text = resp.text
-    access_token = resp_text.split('=')[1].split("&")[0]
-    headers = {"Authorization": f"Bearer {access_token}"}
-    user_resp = requests.get("https://api.github.com/user", headers=headers)
-    if not user_resp:
-        return response
-    user_data = user_resp.json()
-    user_data['username'] = user_data['login']
-    user_email_resp = requests.get("https://api.github.com/user/emails", headers=headers)
-    if not user_email_resp:
-        return response
-    user_email_data = user_email_resp.json()
-    email = None
-    if isinstance(user_email_data, dict):
-        email = user_email_data['email']
-    else:
-        for email_data in user_email_data:
-            if email_data['primary']:
-                email = email_data['email']
-                break
-        if email is None:
-            email = email_data[0]['email']
-    user_data['email'] = email
+    await User.create(**user_data)
     user = UserCustomModel(**user_data)
     request.app.state.auth_manager.login(response, user)
     return response

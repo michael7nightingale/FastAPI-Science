@@ -9,7 +9,7 @@ class RequestSchema(BaseModel):
     method: str = "GET"
     result: str | None = None
     find_mark: str = "x"
-    user_id: str | None = None
+    user_id: str | int | None = None
     nums_comma: int = 10
 
 
