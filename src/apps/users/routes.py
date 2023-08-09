@@ -26,7 +26,6 @@ async def provider_login(provider: Providers):
 
 @auth_router.get("/{provider}/callback")
 async def provider_callback(request: Request, code: str, provider=Depends(get_oauth_provider)):
-    settings = get_app_settings()
     homepage_response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
     login_response = RedirectResponse(auth_router.url_path_for("login_get"), status_code=303)
     user_data = provider.provide()

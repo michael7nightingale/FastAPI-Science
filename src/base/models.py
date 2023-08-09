@@ -4,7 +4,7 @@ from uuid import uuid4
 
 
 class TortoiseModel(Model):
-    id = fields.CharField(max_length=255, pk=True, default=str(uuid4()))
+    id = fields.CharField(max_length=255, pk=True, default=lambda: str(uuid4()))
 
     def as_dict(self):
         schema = self.describe()

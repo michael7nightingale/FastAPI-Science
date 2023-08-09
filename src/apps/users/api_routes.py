@@ -27,7 +27,6 @@ async def provider_login(provider: Providers):
 @auth_router.get("/{provider}/callback")
 async def provider_callback(request: Request, code: str, provider=Depends(get_oauth_provider)):
     """Add access token from GitHub to cookies"""
-    settings = get_app_settings()
     user_data = provider.provide()
     if user_data is None:
         return JSONResponse(
@@ -44,32 +43,6 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
     user = UserCustomModel(**user_data)
     access_token = request.app.state.auth_manager.create_token(user)
     return {"access_token": access_token}
-
-
-# @auth_router.get("/google/callback")
-# async def google_callback(request: Request, code: str):
-#     settings = get_app_settings()
-#     google_provider = GoogleOAuthProvider(
-#         client_secret=settings.GOOGLE_CLIENT_SECRET,
-#         client_id=settings.GOOGLE_CLIENT_ID,
-#         code=code
-#     )
-#     user_data = google_provider()
-#     if user_data is None:
-#         return JSONResponse(
-#             {'detail': "Something went wrong."},
-#             status_code=500
-#         )
-#     try:
-#         await User.create(**user_data)
-#     except IntegrityError:
-#         return JSONResponse(
-#             {"detail": "User with this email or username already exists."},
-#             status_code=400
-#         )
-#     user = UserCustomModel(**user_data)
-#     access_token = request.app.state.auth_manager.create_token(user)
-#     return {"access_token": access_token}
 
 
 @auth_router.post('/token')
