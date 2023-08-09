@@ -57,8 +57,11 @@ class DevSettings(BaseAppSettings):
             env_file = ".dev.env"
 
 
-def get_app_settings() -> DevSettings:
-    return DevSettings()
+def get_app_settings() -> BaseAppSettings:
+    if os.getenv("TEST"):
+        return TestSettings()
+    else:
+        return DevSettings()
 
 
 class TestSettings(BaseAppSettings):

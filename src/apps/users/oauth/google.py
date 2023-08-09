@@ -17,7 +17,6 @@ class GoogleOAuthProvider(BaseProvider):
         }
         query_string = "?" + "&".join(f"{k}={v}" for k, v in body_data.items())
         response = requests.post("https://accounts.google.com/o/oauth2/token" + query_string, json=body_data)
-        print(response, response.text)
         if not response:
             return
         access_token = response.json()['access_token']
@@ -34,7 +33,6 @@ class GoogleOAuthProvider(BaseProvider):
 
     def provide(self):
         access_token = self.get_access_token()
-        print(access_token)
         if access_token is None:
             return
         user_data = self.get_user_data(access_token)
