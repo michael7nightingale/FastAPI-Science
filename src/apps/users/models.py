@@ -1,4 +1,5 @@
 from tortoise import fields
+from tortoise.exceptions import IntegrityError
 
 from src.base.models import TortoiseModel
 from src.services.hash import hash_password, verify_password
@@ -26,7 +27,10 @@ class User(TortoiseModel):
     @classmethod
     async def register(cls, **kwargs):
         kwargs.update(password=hash_password(kwargs['password']))
-        user = await cls.create(**kwargs)
+        try:
+            user = await cls.create(**kwargs)
+        except IntegrityError:
+            return
         return user
 
     @classmethod
