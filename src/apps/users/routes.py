@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-import requests
 from tortoise.exceptions import IntegrityError
 
 from .dependencies import get_user_register_data, get_oauth_provider
 from .models import User
-from .oauth import GithubOAuthProvider, GoogleOAuthProvider, Providers
+from .oauth import Providers
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link

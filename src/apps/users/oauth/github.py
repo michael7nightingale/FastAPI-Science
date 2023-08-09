@@ -8,7 +8,7 @@ class GithubOAuthProvider(BaseProvider):
     name = "github"
 
     def get_access_token(self) -> str | None:
-        url = "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}".format(
+        url = "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}".format(     # noqa: E501
             client_secret=self.client_secret,
             client_id=self.client_id,
             code=self.code

@@ -1,5 +1,4 @@
 from smtplib import SMTP_SSL
-from src.core.config import get_app_settings
 
 
 class SMTPServer(SMTP_SSL):

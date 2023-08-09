@@ -7,7 +7,7 @@ from tortoise.exceptions import IntegrityError
 
 from .dependencies import get_oauth_provider
 from .models import User
-from .oauth import GoogleOAuthProvider, GithubOAuthProvider, Providers
+from .oauth import Providers
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link

@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from tortoise import fields
 
 from src.base.models import TortoiseModel

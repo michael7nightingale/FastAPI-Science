@@ -1,4 +1,4 @@
-from fastapi import Form, Path
+from fastapi import Form
 
 from .oauth import Providers, get_provider, BaseProvider
 from .schemas import UserRegister
