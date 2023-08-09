@@ -90,7 +90,7 @@ async def activate_user(
 ):
     user = await User.get_or_none(id=uuid)
     if user is not None:
-        email = confirm_token(token)
+        email = confirm_token(token, secret_key=request.app.state.SECRET_KEY)
         if email is not None:
             if user.email == email:
                 await User.activate(uuid)
