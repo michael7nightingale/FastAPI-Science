@@ -1,6 +1,7 @@
 from fastapi import status
 from httpx import AsyncClient
 
+from src.core.config import get_test_app_settings
 from src.services.token import generate_token
 from tests_api.conftest import get_auth_url
 
@@ -87,10 +88,11 @@ class TestMain:
 
     async def test_activation_success(self, client: AsyncClient, not_active_user, user_not_activated: dict):
         assert not not_active_user.is_active
+        settings = get_test_app_settings()
         activation_link = get_auth_url(
             "activate_user",
             uuid=not_active_user.id,
-            token=generate_token(not_active_user.email)
+            token=generate_token(not_active_user.email, settings.SECRET_KEY)
         )
         response = await client.get(activation_link)
         assert response.status_code == status.HTTP_200_OK

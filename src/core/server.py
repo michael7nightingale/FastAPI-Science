@@ -57,6 +57,7 @@ class Server:
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
         # error handlers settings
         ErrorHandler.configure_app_error_handlers(self.app)
+        self.app.state.SECRET_KEY = self.settings.SECRET_KEY
         # auth manager settings
         self.app.state.auth_manager = AuthManager(
             app=self.app,
