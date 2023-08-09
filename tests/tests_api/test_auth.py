@@ -92,7 +92,7 @@ class TestMain:
         activation_link = get_auth_url(
             "activate_user",
             uuid=not_active_user.id,
-            token=generate_token(not_active_user.email, settings.SECRET_KEY)
+            token=generate_token(not_active_user.email, secret_key=settings.SECRET_KEY)
         )
         response = await client.get(activation_link)
         assert response.status_code == status.HTTP_200_OK
@@ -112,7 +112,7 @@ class TestMain:
         activation_link = get_auth_url(
             "activate_user",
             uuid="0000-0000-0000-0000",
-            token=generate_token(not_active_user.email)
+            token=generate_token(not_active_user.email, secret_key=get_test_app_settings().SECRET_KEY)
         )
         response = await client.get(activation_link)
         assert response.status_code == status.HTTP_400_BAD_REQUEST

@@ -24,7 +24,7 @@ def confirm_token(token, expiration: int = 3600, secret_key: str | None = None):
 
 
 def generate_activation_link(request, user) -> str:
-    token = generate_token(user.email)
+    token = generate_token(user.email, secret_key=request.app.state.SECRET_KEY)
     url = request.app.url_path_for("activate_user", uuid=user.id, token=token)
     # host = request.client.host
     host = "http://127.0.0.1:8000"
