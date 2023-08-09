@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Body, Request
+from fastapi import APIRouter, Body, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi_authtools import login_required
 from fastapi_authtools.models import UsernamePasswordToken
 from fastapi_authtools.exceptions import raise_invalid_credentials
+from tortoise.exceptions import IntegrityError
 
+from .dependencies import get_oauth_provider
 from .models import User
+from .oauth import GoogleOAuthProvider, GithubOAuthProvider, Providers
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
@@ -15,16 +18,58 @@ auth_router = APIRouter(
 )
 
 
-@auth_router.get('/github-login/')
-async def github_login():
-    """Login with GitHub."""
-    return RedirectResponse(get_app_settings().github_login_url, status_code=303)
+@auth_router.get('/{provider}/login')
+async def provider_login(provider: Providers):
+    """Login with Google."""
+    return RedirectResponse(getattr(get_app_settings(), f"{provider.value}_login_url"), status_code=303)
 
 
-@auth_router.get("/github-got")
-async def github_get(code: str):
+@auth_router.get("/{provider}/callback")
+async def provider_callback(request: Request, code: str, provider=Depends(get_oauth_provider)):
     """Add access token from GitHub to cookies"""
-    return {"access_token": code}
+    settings = get_app_settings()
+    user_data = provider.provide()
+    if user_data is None:
+        return JSONResponse(
+            {'detail': "Something went wrong."},
+            status_code=500
+        )
+    try:
+        await User.create(**user_data)
+    except IntegrityError:
+        return JSONResponse(
+            {"detail": "User with this email or username already exists."},
+            status_code=400
+        )
+    user = UserCustomModel(**user_data)
+    access_token = request.app.state.auth_manager.create_token(user)
+    return {"access_token": access_token}
+
+
+# @auth_router.get("/google/callback")
+# async def google_callback(request: Request, code: str):
+#     settings = get_app_settings()
+#     google_provider = GoogleOAuthProvider(
+#         client_secret=settings.GOOGLE_CLIENT_SECRET,
+#         client_id=settings.GOOGLE_CLIENT_ID,
+#         code=code
+#     )
+#     user_data = google_provider()
+#     if user_data is None:
+#         return JSONResponse(
+#             {'detail': "Something went wrong."},
+#             status_code=500
+#         )
+#     try:
+#         await User.create(**user_data)
+#     except IntegrityError:
+#         return JSONResponse(
+#             {"detail": "User with this email or username already exists."},
+#             status_code=400
+#         )
+#     user = UserCustomModel(**user_data)
+#     access_token = request.app.state.auth_manager.create_token(user)
+#     return {"access_token": access_token}
 
 
 @auth_router.post('/token')

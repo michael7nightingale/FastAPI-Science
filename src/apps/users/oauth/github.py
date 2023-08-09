@@ -1,15 +1,13 @@
 import requests
 
+from .base import BaseProvider
 
-class GithubOAuthProvider:
-    __slots__ = ("client_id", "client_secret", "code", "token_headers")
 
-    def __init__(self, client_id: str, client_secret: str, code: str):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.code = code
+class GithubOAuthProvider(BaseProvider):
+    __slots__ = ()
+    name = "github"
 
-    def set_access_headers(self) -> str | None:
+    def get_access_token(self) -> str | None:
         url = "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}".format(
             client_secret=self.client_secret,
             client_id=self.client_id,
@@ -19,17 +17,18 @@ class GithubOAuthProvider:
         if not response:
             return
         access_token = response.text.split('=')[1].split("&")[0]
-        self.token_headers = {"Authorization": f"Bearer {access_token}"}
         return access_token
 
-    def get_user_data(self) -> dict | None:
-        response = requests.get("https://api.github.com/user", headers=self.token_headers)
+    def get_user_data(self, access_token: str) -> dict | None:
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get("https://api.github.com/user", headers=headers)
         if not response:
             return
         return response.json()
 
-    def get_user_email(self) -> str | None:
-        response = requests.get("https://api.github.com/user/emails", headers=self.token_headers)
+    def get_user_email(self, access_token: str) -> str | None:
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get("https://api.github.com/user/emails", headers=headers)
         if not response:
             return
         user_email_data = response.json()
@@ -41,19 +40,19 @@ class GithubOAuthProvider:
                 if email_data['primary']:
                     email = email_data['email']
                     break
-            if email is None and email_data:
+            if email is None and user_email_data:
                 email = email_data[0]['email']
         return email
 
-    def __call__(self) -> dict | None:
-        access_token = self.set_access_headers()
+    def provide(self) -> dict | None:
+        access_token = self.get_access_token()
         if access_token is None:
             return
-        user_data = self.get_user_data()
-        user_data['username'] = user_data.pop('login')
+        user_data = self.get_user_data(access_token)
         if user_data is None:
             return
-        email = self.get_user_email()
+        user_data['username'] = user_data.pop('login')
+        email = self.get_user_email(access_token)
         if email is None:
             return
         user_data['email'] = email

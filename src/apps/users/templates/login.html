@@ -23,10 +23,10 @@
         <div class="clear-fix"></div>
     </div>
     </form>
-     <a href="{{ url_for('github_login') }}">
+     <a href="{{ url_for('provider_login', provider='github') }}">
             <img src="{{ url_for('static', path='users/images/github.png') }}" alt="" width="15%" height="15%">
         </a>
-    <a href="{{ url_for('google_login') }}">
+    <a href="{{ url_for('provider_login', provider='google') }}">
             <img src="{{ url_for('static', path='users/images/google.png') }}" alt="" width="13%" height="13%">
         </a>
 </div>

@@ -2,10 +2,11 @@ from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 import requests
+from tortoise.exceptions import IntegrityError
 
-from .dependencies import get_user_register_data
+from .dependencies import get_user_register_data, get_oauth_provider
 from .models import User
-from .oauth import GithubOAuthProvider, GoogleOAuthProvider
+from .oauth import GithubOAuthProvider, GoogleOAuthProvider, Providers
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
@@ -17,50 +18,27 @@ auth_router = APIRouter(
 templates = Jinja2Templates('src/apps/users/templates/')
 
 
-@auth_router.get('/github/login/')
-async def github_login(request: Request):
-    """Login with GitHub."""
-    return RedirectResponse(get_app_settings().github_login_url, status_code=303)
+@auth_router.get('/{provider}/login')
+async def provider_login(provider: Providers):
+    """Login with Google."""
+    return RedirectResponse(getattr(get_app_settings(), f"{provider.value}_login_url"), status_code=303)
 
 
-@auth_router.get("/github/callback")
-async def github_callback(request: Request, code: str):
-    """Add access token from GitHub to cookies"""
+@auth_router.get("/{provider}/callback")
+async def provider_callback(request: Request, code: str, provider=Depends(get_oauth_provider)):
     settings = get_app_settings()
-    response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
-    github_provider = GithubOAuthProvider(
-        client_id=settings.GITHUB_CLIENT_ID,
-        client_secret=settings.GITHUB_CLIENT_SECRET,
-        code=code
-    )
-    user_data = github_provider()
-    await User.create(**user_data)
-    user = UserCustomModel(**user_data)
-    request.app.state.auth_manager.login(response, user)
-    return response
-
-
-@auth_router.get("/google/login")
-async def google_login(request: Request):
-    return RedirectResponse(get_app_settings().google_login_url, status_code=303)
-
-
-@auth_router.get("/google/callback")
-async def google_callback(request: Request, code: str):
-    settings = get_app_settings()
-    response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
-    google_provider = GoogleOAuthProvider(
-        client_id=settings.GOOGLE_CLIENT_ID,
-        client_secret=settings.GOOGLE_CLIENT_SECRET,
-        code=code
-    )
-    user_data = google_provider()
+    homepage_response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
+    login_response = RedirectResponse(auth_router.url_path_for("login_get"), status_code=303)
+    user_data = provider.provide()
     if user_data is None:
-        return response
-    await User.create(**user_data)
+        return login_response
+    try:
+        await User.create(**user_data)
+    except IntegrityError:
+        return login_response
     user = UserCustomModel(**user_data)
-    request.app.state.auth_manager.login(response, user)
-    return response
+    request.app.state.auth_manager.login(homepage_response, user)
+    return homepage_response
 
 
 @auth_router.get("/login")
