@@ -12,7 +12,7 @@ class BaseAppSettings(BaseSettings):
     SECRET_KEY: str
     EXPIRE_MINUTES: int
 
-    EMAIL_PORT: str
+    EMAIL_PORT: int
     EMAIL_HOST:  str
     EMAIL_USER: str
     EMAIL_PASSWORD: str

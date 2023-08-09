@@ -23,17 +23,16 @@ class SMTPServer(SMTP_SSL):
         )
 
 
-def create_server() -> SMTPServer:
-    settings = get_app_settings()
+def create_server(host: str, port: int, user: str, password: str) -> SMTPServer:
     server_ = SMTPServer(
-        port=settings.EMAIL_PORT,
-        host=settings.EMAIL_HOST,
-        from_addr=settings.EMAIL_USER,
+        port=port,
+        host=host,
+        from_addr=user,
     )
     server_.ehlo()
     server_.login(
-        user=settings.EMAIL_USER,
-        password=settings.EMAIL_PASSWORD
+        user=user,
+        password=password
     )
     return server_
 
