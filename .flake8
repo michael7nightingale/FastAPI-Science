@@ -3,6 +3,7 @@ exclude =
     .pytest_cache
     venv
     __init__.py
+    conftest.py
 
 
 max-line-length = 120

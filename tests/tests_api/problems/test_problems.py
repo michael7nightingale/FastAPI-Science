@@ -50,6 +50,7 @@ class TestProblems:
         )
         assert resp.status_code == status.HTTP_201_CREATED
         data = resp.json()
+        assert 'title' in data
         problems_after = await Problem.all()
         assert len(problems_after) - len_problems_before == 1
 
@@ -58,6 +59,7 @@ class TestProblems:
         resp = await client_user1.delete(get_problem_url("problem", problem_id=problem1_user1.id))
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
+        assert data == {"detail": "Problem deleted successfully."}
         problems_after = await Problem.all()
         assert len(problems_after) - len_problems_before == -1
 
@@ -66,6 +68,7 @@ class TestProblems:
         resp = await client_user2.delete(get_problem_url("problem", problem_id=problem1_user1.id))
         assert resp.status_code == status.HTTP_403_FORBIDDEN
         data = resp.json()
+        assert data == {"detail": "You don`t have permissions."}
         problems_after = await Problem.all()
         assert len(problems_after) == len_problems_before
 
@@ -74,6 +77,7 @@ class TestProblems:
         resp = await client_user2.delete(get_problem_url("problem", problem_id="90s91db7-18f6-44b1-9ca6-356cf825af83"))
         assert resp.status_code == status.HTTP_404_NOT_FOUND
         data = resp.json()
+        assert data == {"detail": "Problem is not found."}
         problems_after = await Problem.all()
         assert len(problems_after) == len_problems_before
 
@@ -87,6 +91,7 @@ class TestProblems:
         )
         assert resp.status_code == status.HTTP_200_OK
         data = resp.json()
+        assert data == {"detail": "Problem updated successfully."}
         await problem1_user1.refresh_from_db()
         assert problem1_user1.title == update_data['title']
 
@@ -100,7 +105,7 @@ class TestProblems:
             json=update_data
         )
         data = resp.json()
-        print(data)
+        assert data == {"detail": "You don`t have permissions."}
         assert resp.status_code == status.HTTP_403_FORBIDDEN
         problems_after = await Problem.all()
         assert len(problems_after) == len_problems_before
@@ -117,5 +122,6 @@ class TestProblems:
         )
         assert resp.status_code == status.HTTP_404_NOT_FOUND
         data = resp.json()
+        assert data == {"detail": "Problem is not found."}
         problems_after = await Problem.all()
         assert len(problems_after) == len_problems_before

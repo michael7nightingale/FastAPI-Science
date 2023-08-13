@@ -7,7 +7,6 @@ from shutil import rmtree
 import os.path
 from tortoise import Tortoise
 
-from src.apps.problems.models import Problem
 from src.apps.users.api_routes import auth_router
 from src.apps.sciences.api_routes import science_router
 from src.apps.main.api_routes import main_router

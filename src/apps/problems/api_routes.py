@@ -88,7 +88,7 @@ async def problem(
 
 
 @problems_router.get('/detail/{problem_id}')
-async def problem(
+async def problem(  # noqa: F811
         problem_id: str = Path(),
 ):
     """Endpoint for getting a single problem."""
@@ -108,7 +108,7 @@ async def problem(
 
 @problems_router.delete('/detail/{problem_id}')
 @login_required
-async def problem(
+async def problem(  # noqa: F811
         request: Request,
         problem=Depends(get_problem),
 ):
@@ -122,7 +122,7 @@ async def problem(
 
 @problems_router.patch('/detail/{problem_id}')
 @login_required
-async def problem(
+async def problem(  # noqa: F811
         request: Request,
         problem=Depends(get_problem),
         problem_data: ProblemUpdate = Body(),
