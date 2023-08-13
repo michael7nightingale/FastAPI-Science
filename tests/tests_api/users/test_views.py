@@ -19,11 +19,11 @@ class TestMain:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {"detail": "Invalid credentials provided."}
 
-    async def test_token_success(self, client: AsyncClient, users_test_data, user1):
+    async def test_token_success(self, client: AsyncClient, users_test_data, user1_data):
         user_existed_data = {
             ""
-            "password": user1['password'],
-            "username": user1['username']
+            "password": user1_data['password'],
+            "username": user1_data['username']
         }
         response = await client.post(
             get_auth_url("get_token"),
@@ -77,11 +77,11 @@ class TestMain:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {"detail": "Invalid credentials provided."}
 
-    async def test_me_success(self, client_user2: AsyncClient, user2: dict):
+    async def test_me_success(self, client_user2: AsyncClient, user2_data):
         response = await client_user2.get(get_auth_url("me"))
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["username"] == user2['username']
-        assert response.json()["email"] == user2['email']
+        assert response.json()["username"] == user2_data['username']
+        assert response.json()["email"] == user2_data['email']
         assert response.json()["is_active"]
         assert response.json()["is_authenticated"]
         assert "id" in response.json()
