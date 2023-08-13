@@ -1,68 +1,14 @@
-import asyncio
-import pytest
-import pytest_asyncio
-from httpx import AsyncClient
-from fastapi import FastAPI, APIRouter
+import os
 from shutil import rmtree
-import os.path
-from tortoise import Tortoise
+import pytest_asyncio
+from fastapi import FastAPI
+from httpx import AsyncClient
 
-from src.apps.problems.models import Problem
 from src.apps.users.api_routes import auth_router
-from src.apps.sciences.api_routes import science_router
-from src.apps.main.api_routes import main_router
-from src.apps.cabinets.api_routes import cabinets_router
-from src.apps.problems.api_routes import problems_router
-from src.core.server import Server
 from src.apps.users.models import User
+from ..conftest import url_for
 
-
-@pytest.fixture(scope="session")
-def event_loop():
-    return asyncio.new_event_loop()
-
-
-@pytest_asyncio.fixture(scope='session')
-async def app() -> FastAPI:
-    server = Server(test=True, use_cookies=False)
-    await Tortoise.init(
-        {
-            "connections": {
-                "default": {
-                    "engine": "tortoise.backends.sqlite",
-                    "credentials": {"file_path": "example.sqlite3"},
-                }
-            },
-            "apps": {
-                "models": {"models": [
-                    'src.apps.users.models',
-                    'src.apps.main.models',
-                    'src.apps.sciences.models',
-                    'src.apps.problems.models',
-                    'src.apps.cabinets.models',
-                ], "default_connection": "default"}
-            },
-        },
-        _create_db=True
-    )
-    await Tortoise.generate_schemas()
-    await clear_users()
-    await server._load_data()
-    yield server.app
-    await clear_users()
-    await Tortoise._drop_databases()
-
-
-@pytest_asyncio.fixture
-async def client(app: FastAPI) -> AsyncClient:
-    async with AsyncClient(app=app, base_url="http://localhost:8000/api/v1/") as client_:
-        yield client_
-
-
-def url_for(router: APIRouter):
-    def inner(name: str, **kwargs) -> str:
-        return router.url_path_for(name, **kwargs)
-    return inner
+get_auth_url = url_for(auth_router)
 
 
 @pytest_asyncio.fixture
@@ -165,10 +111,3 @@ async def not_active_user(app: FastAPI, user_not_activated: dict):
     user = await User.register(**user_not_activated)
     yield user
     await clear_users()
-
-
-get_main_url = url_for(main_router)
-get_auth_url = url_for(auth_router)
-get_science_url = url_for(science_router)
-get_cabinet_url = url_for(cabinets_router)
-get_problem_url = url_for(problems_router)
