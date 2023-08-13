@@ -22,6 +22,17 @@ class BaseAppSettings(BaseSettings):
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
 
+    REDIS_HOST: str
+    REDIS_PORT: str
+
+    @property
+    def CELERY_BROKER_URL(self) -> str:
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
+
+    @property
+    def CELERY_RESULT_BACKEND(self) -> str:
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
+
     @property
     def github_login_url(self) -> str:
         return f"https://github.com/login/oauth/authorize?client_id={self.GITHUB_CLIENT_ID}"
