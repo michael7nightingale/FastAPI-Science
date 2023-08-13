@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, Request, Depends
+from fastapi import APIRouter, Form, Request, Depends, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from tortoise.exceptions import IntegrityError
@@ -30,10 +30,9 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
     user_data = provider.provide()
     if user_data is None:
         return login_response
-    try:
+    user = await User.get_or_none(email=user_data['email'])
+    if user is None:
         await User.create(**user_data)
-    except IntegrityError:
-        return login_response
     user = UserCustomModel(**user_data)
     request.app.state.auth_manager.login(homepage_response, user)
     return homepage_response
@@ -75,7 +74,8 @@ async def register_get(request: Request):
 @auth_router.post("/register")
 async def register_post(
         request: Request,
-        user_data: UserRegister = Depends(get_user_register_data),
+        background_tasks: BackgroundTasks,
+        user_data: UserRegister = Depends(get_user_register_data)
 ):
     """Registration POST view."""
     new_user = await User.register(**user_data.model_dump())
@@ -83,7 +83,8 @@ async def register_post(
         return RedirectResponse(auth_router.url_path_for("register_get"), status_code=303)
     # message = f"Activation link is sent on email {new_user.email}. Please follow the instructions."
     link = generate_activation_link(request, new_user)
-    request.app.state.email_service.send_activation_email(
+    background_tasks.add_task(
+        request.app.state.email_service.send_activation_email,
         name=new_user.username,
         link=link,
         email=new_user.email
