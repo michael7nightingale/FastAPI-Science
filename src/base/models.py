@@ -12,5 +12,8 @@ class TortoiseModel(Model):
         dicted[schema['pk_field']['name']] = str(getattr(self, schema['pk_field']['name']))
         return dicted
 
+    def update_from_dict(self, data: dict):
+        return super().update_from_dict({k: v for k, v in data.items() if v is not None})
+
     class Meta:
         abstract = True

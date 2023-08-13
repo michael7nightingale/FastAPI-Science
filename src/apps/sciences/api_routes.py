@@ -128,7 +128,7 @@ async def science_get(
             detail="Science is not found."
         )
     return {
-        "sciences": science.as_dict(),
+        **science.as_dict(),
         "categories": [i.as_dict() for i in science.categories]
     }
 

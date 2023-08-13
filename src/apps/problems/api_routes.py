@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, Path, HTTPException
+from fastapi import APIRouter, Request, Depends, Path, HTTPException, Body
 from fastapi_authtools import login_required
 from uuid import uuid4
 from shutil import rmtree
@@ -15,12 +15,12 @@ from .dependencies import (
 )
 from src.base.dependencies import check_object_permissions
 from .models import Problem, ProblemMedia, Solution, SolutionMedia
-from ..sciences.models import Science
-from ..users.schemas import UserRepresent
+from .schemas import ProblemCreate, ProblemUpdate
 from src.services.files import get_name_and_extension, get_all_request_files
 
 
 problems_router = APIRouter(prefix="/problems")
+PROBLEMS_DIR = 'problems/problems/'
 
 
 @problems_router.get("/all")
@@ -36,15 +36,9 @@ async def problems_all(
 
         is_solved = bool(request.query_params.get("is_solved", False))
         problems = await Problem.filter(science__slug__in=sciences_filters, is_solved=is_solved)
-
     else:
         problems = await Problem.all()
-    for p in problems:
-        p['user'] = UserRepresent(**p['user'].as_dict())
-    return {
-        "problems": problems,
-        "sciences": await Science.all(),
-    }
+    return problems
 
 
 @problems_router.get("/detail/{problem_id}/my-solutions")
@@ -60,18 +54,18 @@ async def problem_my_solutions(
     return my_solutions
 
 
-@problems_router.post("/create")
+@problems_router.post("/create", status_code=201)
 @login_required
-async def problem_create(
+async def problem(
         request: Request,
-        problem_data: dict = Depends(get_problem_data),
+        problem_data: ProblemCreate = Body(),
 ):
     """Endpoint for creating problem."""
     problem = await Problem.create(
-        **problem_data,
+        **problem_data.model_dump(),
         user_id=request.user.id
     )
-    problem_path = f"problems/{problem.id}/"
+    problem_path = f"{PROBLEMS_DIR}/{problem.id}/"
     problem_fullpath = os.path.join(request.app.state.STATIC_DIR, problem_path)
     os.makedirs(problem_fullpath)
     problem_medias_path = os.path.join(problem_path, "media")
@@ -94,7 +88,7 @@ async def problem_create(
 
 
 @problems_router.get('/detail/{problem_id}')
-async def problem_get(
+async def problem(
         problem_id: str = Path(),
 ):
     """Endpoint for getting a single problem."""
@@ -114,28 +108,28 @@ async def problem_get(
 
 @problems_router.delete('/detail/{problem_id}')
 @login_required
-async def problem_delete(
+async def problem(
         request: Request,
         problem=Depends(get_problem),
 ):
     """Endpoint for deleting problem."""
     check_object_permissions(problem, request.user, "user_id")
-    problem_fullpath = os.path.join(request.app.state.STATIC_DIR, problem.id)
+    problem_fullpath = os.path.join(request.app.state.STATIC_DIR, PROBLEMS_DIR, problem.id)
     rmtree(problem_fullpath)
-    await problem.delete(problem.id)
+    await problem.delete()
     return {"detail": "Problem deleted successfully."}
 
 
 @problems_router.patch('/detail/{problem_id}')
 @login_required
-async def problem_update(
+async def problem(
         request: Request,
         problem=Depends(get_problem),
-        problem_data: dict = Depends(get_problem_data),
+        problem_data: ProblemUpdate = Body(),
 ):
     """Endpoint for updating problem."""
     check_object_permissions(problem, request.user, "user_id")
-    await problem.update_from_dict(problem_data)
+    await problem.update_from_dict(problem_data.model_dump())
     await problem.save()
     return {"detail": "Problem updated successfully."}
 
