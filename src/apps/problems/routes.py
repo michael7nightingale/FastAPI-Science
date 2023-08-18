@@ -25,7 +25,6 @@ templates = Jinja2Templates(
 )
 
 
-
 def problem_redirect(problem_id):
     return RedirectResponse(
         problems_router.url_path_for("problem_get", problem_id=problem_id), status_code=303
