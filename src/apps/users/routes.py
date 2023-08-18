@@ -8,12 +8,16 @@ from .oauth import Providers
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
+from ...base.apps import context_processor
 
 
 auth_router = APIRouter(
     prefix='/auth'
 )
-templates = Jinja2Templates('src/apps/users/templates/')
+templates = Jinja2Templates(
+    directory='src/apps/users/templates/',
+    context_processors=[context_processor]
+)
 
 
 @auth_router.get('/{provider}/login')

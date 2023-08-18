@@ -16,10 +16,14 @@ from src.base.dependencies import check_object_permissions
 from ..sciences.dependencies import get_all_sciences
 from .models import Problem, ProblemMedia, Solution, SolutionMedia
 from src.services.files import get_name_and_extension, get_all_request_files
-
+from ...base.apps import context_processor
 
 problems_router = APIRouter(prefix="/problems")
-templates = Jinja2Templates(directory='src/apps/problems/templates/')
+templates = Jinja2Templates(
+    directory='src/apps/problems/templates/',
+    context_processors=[context_processor]
+)
+
 
 
 def problem_redirect(problem_id):

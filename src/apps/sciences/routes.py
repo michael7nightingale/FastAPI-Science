@@ -8,6 +8,7 @@ import os
 from .models import Science, Category, Formula
 from src.services.formulas.plots import Plot
 from .schemas import RequestSchema
+from ...base.apps import context_processor
 from ...services.formulas import contextBuilder, mathem_extra_counter
 
 
@@ -16,7 +17,10 @@ science_router = APIRouter(
 )
 PLOTS_DIR = "sciences/images/plots/"
 
-templates = Jinja2Templates('src/apps/sciences/templates/')
+templates = Jinja2Templates(
+    directory='src/apps/sciences/templates/',
+    context_processors=[context_processor]
+)
 
 
 # ================================= PLOTS ================================ #
@@ -104,7 +108,7 @@ async def equations_view(request: Request, category_slug: str):
     result = "Здесь появится решение."
     context = {
         "request": request,
-        "sciences": category.science,
+        "science": category.science,
         "category": category,
         "result": result,
         "message": message,
@@ -125,7 +129,7 @@ async def equations_view_post(request: Request, category_slug: str):
     category = await Category.get_or_none(slug=category_slug)
     context = {
         "request": request,
-        "sciences": category.science,
+        "science": category.science,
         "category": category,
         "result": result,
         "message": message,

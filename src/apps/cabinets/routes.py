@@ -5,10 +5,14 @@ from fastapi_authtools import login_required
 
 from .dependencies import HistoryParser
 from .models import History
+from ...base.apps import context_processor
 
 
 cabinets_router = APIRouter(prefix="/cabinets")
-templates = Jinja2Templates('src/apps/cabinets/templates/')
+templates = Jinja2Templates(
+    directory='src/apps/cabinets/templates/',
+    context_processors=[context_processor]
+)
 
 
 @cabinets_router.get('/')
