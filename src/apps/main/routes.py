@@ -2,11 +2,15 @@ from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from src.base.apps import context_processor
 
 main_router = APIRouter(
     prefix=''
 )
-templates = Jinja2Templates('src/apps/main/templates/')
+templates = Jinja2Templates(
+    directory='src/apps/main/templates/',
+    context_processors=[context_processor]
+)
 
 
 @main_router.get("/")
