@@ -1,14 +1,15 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi_authtools import AuthManager
-from starlette.responses import RedirectResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src.base.apps import BaseConfig
 from src.apps import MainConfig, SciencesConfig, CabinetsConfig, UsersConfig, ProblemsConfig
 from src.core.config import get_app_settings, get_test_app_settings
 from src.apps.users.schemas import UserCustomModel
+from src.core.middleware import register_middleware
 from src.db import register_db
 from src.db.events import create_superuser
 from src.data.load_data import load_all_data
@@ -55,9 +56,11 @@ class Server:
             self.app.include_router(application_config.api_router, prefix="/api/v1")
         self.app.add_event_handler(event_type="startup", func=self._on_startup_event)
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
+        register_middleware(self.app)
         # error handlers settings
         ErrorHandler.configure_app_error_handlers(self.app)
         self.app.state.SECRET_KEY = self.settings.SECRET_KEY
+
         # auth manager settings
         self.app.state.auth_manager = AuthManager(
             app=self.app,
