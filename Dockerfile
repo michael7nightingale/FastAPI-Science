@@ -1,8 +1,6 @@
-FROM python:3.11
+FROM python:3.11-slim
 
-COPY requirements.txt ./requirements.txt
-COPY src ./app
-COPY .docker.env ./.docker.env
+COPY . .
 
 RUN pip install -r /requirements.txt
 
