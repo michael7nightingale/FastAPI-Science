@@ -21,6 +21,10 @@ async def load_categories():
 
     for line in lines:
         try:
+            if line['is_special'] is None:
+                line['is_special'] = 0
+            else:
+                line['is_special'] = bool(int(line['is_special']))
             await Category.create(**line)
         except IntegrityError:
             pass
