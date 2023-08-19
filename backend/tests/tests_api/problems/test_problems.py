@@ -1,7 +1,7 @@
 from fastapi import status
 from httpx import AsyncClient
 
-from backend.src.apps.problems.models import Problem
+from src.apps.problems.models import Problem
 from tests_api.conftest import get_problem_url
 
 

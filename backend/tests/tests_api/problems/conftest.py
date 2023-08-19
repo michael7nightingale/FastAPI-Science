@@ -4,7 +4,7 @@ from shutil import rmtree
 import pytest_asyncio
 from fastapi import FastAPI
 
-from backend.src.apps.problems.models import Problem
+from src.apps.problems.models import Problem
 from ..sciences.conftest import physics, mathem
 
 

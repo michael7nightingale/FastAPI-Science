@@ -7,13 +7,13 @@ from shutil import rmtree
 import os.path
 from tortoise import Tortoise
 
-from backend.src.apps.users.api_routes import auth_router
-from backend.src.apps.sciences.api_routes import science_router
-from backend.src.apps.main.api_routes import main_router
-from backend.src.apps.cabinets.api_routes import cabinets_router
-from backend.src.apps.problems.api_routes import problems_router
-from backend.src.core.server import Server
-from backend.src.apps.users.models import User
+from src.apps.users.routes import auth_router
+from src.apps.sciences.routes import science_router
+from src.apps.main.routes import main_router
+from src.apps.cabinets.routes import cabinets_router
+from src.apps.problems.routes import problems_router
+from src.core.server import Server
+from src.apps.users.models import User
 
 
 @pytest.fixture(scope="session")
@@ -34,11 +34,11 @@ async def app() -> FastAPI:
             },
             "apps": {
                 "models": {"models": [
-                    'backend.apps.users.models',
-                    'backend.apps.main.models',
-                    'backend.apps.sciences.models',
-                    'backend.apps.problems.models',
-                    'backend.apps.cabinets.models',
+                    'src.apps.users.models',
+                    'src.apps.main.models',
+                    'src.apps.sciences.models',
+                    'src.apps.problems.models',
+                    'src.apps.cabinets.models',
                 ], "default_connection": "default"}
             },
         },

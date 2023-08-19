@@ -4,8 +4,8 @@ import pytest_asyncio
 from fastapi import FastAPI
 from httpx import AsyncClient
 
-from backend.src.apps.users.api_routes import auth_router
-from backend.src.apps.users.models import User
+from src.apps.users.routes import auth_router
+from src.apps.users.models import User
 from ..conftest import url_for
 
 get_auth_url = url_for(auth_router)

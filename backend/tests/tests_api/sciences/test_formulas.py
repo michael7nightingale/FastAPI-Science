@@ -16,8 +16,8 @@ class TestFormula:
         assert info == {
             "formula": "F = m * a",
             "args": ["F", "m", "a"],
-            'literals': {
-                'F': {
+            'literals': [
+                {
                     'ed': 'N',
                     'is_constant': False,
                     'is_function': False,
@@ -30,7 +30,19 @@ class TestFormula:
                     },
                     'value': None
                 },
-                'a': {
+                {
+                    'ed': 'kg',
+                    'is_constant': False,
+                    'is_function': False,
+                    'literal': 'm',
+                    'name': 'Mass',
+                    'si': {
+                        'g': 0.001,
+                        'kg': 1
+                    },
+                    'value': None
+                },
+                {
                     'ed': 'm/s^2',
                     'is_constant': False,
                     'is_function': False,
@@ -42,18 +54,7 @@ class TestFormula:
                     },
                     'value': None
                 },
-                'm': {
-                    'ed': 'kg',
-                    'is_constant': False,
-                    'is_function': False,
-                    'literal': 'm',
-                    'name': 'Mass',
-                    'si': {
-                        'g': 0.001,
-                        'kg': 1
-                    },
-                    'value': None}
-            },
+            ]
         }
 
     async def test_formula_detail_not_found(self, client):
@@ -83,8 +84,8 @@ class TestFormula:
                 "a": '100',
                 "asi": "m/s^2"
             },
-            "nums_comma": 2,
-            "find_mark": "F"
+            "numsComma": 2,
+            "findMark": "F"
         }
         response = await client_user1.post(
             get_science_url("formula_post", formula_slug="newton2"),
@@ -103,8 +104,8 @@ class TestFormula:
                 "a": '100',
                 "asi": "m/s^2"
             },
-            "nums_comma": 2,
-            "find_mark": "m"
+            "numsComma": 2,
+            "findMark": "m"
         }
         response = await client_user1.post(
             get_science_url("formula_post", formula_slug="newton2"),

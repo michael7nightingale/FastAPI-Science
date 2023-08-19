@@ -20,11 +20,13 @@ class TestScience:
         response = await client.get(get_science_url("science_get", science_slug="physics"))
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert data['title'] == physics.title
-        assert data['slug'] == physics.slug
-        assert data['content'] == physics.content
-        assert data['image_path'] == physics.image_path
-        assert "categories" in data and "id" in data
+        assert 'science' in data
+        science_data = data['science']
+        assert science_data['title'] == physics.title
+        assert science_data['slug'] == physics.slug
+        assert science_data['content'] == physics.content
+        assert science_data['image_path'] == physics.image_path
+        assert "categories" in data and "id" in science_data
         assert len(data['categories'])
         assert any(1 for i in data['categories'] if i['title'] == "Динамика")
 

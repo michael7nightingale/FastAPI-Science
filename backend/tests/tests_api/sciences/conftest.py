@@ -1,6 +1,6 @@
 import pytest_asyncio
 
-from backend.src.apps.sciences.models import Science
+from src.apps.sciences.models import Science
 
 
 @pytest_asyncio.fixture

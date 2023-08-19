@@ -1,8 +1,8 @@
 from fastapi import status
 from httpx import AsyncClient
 
-from backend.src.core.config import get_test_app_settings
-from backend.src.services.token import generate_token
+from src.core.config import get_test_app_settings
+from src.services.token import generate_token
 from tests_api.conftest import get_auth_url
 
 
