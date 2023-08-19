@@ -1,22 +1,20 @@
-from fastapi import APIRouter, Form, Request, Depends, BackgroundTasks
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Body, Request, Depends
+from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi_authtools import login_required
+from fastapi_authtools.models import UsernamePasswordToken
+from fastapi_authtools.exceptions import raise_invalid_credentials
+from tortoise.exceptions import IntegrityError
 
-from .dependencies import get_user_register_data, get_oauth_provider
+from .dependencies import get_oauth_provider
 from .models import User
 from .oauth import Providers
 from .schemas import UserRegister, UserCustomModel
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
-from ...base.apps import context_processor
 
 
 auth_router = APIRouter(
     prefix='/auth'
-)
-templates = Jinja2Templates(
-    directory='src/apps/users/templates/',
-    context_processors=[context_processor]
 )
 
 
@@ -28,79 +26,60 @@ async def provider_login(provider: Providers):
 
 @auth_router.get("/{provider}/callback")
 async def provider_callback(request: Request, code: str, provider=Depends(get_oauth_provider)):
-    homepage_response = RedirectResponse(request.app.url_path_for("homepage"), status_code=303)
-    login_response = RedirectResponse(auth_router.url_path_for("login_get"), status_code=303)
+    """Add access token from GitHub to cookies"""
     user_data = provider.provide()
     if user_data is None:
-        return login_response
-    user = await User.get_or_none(email=user_data['email'])
-    if user is None:
+        return JSONResponse(
+            {'detail': "Something went wrong."},
+            status_code=500
+        )
+    try:
         await User.create(**user_data)
+    except IntegrityError:
+        return JSONResponse(
+            {"detail": "User with this email or username already exists."},
+            status_code=400
+        )
     user = UserCustomModel(**user_data)
-    request.app.state.auth_manager.login(homepage_response, user)
-    return homepage_response
+    access_token = request.app.state.auth_manager.create_token(user)
+    return {"access_token": access_token}
 
 
-@auth_router.get("/login")
-async def login_get(request: Request):
-    """Login GET view."""
-    return templates.TemplateResponse('login.html', context={"request": request})
-
-
-@auth_router.post('/login')
-async def login_post(
-        request: Request,
-        username: str = Form(),
-        password: str = Form(),
-):
-    """Login POST view."""
-    user = await User.login(username, password)
+@auth_router.post('/token')
+async def get_token(request: Request, user_token_data: UsernamePasswordToken = Body()):
+    """Token get view."""
+    user = await User.login(
+        **user_token_data.model_dump()
+    )
     if user is None:
-        return login_redirect()
-    response = RedirectResponse("/", status_code=303)
+        raise_invalid_credentials()
     user_model = UserCustomModel(**user.as_dict())
-    request.app.state.auth_manager.login(response, user_model)
-    return response
-
-
-def login_redirect():
-    """Just a function to avoid writing redirect every time"""
-    return RedirectResponse(auth_router.url_path_for("login_get"), status_code=303)
-
-
-@auth_router.get("/register")
-async def register_get(request: Request):
-    """Registration GET view."""
-    return templates.TemplateResponse('register.html', context={"request": request})
+    token = request.app.state.auth_manager.create_token(user_model)
+    return {"access_token": token}
 
 
 @auth_router.post("/register")
-async def register_post(
-        request: Request,
-        background_tasks: BackgroundTasks,
-        user_data: UserRegister = Depends(get_user_register_data)
-):
+async def register(request: Request, user_data: UserRegister = Body()):
     """Registration POST view."""
     new_user = await User.register(**user_data.model_dump())
     if new_user is None:
-        return RedirectResponse(auth_router.url_path_for("register_get"), status_code=303)
-    # message = f"Activation link is sent on email {new_user.email}. Please follow the instructions."
+        return JSONResponse(
+            content={"detail": "Invalid data."},
+            status_code=400,
+        )
     link = generate_activation_link(request, new_user)
-    background_tasks.add_task(
-        request.app.state.email_service.send_activation_email,
+    request.app.state.email_service.send_activation_email(
         name=new_user.username,
         link=link,
         email=new_user.email
     )
-    return login_redirect()
+    return {"detail": f"Activation link is sent on email {new_user.email}. Please follow the instructions."}
 
 
-@auth_router.get('/logout')
-async def logout(request: Request):
-    """Logout user view."""
-    response = RedirectResponse(url=request.app.url_path_for('homepage'), status_code=303)
-    request.app.state.auth_manager.logout(response)
-    return response
+@auth_router.get("/me")
+@login_required
+async def me(request: Request):
+    return request.user
 
 
 @auth_router.get("/activation/{uuid}/{token}")
@@ -115,5 +94,8 @@ async def activate_user(
         if email is not None:
             if user.email == email:
                 await User.activate(uuid)
-                return login_redirect()
-    return RedirectResponse(url=request.app.url_path_for('login_get'), status_code=303)
+                return {"detail": "User is activated successfully."}
+    return JSONResponse(
+        content={"detail": "Activation link is invalid."},
+        status_code=400
+    )
