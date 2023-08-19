@@ -97,18 +97,16 @@ class Formula(BaseFormula):
         return filter(
             lambda x: x.is_constant,
             self.literals.values()
-            )
+        )
 
     def get_formulas(self) -> Iterable[Literal]:
         return filter(
             lambda x: x.is_function,
             self.literals.values()
-            )
+        )
 
     def match(self, **nums):
         expr = self.pattern.subs(nums)
-        print(expr, nums, self.pattern)
-        print(sp.solve(expr))
         return sp.solve(expr)
 
 
@@ -144,7 +142,7 @@ def literal_rename(literal: Literal, literal_symbol: str) -> Literal:
 
 G = Constant(si={"m/s^2": 1}, name="Free fall acceleration", literal='g', value=9.813)
 PI = Constant(si={"_": 1}, name="Pi", literal="pi", value=np.pi)
-K = Constant(si={"_": 1}, name="Dielectric constant", literal='k', value=9*10**(-9))
+K = Constant(si={"_": 1}, name="Dielectric constant", literal='k', value=9 * 10 ** (-9))
 
 
 # ======================================= FUNCTIONS ================================== #

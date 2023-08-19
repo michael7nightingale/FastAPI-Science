@@ -78,7 +78,7 @@ class Plot:
                 else:
                     raise ValueError("В функции определено несколько аргументов!")
         definers = np.arange(self.__xlim[0], self.__xlim[1], self.__step)
-        function = re.sub(r"(\S+\.?\S*)\s*\*\*\s*(-?\S+\.?\S*)", r"power(\1, \2)",  function)
+        function = re.sub(r"(\S+\.?\S*)\s*\*\*\s*(-?\S+\.?\S*)", r"power(\1, \2)", function)
         # print(function)
         # ocs_to_replace = re.findall(r"\s*\S+\s*\*\*\s*[-+]?\d*[.,]?\d*", function)
         # ocs_to_power = re.findall(r"\s*(\S+)\s*\*\*\s*([-+]?\d*[.,]?\d*)", function)
@@ -100,7 +100,4 @@ class Plot:
 
     @staticmethod
     def save_plot(path: str):
-        print('1231234124')
-        print(path)
         plt.savefig(path)
-        print('saved')

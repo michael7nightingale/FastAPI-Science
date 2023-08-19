@@ -116,11 +116,12 @@ class CsvTableManager(BaseTableManager):
             nulls_to_add: int = len(self.columns) - len(line_data) if (len(self.columns) - len(line_data) >= 0) else 0
             self._data.append(
                 dict(
-                    zip(self.columns,
+                    zip(
+                        self.columns,
                         (tuple(line_data) + tuple((self.default for i in range(nulls_to_add))))[:len(self.columns)]
-                        )
                     )
-                             )
+                )
+            )
         else:
             if len(line_data) != len(self.columns):
                 # logger.error("__TABLES__" + exceptions.AddLineException.__doc__)

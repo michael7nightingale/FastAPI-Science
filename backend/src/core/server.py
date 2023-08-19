@@ -5,8 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi_authtools import AuthManager
 from starlette.staticfiles import StaticFiles
 
-from src.base.apps import BaseConfig
-from src.apps import MainConfig, SciencesConfig, CabinetsConfig, UsersConfig, ProblemsConfig
+from src.apps import __routers__
 from src.core.config import get_app_settings, get_test_app_settings
 from src.apps.users.schemas import UserCustomModel
 from src.core.middleware import register_middleware
@@ -17,16 +16,8 @@ from src.services.email import create_server, EmailService
 
 
 class Server:
-    applications: tuple[BaseConfig] = (
-        MainConfig,
-        UsersConfig,
-        SciencesConfig,
-        CabinetsConfig,
-        ProblemsConfig,
 
-    )
-
-    def __init__(self, test: bool = False, use_cookies: bool = True):
+    def __init__(self, test: bool = False, use_cookies: bool = False):
         self.test = test
         self.use_cookies = use_cookies
         self._app = FastAPI()
@@ -51,9 +42,8 @@ class Server:
         """Configurate FastAPI application."""
         # including routers
         # event handlers settings
-        for application_config in self.applications:
-            self.app.include_router(application_config.router)
-            self.app.include_router(application_config.api_router, prefix="/api/v1")
+        for router in __routers__:
+            self.app.include_router(router, prefix="/api/v1")
         self.app.add_event_handler(event_type="startup", func=self._on_startup_event)
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
         register_middleware(self.app)

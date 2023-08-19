@@ -167,7 +167,6 @@ async def count_result(request: RequestSchema, formula_slug: str):
             nums = np.array([], dtype='float16')
             si = np.array([], dtype='float16')
             find_args = tuple(filter(lambda x: x != find_mark, formula_obj.args))
-
             for arg in find_args:
                 if isinstance(request.data[arg], int):
                     nums = np.append(nums, request.data[arg])
