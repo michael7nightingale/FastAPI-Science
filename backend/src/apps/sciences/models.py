@@ -30,6 +30,7 @@ class Category(TortoiseModel):
         related_name="categories",
     )
     slug = fields.CharField(max_length=40, unique=True, index=True)
+    is_special = fields.BooleanField(default=False)
 
     def __str__(self):
         return self.title
