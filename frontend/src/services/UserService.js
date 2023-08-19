@@ -1,4 +1,6 @@
 import axios from 'axios';
+import {getHeaders} from "@/services/Auth";
+import {buildUrl} from "@/services/Base";
 
 
 export function loginUser(username, password){
@@ -6,12 +8,10 @@ export function loginUser(username, password){
         username: username,
         password: password
     }
-
-    let promise = axios.post(
-         'http://localhost:8001/api/v1/auth/token/',
+    return axios.post(
+         buildUrl('auth/token/'),
         data
     )
-    return promise.then(response => response.data);
 }
 
 
@@ -22,18 +22,20 @@ export function registerUser(email, username, password){
         username: username,
         password: password
     }
-         let promise = axios.post(
-         'http://localhost:8001/api/v1/auth/register/',
-        data,{
-             validateStatus: (status) => Boolean(status)
-             }
-         ).catch(
-            function (){
-                  alert("Data is invalid!")
-            }
-        );
-        return promise.then(response => response.data);
+    return axios.post(
+        buildUrl('auth/register/'),
+        data
+    )
 
 }
 
 
+export function meUser(){
+    return axios.get(
+        buildUrl('auth/me/'),
+        {
+            headers: getHeaders()
+        }
+    )
+
+}

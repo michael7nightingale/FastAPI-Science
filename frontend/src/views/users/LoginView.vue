@@ -1,8 +1,11 @@
 <script>
 import {loginUser} from "@/services/UserService";
+import {setUser} from "@/services/Auth";
+import OAuth from "@/components/OAuth.vue";
 
 export default {
   name: "LoginView",
+  components: {OAuth},
   data(){
     return{
       username: null,
@@ -11,7 +14,16 @@ export default {
   },
   methods: {
     loginClick(){
-        loginUser(this.username, this.password);
+        let data;
+        loginUser(this.username, this.password)
+            .then((response) => {
+              data = response.data;
+              setUser(data.access_token)
+              this.$router.push("/");
+            })
+            .catch((error) => {
+              alert(error.response.data.detail);
+            })
     },
 
     usernameInput(value){
@@ -47,12 +59,7 @@ export default {
       </button>
         <div class="clear-fix"></div>
     </div>
-     <a href="github/login">
-            <img src="{{ url_for('static', path='users/images/github.png') }}" alt="" width="15%" height="15%">
-        </a>
-    <a href="google/login">
-            <img src="{{ url_for('static', path='users/images/google.png') }}" alt="" width="13%" height="13%">
-        </a>
+    <OAuth/>
 </div>
 </div>
 </div>

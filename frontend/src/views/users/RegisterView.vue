@@ -1,8 +1,10 @@
 <script>
 import {registerUser} from "@/services/UserService";
+import OAuth from "@/components/OAuth.vue";
 
 export default {
   name: "LoginView",
+  components: {OAuth},
   data() {
     return {
       username: null,
@@ -12,14 +14,16 @@ export default {
   },
   methods: {
     registerClick() {
-      let data
+      let data;
       registerUser(this.email, this.username, this.password)
-          .then(responseData => data = responseData);
-      this.$router.push('/auth/login')
-      if (data !== undefined){
-         this.$router.push('/auth/login')
-      }
-
+          .then(responseData => {
+            data = responseData.data;
+            console.log(data);
+            this.$router.push("/auth/login")
+          })
+          .catch((error) => {
+            alert(error.response.data.detail);
+          });
     },
     emailInput(value) {
       this.email = value;
@@ -60,12 +64,7 @@ export default {
         </button>
         <div class="clear-fix"></div>
     </div>
-    <a href="{{ url_for('provider_login', provider='github') }}">
-            <img src="{{ url_for('static', path='users/images/github.png') }}" alt="" width="15%" height="15%">
-        </a>
-    <a href="{{ url_for('provider_login', provider='google') }}">
-            <img src="{{ url_for('static', path='users/images/google.png') }}" alt="" width="13%" height="13%">
-        </a>
+    <OAuth/>
 </div>
 </div>
 </div>
