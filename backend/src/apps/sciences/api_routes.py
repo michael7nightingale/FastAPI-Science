@@ -109,7 +109,7 @@ SPECIAL_CATEGORIES_POST = {
 }
 
 
-@science_router.get('/science')
+@science_router.get('/')
 async def sciences_all():
     """All sciences list endpoint."""
     sciences = await Science.all()
@@ -128,7 +128,7 @@ async def science_get(
             detail="Science is not found."
         )
     return {
-        **science.as_dict(),
+        "science": science.as_dict(),
         "categories": [i.as_dict() for i in science.categories]
     }
 
@@ -189,6 +189,11 @@ async def formula_get(
         )
     formula_obj = get_formula(formula_slug)
     if formula_obj is not None:
+        print({
+            "formula": formula.as_dict(),
+            "category": formula.category.as_dict(),
+            "info": formula_obj.as_dict()
+        })
         return {
             "formula": formula.as_dict(),
             "category": formula.category.as_dict(),

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 
 
@@ -15,8 +15,8 @@ class RequestSchema(BaseModel):
 
 class RequestData(BaseModel):
     data: dict | None = None
-    find_mark: str = "x"
-    nums_comma: int = 10
+    find_mark: str = Field(default=10, alias="findMark")
+    nums_comma: int = Field(default=10, alias="numsComma")
 
 
 class ScienceEnum(Enum):
