@@ -16,7 +16,7 @@
 </script>
 
 <template>
-<footer class="footer_">
+<footer class="footer_" style="margin-top: 20px">
       <p class="">© {{ year }}, Все права защищены. Создан {{ author }}</p>
   </footer>
 </template>
