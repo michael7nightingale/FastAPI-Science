@@ -1,22 +1,73 @@
+<script>
+import Footer from "@/components/Footer.vue";
+import {logoutUser} from "@/services/Auth";
+
+export default {
+  name: "AppItem",
+  components: {
+    Footer,
+
+  },
+
+  data(){
+    return {
+      publicPath: process.env.BASE_URL,
+      editMeUrl: 'https://github.com/michael7nightingale/FastAPI-Science',
+      logoUrl: "http://127.0.0.1:8001/static/main/images/logo.png",
+
+    }
+  },
+
+  computed: {
+    user(){
+      return Boolean(localStorage.user);
+    }
+  },
+
+  methods: {
+    logoutClick(){
+      logoutUser()
+    },
+    githubOpen(){
+      window.open(this.editMeUrl, "_blank");
+    }
+  },
+
+}
+</script>
+
+
 <template>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-    <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
-        <router-link to="/">
-          <img :src="`${publicPath}images/logo.png`" class="nav-logo" width="17%" height="10%">
+      <router-link to="/">
+       <img :src="logoUrl" alt="Logo" class="nav-logo" style="width: 120px">
         </router-link>
+    <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
+
+
 
         <nav class="my-2 my-md-0 mr-md-4">
-            <a href="{{ editMeUrl }}">
+            <div v-if="user">
+              <a href="/" @click="githubOpen">
                 Edit me
-                <img alt="" :src="`${publicPath}images/github.png`" class="nav-logo" width=10% height="10%">
-            </a>
-
-            <router-link class="p-2 text-dark" to="/">Home</router-link>
-           <router-link class="p-2 text-dark" to="/auth/login">Login</router-link>
+                <img alt="" :src="`images/github.png`" class="nav-logo" style="width:70px">
+              </a>
+              <router-link class="p-2 text-dark" to="/">Home</router-link>
+               <a class="p-2 text-dark" href="" @click="logoutClick">Logout</a>
+               <router-link class="p-2 text-dark" to="/cabinet">Cabinet</router-link>
+            </div>
+            <div v-else>
+              <a href="/" @click="githubOpen">
+                Edit me
+                <img alt="" :src="`images/github.png`" class="nav-logo" style="width:70px">
+              </a>
+              <router-link class="p-2 text-dark" to="/">Home</router-link>
+              <router-link class="p-2 text-dark" to="/auth/login">Login</router-link>
+            </div>
         </nav>
     </div>
 
-  <div class="body-content background"  >
+  <div class="body-content background">
     <hr/>
     <router-view/>
   </div>
@@ -26,8 +77,9 @@
 
 <style>
 .background{
-        //background-image: url("");
+        background-image: url("/public/images/main_bg.jpg");
         min-height: 700px;
+  padding-bottom: 100px;
 }
 .white_text{
   color: whitesmoke;
@@ -53,22 +105,3 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 </style>
-
-<script>
-import Footer from "@/components/Footer.vue";
-
-export default {
-  name: "AppItem",
-  components: {
-    Footer,
-
-  },
-  data(){
-    return {
-      publicPath: process.env.BASE_URL,
-      editMeUrl: 'https://github.com/michael7nightingale/FastAPI-Science',
-
-    }
-  }
-}
-</script>
