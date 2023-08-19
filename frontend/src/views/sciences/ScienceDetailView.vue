@@ -33,18 +33,16 @@ export default {
 
     <div class="container">
       <div class="category-col row" v-for="category in categories" v-bind:key="category">
-            <div class="col-3">
+            <div class="col-3" style="background-color: #cccccc; margin: 20px">
                 <div class="row">
-<!--                    {% if i.image_path %}-->
-<!--                   <img src="{{ url_for('static', path=category.image_path) }}" width="130">-->
-<!--                    {% endif %}-->
+                   <img v-if="category.image_path" src="" width="130">
                 </div>
             </div>
-            <div class="col">
+            <div class="col" style="background-color: #cccccc; margin: 20px">
                 <div class="row">
                     <h4 align="center">
-                    <router-link v-if="category.is_special" :to="{name: 'category', params: {slug: category.slug}}">{{ category.title  }}</router-link>
-                    <router-link v-else :to="{name: 'special-category', params: {slug: category.slug}}">{{ category.title  }}</router-link>
+                    <router-link v-if="category.is_special" :to="`/special-category/${category.slug}`">{{ category.title  }}</router-link>
+                    <router-link v-else :to="{name: 'category', params: {slug: category.slug}}">{{ category.title  }}</router-link>
                     </h4>
                 </div>
 
@@ -67,7 +65,7 @@ export default {
     align-content: center;
 
 .category-col{
-  background-color: #ececec;
+  background-color: #d30c0c;
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 5%;

@@ -25,9 +25,7 @@ export default {
 
 <div class="row">
     <div class="col science-col" v-for="science in sciences" v-bind:key="science">
-<!--        {% if i.image_path %}-->
-<!--        <img src="{{ url_for('static', path="sciences/" + i.image_path) }}" width=30% height=60%>-->
-<!--        {% endif %}-->
+        <img :src="`http://127.0.0.1:8001/static/sciences/${science.image_path}`" style="width: 200px; height: 200px">
         <h2>{{ science.title }}</h2>
         <p>
             {{ science.content.slice(0, 50) }}

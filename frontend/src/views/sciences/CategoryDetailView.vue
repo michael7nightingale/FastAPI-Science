@@ -1,13 +1,19 @@
 <script>
 import {getCategoryDetail} from "/src/services/ScienceService";
+import VueMathjax from 'vue-mathjax';
+
 
 export default {
   name: "CategoryDetailView",
+  components: {
+    'vue-mathjax': VueMathjax
+  },
   data(){
     return {
       science: {slug: 'ps'},
-      formulas: [],
+      formulas: null,
       category: {},
+      loaded: false
     }
   },
   mounted() {
@@ -16,10 +22,9 @@ export default {
       this.category = response.category;
       this.formulas = response.formulas;
       this.science = response.science;
-      console.log(this.science)
+      this.loaded = true;
     });
-
-  }
+  },
 
 }
 </script>
@@ -29,10 +34,10 @@ export default {
  <div class="jumbotron">
     <h2>{{ category.title }}</h2>
     <p class="lead">{{ category.content }}</p>
-<!--    <link rel="stylesheet" href="{{ url_for('static', path='sciences/css/category.css') }}">-->
-<!--    <router-link :to="{name: 'science', params: {slug: science.slug}}" class="btn btn-primary btn-large">назад к {{ science.title }} &raquo;</router-link>-->
+    <router-link :to="{name: 'science', params: {slug: science.slug}}" class="btn btn-primary btn-large">назад к {{ science.title }} &raquo;</router-link>
 </div>
-    <h3 align="center" class="white_text">Formulas</h3>
+  <div class="formulas" v-if="loaded">
+     <h3 align="center" class="white_text">Formulas</h3>
     <div class="row">
       <div class="col" style="background-color: #b2b3b4">
         <ul>
@@ -46,26 +51,22 @@ export default {
 
         </div>
       <div class="col">
-<!--             {% for row_idx in range((formulas|length // 3) + 1) %}-->
-<!--                 <div class="row">-->
-<!--                 {% for col_idx in range(0, 3) %}-->
-<!--                    {% if row_idx * 3 + col_idx < formulas|length %}-->
-<!--                    <div class="col">-->
-<!--                        <div class="formula" style="background-color: white; padding: 5px; margin-bottom: 20px">-->
-<!--                            <a class="" href="{{ url_for('formula_get', formula_slug=formulas[row_idx * 3 + col_idx].slug) }}">-->
-<!--                                 <h5 style="color: black">{{ formulas[row_idx * 3 + col_idx].formula }}</h5>-->
-<!--                             </a>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    {% else %}-->
-<!--                        <div class="col"></div>-->
-<!--                    {% endif %}-->
-<!---->
-<!--                 {% endfor %}-->
-<!--                 </div>-->
-<!--            {% endfor %}-->
+        <div class="row" v-for="rowIdx in Array(Math.floor(formulas.length/3) + 1).keys()" v-bind:key="rowIdx">
+            <div class="col" v-for="colIdx in Array(3).keys()" v-bind:key="colIdx">
+              <div class="row" v-if="colIdx + rowIdx * 3 < formulas.length">
+                <div class="formula" style="background-color: white; padding: 5px; margin-bottom: 20px">
+                <a class="" :href="formulas[rowIdx * 3 + colIdx].slug">
+                  <vue-mathjax :formula="formulas[rowIdx * 3 + colIdx].formula"></vue-mathjax>
+                </a>
+              </div>
+              </div>
+
+          </div>
+        </div>
         </div>
      </div>
+  </div>
+
 
 </template>
 
