@@ -1,6 +1,7 @@
 from fastapi import Request, Response, FastAPI
 import time
 
+from starlette.middleware.cors import CORSMiddleware
 
 middleware_stack = {}
 
@@ -28,3 +29,12 @@ def register_middleware(app: FastAPI) -> None:
     for type_, functions in middleware_stack.items():
         for func in functions:
             app.middleware(type_)(func)
+
+    origins = ["*"]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
