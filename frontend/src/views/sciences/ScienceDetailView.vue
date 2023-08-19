@@ -43,7 +43,8 @@ export default {
             <div class="col">
                 <div class="row">
                     <h4 align="center">
-                    <router-link :to="{name: 'category', params: {slug: category.slug}}">{{ category.title  }}</router-link>
+                    <router-link v-if="category.is_special" :to="{name: 'category', params: {slug: category.slug}}">{{ category.title  }}</router-link>
+                    <router-link v-else :to="{name: 'special-category', params: {slug: category.slug}}">{{ category.title  }}</router-link>
                     </h4>
                 </div>
 

@@ -11,7 +11,6 @@ export default {
   mounted() {
     let promise = getScienceList()
     promise.then(response => this.sciences = response);
-
   }
 
 }

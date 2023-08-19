@@ -37,6 +37,7 @@ export default {
         }
         this.findMark = literal;
         event.target.className += " active";
+
     },
 
   numberInput(event, literal){
@@ -53,7 +54,12 @@ export default {
   },
 
   countResult(){
-    countResult(this.$route.params.slug, this.storage, this.numsComma, this.findMark);
+      let result;
+      countResult(this.$route.params.slug, this.storage, this.numsComma, this.findMark)
+          .then(responseData => {
+            result = responseData.result;
+            this.result = result;
+          })
 
   }
 
@@ -99,8 +105,19 @@ export default {
        <div class="form"  style="{min-height: 400px}" v-if="literal.literal !== findMark">
         <input type="text" :placeholder="`${literal.literal} =`" class="form-control" @input="numberInput($event, literal.literal)">
         <label :for="`${literal.literal}si`">Ед.измерения:</label>
-        <select :id="`${literal.literal}si`" @change="siSelect($event, literal.literal)">
-          <option v-for="(ed, name) in literal.si" v-bind:key="ed" :value="name">{{ name }}</option>
+        <select
+            :id="`${literal.literal}si`"
+            @change="siSelect($event, literal.literal)"
+            v-model="storage[`${literal.literal}si`]"
+        >
+          <option
+              v-for="(ed, name) in literal.si"
+              v-bind:key="ed"
+              :value="name"
+              :selected="ed === 1 ? '' : 'selected'"
+          >
+            {{ name }}
+          </option>
         </select>
         </div>
     </div>
