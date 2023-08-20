@@ -19,6 +19,10 @@ class RequestData(BaseModel):
     nums_comma: int = Field(default=10, alias="numsComma")
 
 
+class DownloadPlot(BaseModel):
+    filename: str
+
+
 class ScienceEnum(Enum):
     physics = "physics"
     mathem = "mathem"

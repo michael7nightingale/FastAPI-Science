@@ -17,9 +17,9 @@ async def history(request: Request):
     return history_list
 
 
-@cabinets_router.post('/history')
+@cabinets_router.post('/history/download')
 @login_required
-async def history(filedata: str = Depends(HistoryParser())):
+async def history(request: Request, filedata: str = Depends(HistoryParser())):
     if filedata is not None:
         filepath, filename = filedata
         return FileResponse(path=filepath, filename=filename)

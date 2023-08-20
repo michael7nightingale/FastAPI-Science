@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Path, Request, Body
 from fastapi_authtools import login_required
+from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException
 import os
 
 from .models import Science, Category, Formula
 from ...services.formulas import contextBuilder, mathem_extra_counter
 from src.services.formulas.plots import Plot
-from .schemas import RequestSchema, RequestData
+from .schemas import RequestSchema, RequestData, DownloadPlot
 from src.services.formulas.metadata import get_formula
 
 
@@ -63,6 +64,21 @@ async def plots_view_post(request: Request, data: dict = Body()):
     else:
         message = "Неполные данные."
     return {"detail": message}
+
+
+@science_router.post('/special-category/plots/download')
+@login_required
+async def plots_view_post(request: Request, filedata: DownloadPlot = Body()):
+    """Plot file download view"""
+    plot_path = PLOTS_DIR + f'/{request.user.id}.png'
+    full_plot_path = request.app.state.STATIC_DIR + plot_path
+    if os.path.exists(full_plot_path):
+        return FileResponse(path=full_plot_path, filename=filedata.filename + ".png")
+    else:
+        return JSONResponse(
+            {"detail": "Missing any plots."},
+            status_code=404
+        )
 
 
 # ======================================= EQUATIONS ===================================== #

@@ -1,9 +1,9 @@
-from fastapi import Request, Form
+from fastapi import Request, Body
 import os
 
 from .models import History
 from src.services.tables import CsvTableManager, PandasTableManager
-
+from .schemas import DownloadFile
 
 HISTORY_DIR = '/files/history/'
 
@@ -12,7 +12,6 @@ def get_field(record, value):
     field = record
     for attribute in value.split("."):
         field = getattr(field, attribute)
-        print(field, record)
     return field
 
 
@@ -30,12 +29,11 @@ class HistoryParser:
     async def __call__(
             self,
             request: Request,
-            filename: str = Form(),
-            extension: str = Form(),
+            filedata: DownloadFile = Body(),
     ):
         history_list = await History.filter(user_id=request.user.id)
-        filepath = request.app.state.STATIC_DIR + HISTORY_DIR + request.user.id + '.' + extension
-        if extension == 'csv':
+        filepath = request.app.state.STATIC_DIR + HISTORY_DIR + request.user.id + '.' + filedata.extension
+        if filedata.extension == 'csv':
             table = CsvTableManager(filepath)
         else:
             table = PandasTableManager(filepath)
@@ -46,6 +44,6 @@ class HistoryParser:
             for record in history_list:
                 table.add_line_dict(self.parse_record(record))
             table.save_data()
-            filename = f"{filename}.{extension}"
+            filename = f"{filedata.filename}.{filedata.extension}"
             yield filepath, filename
             os.remove(filepath)
