@@ -218,6 +218,9 @@ class PandasTableManager(BaseTableManager):
                 self._data.loc[len(self._data)] = line_data
         # logger.info(f"В данные объекта успешно добавлена строчка")
 
+    def add_line_dict(self, line: dict) -> None:
+        self._data.loc[len(self._data)] = line
+
     def add_column(self, column_name: str,
                    column_data: Sequence = tuple(),
                    nullable: bool = False) -> None:
