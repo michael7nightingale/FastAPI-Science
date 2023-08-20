@@ -39,12 +39,5 @@ export default {
 
 
 <style scoped>
-.science-col{
-  background-color: dodgerblue;
-  height: 100%;
-  padding: 20px;
-  border-radius: 10px;
-  margin-left: 5%;
-
-}
+@import '../../assets/css/sciences.css';
 </style>

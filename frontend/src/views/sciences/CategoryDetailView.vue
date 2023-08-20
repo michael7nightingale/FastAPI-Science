@@ -32,14 +32,20 @@ export default {
 
 <template>
  <div class="jumbotron">
-    <h2>{{ category.title }}</h2>
-    <p class="lead">{{ category.content }}</p>
+     <div id="faq">
+      <ul>
+        <li>
+          <input type="checkbox" checked>
+          <h2 align="center" style="text-align: center">{{ category.title }}</h2>
+        <p class="lead">{{ category.content }}</p>
+        </li>
+      </ul>
+      </div>
     <router-link :to="{name: 'science', params: {slug: science.slug}}" class="btn btn-primary btn-large">назад к {{ science.title }} &raquo;</router-link>
 </div>
   <div class="formulas" v-if="loaded">
-     <h3 align="center" class="white_text">Formulas</h3>
     <div class="row">
-      <div class="col" style="background-color: #b2b3b4">
+      <div class="col" style="background-color: white">
         <ul>
             <h4 align="center">Contains</h4>
                 <li v-for="formula in formulas" v-bind:key="formula">
@@ -72,8 +78,5 @@ export default {
 
 
 <style scoped>
-.f_content{
-    background-color: #b2b3b4;
-}
-
+@import '../../assets/css/sciences.css';
 </style>

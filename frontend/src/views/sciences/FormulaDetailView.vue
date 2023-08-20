@@ -20,11 +20,7 @@ export default {
       this.category = response.category;
       this.formula = response.formula;
       this.info = response.info;
-      for (let l in this.info.literals){
-        this.findMark = this.info.literals[l].literal;
-        break;
-      }
-
+      this.findMark = this.info.literals[0].literal;
     });
 
   },
@@ -53,13 +49,41 @@ export default {
       this.storage[literal + 'si'] = event.target.value;
   },
 
+  getLiteralsExceptFindMark(){
+      let literals = [];
+      for (const literalData of this.info.literals){
+        if (literalData.literal !== this.findMark){
+          literals.push(literalData.literal);
+        }
+      }
+      return literals;
+  },
+
+  checkStorage(){
+      let neededLiterals = this.getLiteralsExceptFindMark();
+      let needElseNumbers = false;
+      for (const lit of neededLiterals){
+        if (!(this.storage[lit] && this.storage[`${lit}si`])){
+          needElseNumbers = true;
+        }
+      }
+      if (needElseNumbers){
+        alert("Fill in the data!");
+        return false;
+      }
+      return true;
+  },
+
   countResult(){
       let result;
-      countResult(this.$route.params.slug, this.storage, this.numsComma, this.findMark)
+      let count = this.checkStorage();
+      if (count){
+          countResult(this.$route.params.slug, this.storage, this.numsComma, this.findMark)
           .then(responseData => {
             result = responseData.result;
             this.result = result;
           })
+      }
 
   }
 
@@ -70,11 +94,18 @@ export default {
 
 <template>
     <div class="jumbotron">
-    <h2>{{ formula.title }}</h2>
-    <p class="lead">{{ category.title }}</p>
-    <a href="}" class="btn btn-primary btn-large">назад к  &raquo;
+       <div id="faq">
+      <ul>
+        <li>
+          <input type="checkbox" checked>
+          <h3 style="text-align: center">{{ formula.title }}</h3>
+        <p class="lead">{{ formula.content }}</p>
+        </li>
+      </ul>
+      </div>
+    <router-link :to="{name: 'category', params: {slug: category.slug}}" class="btn btn-primary btn-large">назад к  &raquo;
         {{ category.title }}
-    </a>
+    </router-link>
 </div>
 <div class="tab" style="min-height: 400px;">
   <div v-for="literal in this.info.literals" v-bind:key="literal">
@@ -90,7 +121,7 @@ export default {
 
 <div class="container" style="min-height: 400px;">
   <div id="{{ findMark }}" class="tabcontent">
-  <label for="nums_comma">Цифр после запятой: </label>
+  <label class="white_text" for="nums_comma">Цифр после запятой: </label>
   <select title="nums_comma" name="nums_comma" id="nums_comma" @change="numsCommaSelect($event)">
     <option
         v-for="n in numsComma"
@@ -103,8 +134,14 @@ export default {
 
     <div v-for="literal in this.info.literals" v-bind:key="literal">
        <div class="form"  style="{min-height: 400px}" v-if="literal.literal !== findMark">
-        <input type="text" :placeholder="`${literal.literal} =`" class="form-control" @input="numberInput($event, literal.literal)">
-        <label :for="`${literal.literal}si`">Ед.измерения:</label>
+        <input
+            type="text"
+            :placeholder="`${literal.literal} =`"
+            class="form-control"
+            @input="numberInput($event, literal.literal)"
+            :value="storage[literal.literal]"
+        >
+        <label class="white_text" :for="`${literal.literal}si`">Ед.измерения:</label>
         <select
             :id="`${literal.literal}si`"
             @change="siSelect($event, literal.literal)"
@@ -114,77 +151,26 @@ export default {
               v-for="(ed, name) in literal.si"
               v-bind:key="ed"
               :value="name"
-              :selected="ed === 1 ? '' : 'selected'"
+              :selected="ed === '1' ? '' : 'selected'"
           >
-            {{ name }}
+            {{  ed === 1 ? storage[`${literal.literal}si`] = name : name  }}
           </option>
         </select>
         </div>
     </div>
 
   <button
-    class="btn btn-primary"
+    class="btn btn-primary button-blue"
     @click="countResult"
   >
   Считать
   </button>
-  <h4>{{ findMark }} = {{ result }}</h4>
+  <h4 class="white_text">{{ findMark }} = {{ result }}</h4>
   </div>
-</div>
-
-
-<div style="">
-<p class="lead">{{ formula.content }}</p>
 </div>
 
 </template>
 
 <style scoped>
-/* Style the tab */
-.tab {
-  float: left;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-  width: 30%;
-  height: 300px;
-}
-
-/* Style the buttons that are used to open the tab content */
-.tab button {
-  display: block;
-  background-color: inherit;
-  color: black;
-  padding: 22px 16px;
-  width: 100%;
-  border: none;
-  outline: none;
-  text-align: left;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
-
-/* Create an active/current "tab button" class */
-.tab button.active {
-  background-color: #ccc;
-}
-
-.input{
-  background: rosybrown;
-}
-
-/* Style the tab content */
-.tabcontent {
-  float: left;
-  padding: 0px 12px;
-  border: 1px solid #ccc;
-  width: 70%;
-  border-left: none;
-  height: 300px;
-}
-
+@import '../../assets/css/sciences.css';
 </style>

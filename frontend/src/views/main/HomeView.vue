@@ -37,12 +37,5 @@ export default {
 
 
 <style>
-.block{
-  background-color: #ececec;
-  padding: 20px;
-  border-radius: 10px;
-  margin-left: 5%;
-
-}
-
+@import '../../assets/css/home.css';
 </style>

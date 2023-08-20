@@ -26,8 +26,15 @@ export default {
 
 <template>
      <div class="jumbotron">
-         <h2>{{ science.title }}</h2>
-         <p class="lead">&nbsp;{{ science.content }}</p>
+          <div id="faq">
+      <ul>
+        <li>
+          <input type="checkbox" checked>
+          <h1 align="center">{{ science.title }}</h1>
+        <p class="lead">{{ science.content }}</p>
+        </li>
+      </ul>
+      </div>
       <router-link to="/sciences" class="btn btn-primary btn-large">назад к наукам &raquo;</router-link>
 </div>
 
@@ -58,18 +65,5 @@ export default {
 
 
 <style scoped>
-.science-container{
-    margin-bottom: 50px;
-    background: #dddddd;
-    padding: 10px;
-    align-content: center;
-
-.category-col{
-  background-color: #d30c0c;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 5%;
-
-}
-}
+@import '../../assets/css/sciences.css';
 </style>
