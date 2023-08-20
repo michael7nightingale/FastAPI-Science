@@ -3,12 +3,14 @@ version: "5"
 services:
   fastapi_app:
     build: ./backend
+    volumes:
+      - .:/backend
     environment:
       - DOCKER=1
     env_file:
       - ./backend/.docker.env
     command: >
-      sh -c "uvicorn src.main:create_app --host 0.0.0.0 --port 8000 --reload --factory"
+      sh -c "uvicorn src.main:create_app --host 0.0.0.0 --port 8001 --reload --factory"
     ports:
       - "8001:8001"
 
@@ -26,7 +28,7 @@ services:
   frontend:
      build: ./frontend
      ports:
-       - "8080:8080"
+       - "8888:8888"
      depends_on:
        fastapi_app:
          condition: service_started

@@ -58,7 +58,7 @@ class DevSettings(BaseAppSettings):
 
     @property
     def db_uri(self) -> str:
-        host_address = gethostbyname(self.DB_HOST)
+        host_address = self.DB_HOST
         return f"{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{host_address}:{self.DB_PORT}/{self.DB_NAME}"
 
     class Config:
