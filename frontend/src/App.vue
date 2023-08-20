@@ -13,7 +13,6 @@ export default {
     return {
       publicPath: process.env.BASE_URL,
       editMeUrl: 'https://github.com/michael7nightingale/FastAPI-Science',
-      logoUrl: "http://127.0.0.1:8001/static/main/images/logo.png",
 
     }
   },
@@ -40,7 +39,7 @@ export default {
 <template>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
       <router-link to="/">
-       <img :src="logoUrl" alt="Logo" class="nav-logo" style="width: 120px">
+       <img :src="`images/logo.png`" alt="Logo" class="nav-logo" style="width: 120px">
         </router-link>
     <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
 
