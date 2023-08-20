@@ -86,11 +86,22 @@ export function postPlot(storage){
 }
 
 
+export function downloadPlot(filename){
+    let data = {filename: filename};
+    return axios.post(
+        buildUrl(`sciences/special-category/plots/download`),
+        data,
+        {
+             headers: getHeaders(),
+            responseType: "blob"
+         }
+    );
+}
+
 // function getCategoryList(scienceSlug){
 //     let promise = axios.get(`http://localhost:8001/api/v1/sciences/category/${scienceSlug}`);
 //     return promise.then((response) => response.data);
 // }
-
 
 
 export {
