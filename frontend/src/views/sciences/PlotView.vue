@@ -25,7 +25,7 @@ export default {
       this.category = response.category;
       this.science = response.science;
       this.plotPath = response.plotPath
-    });
+    })
 
   },
 
@@ -62,10 +62,16 @@ export default {
                 this.plotPath = response.plotPath
               }
             })
+            .catch((error) => {
+              error
+              alert("You are not authorized!")
+              this.$router.push("/auth/login")
+            })
     },
 
     downloadClick(){
-        downloadPlot(this.filename)
+        if (this.plotPath){
+               downloadPlot(this.filename)
             .then((response) => {
               console.log(response.status)
                const blob = new Blob([response.data], { type: `application/png` });
@@ -75,6 +81,7 @@ export default {
                link.click();
                URL.revokeObjectURL(link.href);
             })
+        }
     },
 
     inputFunction(value, name){

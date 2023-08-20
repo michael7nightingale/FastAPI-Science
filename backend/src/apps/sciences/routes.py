@@ -27,9 +27,9 @@ async def plots_view(request: Request):
         "science": category.science,
         "category": category
     }
-    plot_path = PLOTS_DIR + f'/{request.user.id}.png'
-    full_plot_path = request.app.state.STATIC_DIR + plot_path
     if request.user is not None:
+        plot_path = PLOTS_DIR + f'/{request.user.id}.png'
+        full_plot_path = request.app.state.STATIC_DIR + plot_path
         if os.path.exists(full_plot_path):
             response.update(plotPath=plot_path)
     return response

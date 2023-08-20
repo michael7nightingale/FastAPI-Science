@@ -83,6 +83,11 @@ export default {
             result = responseData.result;
             this.result = result;
           })
+         .catch((error) => {
+              error
+              alert("You are not authorized!")
+              this.$router.push("/auth/login")
+            })
       }
 
   }
