@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings
 import os
-from socket import gethostbyname
 
 
 class BaseAppSettings(BaseSettings):
