@@ -1,11 +1,13 @@
 <script>
-import {deleteHistory, getHistoryList} from "@/services/CabinetService";
+import {deleteHistory, downloadHistory, getHistoryList} from "@/services/CabinetService";
 
 export default {
   name: "HistoryView",
   data() {
     return {
-        history: []
+        history: [],
+        extension: "csv",
+        filename: "history"
     }
   },
 
@@ -25,8 +27,21 @@ export default {
       deleteButtonClick(){
           deleteHistory()
               .then((response) => {
-                console.log(response.data);
+                response
+                this.history = []
               })
+      },
+
+      downloadClick(){
+        downloadHistory(this.filename, this.extension)
+            .then((response) => {
+                const blob = new Blob([response.data], { type: `application/${this.extension}` });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `${this.filename}.${this.extension}`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            })
       }
   }
 
@@ -52,10 +67,10 @@ export default {
   </div>
   <div class="row">
     <div class="col">
-      <input class="white_text form-control" style="width: 30%" id='filename-input' type="text" name="filename" placeholder="Скачать как:">
+      <input class="form-control" type="text" :value="filename" @input="($event) => filename = $event.target.value" placeholder="Скачать как:">
     </div>
     <div class="col">
-      <select class="form-control" style="width: 30%" id='extension-input' name="extension">
+      <select class="form-control" id='extension-input' v-model="extension" name="extension">
         <option value="csv">.csv</option>
         <option value="xls">.xls</option>
         <option value="xlsx">.xlsx</option>
@@ -64,8 +79,11 @@ export default {
     </div>
   </div>
   <div class="row">
-    <button class="btn btn-large" style="background-color: dodgerblue" >Скачать</button>
+    <div class="col">
+       <button class="btn btn-large button-blue" @click="downloadClick">Скачать</button>
   </div>
+    </div>
+
 <table style="background-color: white; margin-top: 100px; width:100%" border=1 frame=void>
     <tbody >
         <tr>
@@ -82,11 +100,10 @@ export default {
         </tr>
     </tbody>
 </table>
-    <button class="btn-link" @click="deleteButtonClick">Удалить историю</button>
+  <button class="btn btn-large button-red" @click="deleteButtonClick">Удалить историю</button>
 </div>
 </template>
 
 
 <style>
-
 </style>

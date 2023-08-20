@@ -24,3 +24,21 @@ export function deleteHistory() {
             }
         );
 }
+
+
+export function downloadHistory(filename, extension){
+    let data = {
+        filename: filename,
+        extension: extension
+    }
+    return axios
+        .post(
+            buildUrl("cabinet/history/download"),
+            data,
+            {
+                headers: getHeaders(),
+                responseType: "blob"
+            }
+        )
+
+}
