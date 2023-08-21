@@ -2,7 +2,8 @@
 
 [![Build Status](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/fastapi-app.yml/badge.svg)](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/fastapi-app.yml/)
 [![Build Status](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/codeql.yml/badge.svg)](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/codeql.yml/)
-[![Build Status](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/docker-image.yml/badge.svg)](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/docker-image.yml/)
+[![Build Status](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/docker-backend-image.yml/badge.svg)](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/docker-backend-image.yml/)
+[![Build Status](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/docker-frontend-image.yml/badge.svg)](https://github.com/michael7nightingale/FastAPI-Science/actions/workflows/docker-frontend-image.yml/)
 
 I found my old project and decided to make it more interesting. So the fact is I restructured the project to change its architecture.
 Some new features are coming. The web-app is both fullstack and API.
@@ -19,6 +20,7 @@ Some new features are coming. The web-app is both fullstack and API.
 - `Asyncpg` async engine for production and development, `aiosqlite` for testing;
 - `numpy` / `pandas` / `sympy` / `matplotlib` for calculations;
 - `Docker`;
+- `Vue.js`;
 - `HTML` / `CSS` / `js` for fullstack;
 - `pytest` in async mode for testing;
 - `flake8` linter;
