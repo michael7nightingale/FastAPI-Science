@@ -10,13 +10,16 @@ import PlotView from "@/views/sciences/PlotView.vue";
 import FormulaDetailView from "@/views/sciences/FormulaDetailView.vue";
 import CabinetView from "@/views/cabinets/CabinetView.vue";
 import HistoryView from "@/views/cabinets/HistoryView.vue";
+import ProblemsListView from "@/views/problems/ProblemsListView.vue";
+import ProblemView from "@/views/problems/ProblemView.vue";
+import ProblemCreateView from "@/views/problems/ProblemCreateView.vue";
 
 
 const routes = [
   // main
   {
     path: '/',
-    name: 'home',
+    name: 'homepage',
     component: HomeView
   },
   {
@@ -77,6 +80,22 @@ const routes = [
     component: FormulaDetailView
   },
 
+   // problems
+  {
+    path: '/problems',
+    name: 'problems',
+    component: ProblemsListView
+  },
+  {
+    path: '/problems/create',
+    name: 'problem-create',
+    component: ProblemCreateView
+  },
+  {
+    path: '/problems/:problem_id',
+    name: 'problem',
+    component: ProblemView
+  },
 ]
 
 const router = createRouter({
