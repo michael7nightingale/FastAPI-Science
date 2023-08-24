@@ -8,7 +8,7 @@ class Problem(TortoiseModel):
     text = fields.TextField()
     user = fields.ForeignKeyField("models.User", related_name="problems")
     # solution = fields.OneToOneField("models.Solution", related_name="problem_solved", null=True)
-    science = fields.ForeignKeyField("models.Science", related_name="problems")
+    science = fields.ForeignKeyField("models.Science", related_name="science")
     is_solved = fields.BooleanField(default=False)
     time_opened = fields.DatetimeField(auto_now=True)
     time_solved = fields.DatetimeField(null=True)

@@ -1,9 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ProblemCreate(BaseModel):
     title: str
     text: str
+    medias: list
     science_id: str
 
 

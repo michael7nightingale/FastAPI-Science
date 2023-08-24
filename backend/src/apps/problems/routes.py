@@ -61,11 +61,11 @@ async def problem(
         problem_data: ProblemCreate = Body(),
 ):
     """Endpoint for creating problem."""
-    problem = await Problem.create(
+    problem_ = await Problem.create(
         **problem_data.model_dump(),
         user_id=request.user.id
     )
-    problem_path = f"{PROBLEMS_DIR}/{problem.id}/"
+    problem_path = f"{PROBLEMS_DIR}/{problem_.id}/"
     problem_fullpath = os.path.join(request.app.state.STATIC_DIR, problem_path)
     os.makedirs(problem_fullpath)
     problem_medias_path = os.path.join(problem_path, "media")
@@ -78,7 +78,7 @@ async def problem(
         problem_media_path = os.path.join(problem_medias_path, filename)
         problem_media_fullpath = os.path.join(request.app.state.STATIC_DIR, problem_media_path)
         await ProblemMedia.create(
-            problem_id=problem.id,
+            problem_id=problem_.id,
             media_path=problem_media_path
         )
         with open(problem_media_fullpath, "wb") as file:
