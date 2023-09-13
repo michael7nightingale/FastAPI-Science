@@ -19,6 +19,26 @@ class RequestData(BaseModel):
     nums_comma: int = Field(default=10, alias="numsComma")
 
 
+class PlotData(BaseModel):
+    functions: list[str]
+    x_min: int = Field(alias="xMin")
+    x_max: int = Field(alias="xMax")
+    y_min: int = Field(alias="yMin")
+    y_max: int = Field(alias="yMax")
+
+    @property
+    def x_lim(self) -> tuple[int, int]:
+        return self.x_min, self.x_max
+
+    @property
+    def y_lim(self) -> tuple[int, int]:
+        return self.y_min, self.y_max
+
+
+class EquationsData(BaseModel):
+    equations: list[str]
+
+
 class DownloadPlot(BaseModel):
     filename: str
 

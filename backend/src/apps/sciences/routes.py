@@ -7,14 +7,14 @@ import os
 from .models import Science, Category, Formula
 from ...services.formulas import contextBuilder, mathem_extra_counter
 from src.services.formulas.plots import Plot
-from .schemas import RequestSchema, RequestData, DownloadPlot
+from .schemas import RequestSchema, RequestData, DownloadPlot, PlotData, EquationsData
 from src.services.formulas.metadata import get_formula
 
 
 science_router = APIRouter(
     prefix='/sciences'
 )
-PLOTS_DIR = "/files/plots/"
+PLOTS_DIR = "files/plots/"
 
 
 # ================================= PLOTS ================================ #
@@ -37,22 +37,18 @@ async def plots_view(request: Request):
 
 @science_router.post('/special-category/plots')
 @login_required
-async def plots_view_post(request: Request, data: dict = Body()):
+async def plots_view_post(request: Request, data: PlotData = Body()):
     """Plot file view"""
-    functions_list = [data.get(k) for k in data if "function" in k]
-    x_lim = data['xMin'], data['xMax']
-    if all(x_lim) and functions_list:
-        y_lim = data['yMin'], data['yMax']
-        y_lim = y_lim if all(y_lim) else None
+    if data.functions:
         try:
-            plot = Plot(functions_list, x_lim, y_lim)
-            plot_path = PLOTS_DIR + f'/{request.user.id}.png'
+            plot = Plot(data.functions, data.x_lim, data.y_lim)
+            plot_path = PLOTS_DIR + f'{request.user.id}.png'
             full_plot_path = request.app.state.STATIC_DIR + plot_path
+            print(full_plot_path)
             plot.save_plot(full_plot_path)
         except (SyntaxError, NameError):
             message = "Невалидные данные."
-        except TypeError as e:
-            raise e
+        except TypeError:
             message = "Ожидаются рациональные числа."
         except ZeroDivisionError:
             message = "На ноль делить нет смысла."
@@ -97,13 +93,10 @@ async def equations_view(request: Request):
 
 @science_router.post('/special-category/equations')
 @login_required
-async def equations_view_post(request: Request, data: dict = Body()):
-    message = ""
-    result = ""
-    equations = [data.get(k) for k in data if "equation" in k]
-    if len(equations) > 0:
-        result = mathem_extra_counter.equation_system(equations)
-        print(1231, result)
+async def equations_view_post(request: Request, data: EquationsData = Body()):
+    message = result = ""
+    if len(data.equations) > 0:
+        result = mathem_extra_counter.equation_system(data.equations)
     else:
         message = "Данные не предоставлены."
     if not message:
