@@ -10,7 +10,7 @@ export default {
       category: {},
       xMin: -100,
       xMax: 100,
-      yMin: 100,
+      yMin: -100,
       yMax: 100,
       plotPath: null,
       storage: [""],
@@ -47,31 +47,28 @@ export default {
     },
 
     buildPlot(){
-      let data = {}
-      data.xMin = this.xMin;
-      data.xMax = this.xMax;
-      data.yMax = this.yMax;
-      data.yMin = this.yMin;
-      let number = 1
-      for (let functionValue of this.storage){
-        data[`function${number}`] = functionValue;
-        number += 1
+      let data = {
+        xMin: this.xMin,
+        xMax: this.xMax,
+        yMin: this.yMin,
+        yMax: this.yMax,
+        functions: this.storage
       }
-        postPlot(data)
-            .then((response) => {
-              let message = response.detail;
-              if (message){
-                alert(message)
-              }
-              else{
-                this.plotPath = response.plotPath
-              }
-            })
-            .catch((error) => {
-              error
-              alert("You are not authorized!")
-              this.$router.push("/auth/login")
-            })
+      postPlot(data)
+          .then((response) => {
+            let message = response.detail;
+            if (message){
+              alert(message)
+            }
+            else{
+              this.plotPath = response.plotPath
+            }
+          })
+          .catch((error) => {
+            error
+            alert("You are not authorized!")
+            this.$router.push("/auth/login")
+          })
     },
 
     downloadClick(){

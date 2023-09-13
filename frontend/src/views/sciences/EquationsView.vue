@@ -25,27 +25,24 @@ export default {
   methods: {
 
     buildPlot(){
-      let data = {}
-      let number = 1
-      for (let functionValue of this.storage){
-        data[`equation${number}`] = functionValue;
-        number += 1
+      let data = {
+        equations: this.storage
       }
-        postEquations(data)
-            .then((response) => {
-              let message = response.detail;
-              if (message){
-                alert(message)
-              }
-              else{
-                this.result = response.result
-              }
-            })
-            .catch((error) => {
-              error
-              alert("You are not authorized!")
-              this.$router.push("/auth/login")
-            })
+      postEquations(data)
+          .then((response) => {
+            let message = response.detail;
+            if (message){
+              alert(message)
+            }
+            else{
+              this.result = response.result
+            }
+          })
+          .catch((error) => {
+            error
+            alert("You are not authorized!")
+            this.$router.push("/auth/login")
+          })
     },
 
     inputFunction(value, name){

@@ -39,7 +39,7 @@ export default {
 <template>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
       <router-link to="/">
-       <img :src="`images/logo.png`" alt="Logo" class="nav-logo" style="width: 120px">
+       <img :src="`/images/logo.png`" alt="Logo" class="nav-logo" style="width: 120px">
         </router-link>
     <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
 
@@ -49,7 +49,7 @@ export default {
             <div v-if="user">
               <a href="/" @click="githubOpen">
                 Edit me
-                <img alt="" :src="`images/github.png`" class="nav-logo" style="width:70px">
+                <img alt="" :src="`/images/github.png`" class="nav-logo" style="width:70px">
               </a>
               <router-link class="p-2 text-dark" to="/">Home</router-link>
                <a class="p-2 text-dark" href="" @click="logoutClick">Logout</a>
@@ -58,7 +58,7 @@ export default {
             <div v-else>
               <a href="/" @click="githubOpen">
                 Edit me
-                <img alt="" :src="`images/github.png`" class="nav-logo" style="width:70px">
+                <img alt="" :src="`/images/github.png`" class="nav-logo" style="width:70px">
               </a>
               <router-link class="p-2 text-dark" to="/">Home</router-link>
               <router-link class="p-2 text-dark" to="/auth/login">Login</router-link>
