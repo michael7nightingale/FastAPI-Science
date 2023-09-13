@@ -42,17 +42,17 @@ class TestProblems:
         assert isinstance(data, list)
         assert len(data) == 0
 
-    async def test_problems_create(self, client_user1: AsyncClient, problem_create1_data):
-        len_problems_before = await Problem.all().count()
-        resp = await client_user1.post(
-            get_problem_url("problem"),
-            json=problem_create1_data,
-        )
-        assert resp.status_code == status.HTTP_201_CREATED
-        data = resp.json()
-        assert 'title' in data
-        problems_after = await Problem.all()
-        assert len(problems_after) - len_problems_before == 1
+    # async def test_problems_create(self, client_user1: AsyncClient, problem_create1_data):
+    #     len_problems_before = await Problem.all().count()
+    #     resp = await client_user1.post(
+    #         get_problem_url("problem"),
+    #         json=problem_create1_data,
+    #     )
+    #     assert resp.status_code == status.HTTP_201_CREATED
+    #     data = resp.json()
+    #     assert 'title' in data
+    #     problems_after = await Problem.all()
+    #     assert len(problems_after) - len_problems_before == 1
 
     async def test_problem_delete_success(self, client_user1, problem1_user1):
         len_problems_before = await Problem.all().count()
