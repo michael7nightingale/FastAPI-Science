@@ -39,7 +39,7 @@ async def plots_view(request: Request):
 @login_required
 async def plots_view_post(request: Request, data: dict = Body()):
     """Plot file view"""
-    functions_list = [data.get(f"function{i}") for i in range(1, 5) if data.get(f"function{i}") is not None]
+    functions_list = [data.get(k) for k in data if "function" in k]
     x_lim = data['xMin'], data['xMax']
     if all(x_lim) and functions_list:
         y_lim = data['yMin'], data['yMax']
@@ -51,7 +51,8 @@ async def plots_view_post(request: Request, data: dict = Body()):
             plot.save_plot(full_plot_path)
         except (SyntaxError, NameError):
             message = "Невалидные данные."
-        except TypeError:
+        except TypeError as e:
+            raise e
             message = "Ожидаются рациональные числа."
         except ZeroDivisionError:
             message = "На ноль делить нет смысла."
@@ -83,24 +84,26 @@ async def plots_view_post(request: Request, filedata: DownloadPlot = Body()):
 
 # ======================================= EQUATIONS ===================================== #
 
-@science_router.post('/special-category/equations')
+@science_router.get('/special-category/equations')
 async def equations_view(request: Request):
+    """Equations get endpoint."""
     category = await Category.get_or_none(slug="equations")
-    return {
-        "request": request,
-        "sciences": category.science,
+    response = {
+        "science": category.science,
         "category": category
     }
+    return response
 
 
 @science_router.post('/special-category/equations')
-async def equations_view_post(request: Request):
-    form_data = await request.form()
+@login_required
+async def equations_view_post(request: Request, data: dict = Body()):
     message = ""
     result = ""
-    equations = list(filter(bool, form_data.values()))
+    equations = [data.get(k) for k in data if "equation" in k]
     if len(equations) > 0:
         result = mathem_extra_counter.equation_system(equations)
+        print(1231, result)
     else:
         message = "Данные не предоставлены."
     if not message:

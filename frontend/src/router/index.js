@@ -13,6 +13,7 @@ import HistoryView from "@/views/cabinets/HistoryView.vue";
 import ProblemsListView from "@/views/problems/ProblemsListView.vue";
 import ProblemView from "@/views/problems/ProblemView.vue";
 import ProblemCreateView from "@/views/problems/ProblemCreateView.vue";
+import EquationsView from "@/views/sciences/EquationsView.vue";
 
 
 const routes = [
@@ -68,6 +69,11 @@ const routes = [
     path: '/special-category/plots',
     name: 'plots',
     component: PlotView
+  },
+  {
+    path: '/special-category/equations',
+    name: 'equations',
+    component: EquationsView
   },
   {
     path: '/category/:slug',

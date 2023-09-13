@@ -3,18 +3,17 @@ import {downloadPlot, getSpecialCategoryDetail, postPlot} from "/src/services/Sc
 
 
 export default {
-  name: "SciencesDetailView",
+  name: "PlotView",
   data(){
     return {
       science: {},
       category: {},
-      functionsAmount: 4,
       xMin: -100,
       xMax: 100,
       yMin: 100,
       yMax: 100,
       plotPath: null,
-      storage: {},
+      storage: [""],
       filename: "plot",
 
     }
@@ -48,11 +47,17 @@ export default {
     },
 
     buildPlot(){
-      this.storage.xMin = this.xMin;
-      this.storage.xMax = this.xMax;
-      this.storage.yMax = this.yMax;
-      this.storage.yMin = this.yMin;
-        postPlot(this.storage)
+      let data = {}
+      data.xMin = this.xMin;
+      data.xMax = this.xMax;
+      data.yMax = this.yMax;
+      data.yMin = this.yMin;
+      let number = 1
+      for (let functionValue of this.storage){
+        data[`function${number}`] = functionValue;
+        number += 1
+      }
+        postPlot(data)
             .then((response) => {
               let message = response.detail;
               if (message){
@@ -88,6 +93,18 @@ export default {
       this.storage[name] = value;
     },
 
+    addFunction(){
+      let storageProxy = this.storage;
+       storageProxy.push("");
+       this.storage = storageProxy;
+    },
+
+    deleteFunction(idx){
+       let storageProxy = this.storage;
+       storageProxy.splice(idx, 1);
+       this.storage = storageProxy;
+    },
+
     plotUrl(){
       return "http://localhost:8001/static/".concat(this.plotPath)
     }
@@ -114,18 +131,65 @@ export default {
 </div>
 
 <div class="container">
-  <input
-      v-for="n in Array(functionsAmount).keys()"
-      v-bind:key="n"
-      class="form-control"
+  <div class="form-item">
+    <button class="btn btn-primary" @click="addFunction()">
+      + Add
+    </button>
+  </div>
+  <div class="row" v-for="n in Array(storage.length).keys()" :key="n">
+    <div class="col">
+      <input
+      class="form-control form-item"
       type="text"
-      @input="inputFunction($event.target.value, `function${n + 1}`)"
+      :value="storage[n]"
+      @input="inputFunction($event.target.value, n)"
       :placeholder="`Функция ${n + 1}`"
-  />
-  <input class="form-control" type="number" :value="xMin" @click="xMinInput($event.target.value)" placeholder="x min">
-  <input class="form-control" type="number" :value="xMax" @click="xMaxInput($event.target.value)" placeholder="x max">
-  <input class="form-control" type="number" :value="yMin" @click="yMinInput($event.target.value)" placeholder="y min">
-  <input class="form-control" type="number" :value="yMax" @click="yMaxInput($event.target.value)" placeholder="y max">
+      />
+    </div>
+    <div class="col-2">
+      <button class="btn btn-primary form-item" style="background-color: red"
+        @click="deleteFunction(n)">
+        Удалить
+      </button>
+    </div>
+  </div>
+
+  <div class="row form-item">
+    <div class="col-2">
+        <label for="x-min" style="color: white">X min</label>
+    </div>
+    <div class="col">
+      <input class="form-control" id="x-min" type="number" :value="xMin" @click="xMinInput($event.target.value)" placeholder="x min">
+    </div>
+  </div>
+
+  <div class="row form-item">
+    <div class="col-2">
+        <label for="x-max" style="color: white">X max</label>
+    </div>
+    <div class="col">
+      <input class="form-control" id="x-max" type="number" :value="xMax" @click="xMaxInput($event.target.value)" placeholder="x max">
+    </div>
+  </div>
+
+  <div class="row form-item">
+    <div class="col-2">
+        <label for="y-min" style="color: white">Y min</label>
+    </div>
+    <div class="col">
+      <input class="form-control" id="y-min" type="number" :value="yMin" @click="yMinInput($event.target.value)" placeholder="y min">
+    </div>
+  </div>
+
+  <div class="row form-item">
+    <div class="col-2">
+        <label for="y-max" style="color: white">Y max</label>
+    </div>
+    <div class="col">
+      <input class="form-control" id="y-max" type="number" :value="yMax" @click="yMaxInput($event.target.value)" placeholder="y max">
+    </div>
+  </div>
+
   <div class="row" style="margin: 20px">
     <div class="col">
        <button class="btn btn-primary" @click="buildPlot">Построить график</button>
@@ -152,5 +216,7 @@ export default {
 
 
 <style>
-
+.form-item{
+  margin: 15px;
+}
 </style>

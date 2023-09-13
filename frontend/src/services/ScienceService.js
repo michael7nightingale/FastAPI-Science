@@ -85,6 +85,18 @@ export function postPlot(storage){
     return promise.then(response => response.data);
 }
 
+export function postEquations(storage){
+    let promise = axios.post(
+        buildUrl(`sciences/special-category/equations`),
+        storage,
+        {
+             headers: getHeaders()
+         }
+    );
+    return promise.then(response => response.data);
+}
+
+
 
 export function downloadPlot(filename){
     let data = {filename: filename};

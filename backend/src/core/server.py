@@ -80,13 +80,13 @@ class Server:
 
     def _configure_services(self):
         """SMTP server configuration for sending email messages."""
-        self._smpt_server = create_server(
-            host=self.settings.EMAIL_HOST,
-            port=self.settings.EMAIL_PORT,
-            password=self.settings.EMAIL_PASSWORD,
-            user=self.settings.EMAIL_USER
-        )
-        self.app.state.email_service = EmailService(smtp_server=self._smpt_server)
+        # self._smpt_server = create_server(
+        #     host=self.settings.EMAIL_HOST,
+        #     port=self.settings.EMAIL_PORT,
+        #     password=self.settings.EMAIL_PASSWORD,
+        #     user=self.settings.EMAIL_USER
+        # )
+        # self.app.state.email_service = EmailService(smtp_server=self._smpt_server)
 
     async def _load_data(self):
         """Data loading function."""
@@ -99,7 +99,7 @@ class Server:
 
     async def _on_shutdown_event(self):
         """Shutdown handler."""
-        self._smpt_server.close()
+        # self._smpt_server.close()
 
 
 class ErrorHandler:
