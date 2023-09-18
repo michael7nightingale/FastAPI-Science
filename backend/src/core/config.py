@@ -24,6 +24,9 @@ class BaseAppSettings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: str
 
+    MONGODB_URL: str
+    MONGODB_NAME: str
+
     @property
     def CELERY_BROKER_URL(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
