@@ -3,7 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Iterable
 
-import numpy as np
+import numpy as np    # noqa: F401
 from numpy import cos, sin  # noqa: F401
 from pydantic import BaseModel
 import sympy as sp
@@ -35,6 +35,16 @@ class Literal(BaseModel):
     def __hash__(self):
         return hash(self.formula)
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Literal":
+        fields = "si", "literal", "ed", "name"
+        nullable_fields = "value", "is_constant", "is_function"
+        assert all(fields in data for fields in fields)
+        return cls(
+            **{field: data[field] for field in fields},
+            **{nullable_field: data.get(nullable_field) for nullable_field in nullable_fields}
+        )
+
 
 class Constant(Literal):
     """Constant model (si = ed)"""
@@ -55,17 +65,13 @@ class BaseFormula(ABC):
     def __init__(
         self,
         formula: str,
-        name: str,
-        **kwargs
+        literals: dict
     ):
         global storage
-        if name in storage:
-            raise AssertionError("Name is already in the storage!")
-        storage[name] = self
         self.formula = formula
         self.pattern: sp.Eq = sp.simplify(self._template.replace("?", ", ".join(formula.split("="))))
-        self.args: tuple[str] = tuple(kwargs.keys())
-        self.literals: dict[str, Literal] = dict(kwargs)
+        self.args: tuple[str] = tuple(literals.keys())
+        self.literals: dict[str, Literal] = literals
 
     def __len__(self) -> int:
         return len(self.args)
@@ -84,9 +90,20 @@ class BaseFormula(ABC):
     def as_dict(self) -> dict:
         return {
             "formula": self.formula,
-            "args": self.args,
-            "literals": [v.model_dump() for k, v in self.literals.items()]
+            "literals": {k: v.model_dump() for k, v in self.literals.items()}
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "BaseFormula":
+        fields = "formula", "literals"
+        assert all(field in data for field in fields)
+        literals = {
+            literal_key: Literal.from_dict(literal_data) for literal_key, literal_data in data['literals'].items()
+        }
+        return cls(
+            formula=data['formula'],
+            literals=literals
+        )
 
 
 class Formula(BaseFormula):
@@ -95,13 +112,13 @@ class Formula(BaseFormula):
 
     def get_constants(self) -> Iterable[Literal]:
         return filter(
-            lambda x: x.is_constant,
+            lambda literal: literal.is_constant,
             self.literals.values()
         )
 
     def get_formulas(self) -> Iterable[Literal]:
         return filter(
-            lambda x: x.is_function,
+            lambda literal: literal.is_function,
             self.literals.values()
         )
 
@@ -110,54 +127,10 @@ class Formula(BaseFormula):
         return sp.solve(expr)
 
 
-# define storage
-storage: dict[str, Formula] = {}
-
-
-# ======================================= LITERALS ================================== #
-
-Impulse = Literal(si={"kg*m/s": 1, "g*m/s": 0.001}, name="Impulse", literal="p")
-Speed = Literal(si={"m/s": 1, "km/s": 1000}, name="Speed", literal="V")
-Mass = Literal(si={"kg": 1, "g": 0.001}, name="Mass", literal="m")
-Way = Literal(si={"m": 1, "km": 1000, "sm": 0.01}, name='Way', literal="S")
-Height = Literal(si={"m": 1, "km": 1000, "sm": 0.01}, name='Height', literal="h")
-Density = Literal(si={"kg/m^3": 1}, literal="p", name="Density")
-Pressure = Literal(si={"Pa": 1, "kPa": 1000, "mPa": 0.001}, name="Pressure", literal='ro')
-Force = Literal(si={"N": 1, "kN": 1000, "mN": 0.001}, name="Force", literal='F')
-Acceleration = Literal(si={"m/s^2": 1, "km/s^2": 1000}, name="Acceleration", literal="a")
-Coordinate = Literal(si={"_": 1}, name="Coordinate", literal="")
-
-
-def coordinate(literal: str) -> Literal:
-    return Literal(si={"_": 1}, name="Coordinate", literal=literal)
-
-
 def literal_rename(literal: Literal, literal_symbol: str) -> Literal:
     new_literal = deepcopy(literal)
     new_literal.literal = literal_symbol
     return new_literal
-
-
-# ======================================= CONSTANTS ================================== #
-
-G = Constant(si={"m/s^2": 1}, name="Free fall acceleration", literal='g', value=9.813)
-PI = Constant(si={"_": 1}, name="Pi", literal="pi", value=np.pi)
-K = Constant(si={"_": 1}, name="Dielectric constant", literal='k', value=9 * 10 ** (-9))
-
-
-# ======================================= FUNCTIONS ================================== #
-
-cos_ = Function(si={"radians": 1, "degrees": 0.017453293}, name="Cosinus", literal="cos", py_name='cos')
-
-# ======================================= FORMULAS ================================== #
-
-impulse = Formula(name='impulse', formula="p = m * V", p=Impulse, m=Mass, V=Speed)
-pressure_liquid = Formula(name='pressure_liquid', formula="p = r * g * h", p=Pressure, r=Density, h=Height, g=G)
-newton2 = Formula(name="newton2", formula="F = m * a", F=Force, m=Mass, a=Acceleration)
-peremeshenie = Formula(name='peremeshenie', formula="s = x - x_0",
-                       s=Way, x=coordinate("x"), x_0=coordinate("x_0"))
-moving_proection = Formula(name="moving_proection", formula="s_x = s * cos(a)",
-                           s_x=literal_rename(Way, "S_x"), s=Way, a=cos_)
 
 
 def get_formula(slug: str):
