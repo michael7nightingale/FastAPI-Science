@@ -25,6 +25,9 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=calculation_db
 
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+
   frontend:
      build: ./frontend
      ports:
