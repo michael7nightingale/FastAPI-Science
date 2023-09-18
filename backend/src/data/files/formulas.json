@@ -1,0 +1,33 @@
+[
+  {
+    "slug": "newton2",
+    "formula": "F = m * a",
+    "literals": {
+      "F": {
+        "name": "Force",
+        "si": {"N": 1, "kN": 1000, "mN": 0.001},
+        "ed": "N",
+        "literal": "F",
+        "is_function": false,
+        "is_constant": false
+      },
+      "a": {
+        "name": "acceleration",
+        "si": {"m/s^2": 1, "km/s^2": 1000},
+        "literal": "a",
+        "ed": "m/s^2",
+        "is_function": false,
+        "is_constant": false
+      },
+      "m": {
+        "name": "mass",
+        "si": {"kg": 1, "g": 0.001},
+        "literal": "m",
+        "ed": "m",
+        "is_function": false,
+        "is_constant": false
+      }
+    }
+  }
+
+]
