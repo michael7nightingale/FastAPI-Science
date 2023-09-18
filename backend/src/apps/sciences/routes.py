@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Path, Request, Body
+from fastapi import APIRouter, Path, Request, Body, Depends
 from fastapi_authtools import login_required
 from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException
@@ -8,7 +8,8 @@ from .models import Science, Category, Formula
 from ...services.formulas import contextBuilder, mathem_extra_counter
 from src.services.formulas.plots import Plot
 from .schemas import RequestSchema, RequestData, DownloadPlot, PlotData, EquationsData
-from src.services.formulas.metadata import get_formula
+from src.services.formulas.metadata import Formula as FormulaObject
+from .dependencies import get_formula_mongo_repository
 
 
 science_router = APIRouter(
@@ -149,7 +150,8 @@ async def category_get(
 
 @science_router.get('/formula/{formula_slug}')
 async def formula_get(
-        formula_slug: str = Path()
+        formula_slug: str = Path(),
+        formula_repository=Depends(get_formula_mongo_repository)
 ):
     """Science GET view."""
     formula = await Formula.get_or_none(slug=formula_slug)
@@ -158,7 +160,8 @@ async def formula_get(
             status_code=404,
             detail="Formula is not found."
         )
-    formula_obj = get_formula(formula_slug)
+    formula_data = await formula_repository.get(slug=formula_slug)
+    formula_obj = FormulaObject.from_dict(formula_data)
     if formula_obj is not None:
         return {
             "formula": formula.as_dict(),
@@ -173,6 +176,7 @@ async def formula_post(
         request: Request,
         formula_slug: str = Path(),
         request_data: RequestData = Body(),
+        formula_repository=Depends(get_formula_mongo_repository)
 ):
     """Request form to calculate."""
     formula = await Formula.get_or_none(slug=formula_slug)
@@ -181,6 +185,8 @@ async def formula_post(
             status_code=404,
             detail="Formula is not found."
         )
+    formula_data = await formula_repository.get(slug=formula_slug)
+    formula_obj = FormulaObject.from_dict(formula_data)
     request_schema = RequestSchema(
         formula_id=str(formula.id),
         url=request.url.path,
@@ -190,6 +196,6 @@ async def formula_post(
     )
     result = await contextBuilder.count_result(
         request=request_schema,
-        formula_slug=formula_slug,
+        formula_obj=formula_obj,
     )
     return {"result": result}

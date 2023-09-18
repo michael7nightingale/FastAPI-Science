@@ -15,46 +15,45 @@ class TestFormula:
         info = data['info']
         assert info == {
             "formula": "F = m * a",
-            "args": ["F", "m", "a"],
-            'literals': [
-                {
-                    'ed': 'N',
-                    'is_constant': False,
-                    'is_function': False,
-                    'literal': 'F',
-                    'name': 'Force',
-                    'si': {
-                        'N': 1,
-                        'kN': 1000,
-                        'mN': 0.001
+            "literals": {
+                "F": {
+                    "literal": "F",
+                    "name": "Force",
+                    "si": {
+                        "N": 1,
+                        "kN": 1000,
+                        "mN": 0.001
                     },
-                    'value': None
+                    "is_constant": False,
+                    "is_function": False,
+                    "ed": "N",
+                    "value": None
                 },
-                {
-                    'ed': 'kg',
-                    'is_constant': False,
-                    'is_function': False,
-                    'literal': 'm',
-                    'name': 'Mass',
-                    'si': {
-                        'g': 0.001,
-                        'kg': 1
+                "a": {
+                    "literal": "a",
+                    "name": "acceleration",
+                    "si": {
+                        "m/s^2": 1,
+                        "km/s^2": 1000
                     },
-                    'value': None
+                    "is_constant": False,
+                    "is_function": False,
+                    "ed": "m/s^2",
+                    "value": None
                 },
-                {
-                    'ed': 'm/s^2',
-                    'is_constant': False,
-                    'is_function': False,
-                    'literal': 'a',
-                    'name': 'Acceleration',
-                    'si': {
-                        'km/s^2': 1000,
-                        'm/s^2': 1
+                "m": {
+                    "literal": "m",
+                    "name": "mass",
+                    "si": {
+                        "kg": 1,
+                        "g": 0.001
                     },
-                    'value': None
-                },
-            ]
+                    "is_constant": False,
+                    "is_function": False,
+                    "ed": "kg",
+                    "value": None
+                }
+            }
         }
 
     async def test_formula_detail_not_found(self, client):

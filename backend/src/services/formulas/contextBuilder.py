@@ -1,13 +1,12 @@
 import numpy as np
 
 from src.apps.cabinets.models import History
-from src.services.formulas.metadata import storage
 from src.apps.sciences.schemas import RequestSchema
+from src.services.formulas.metadata import Formula
 
 
-async def build_template(request: RequestSchema, formula_slug: str):
+async def build_template(request: RequestSchema, formula_obj: Formula):
     # получение параметров
-    formula_obj = storage[formula_slug]
     params = formula_obj.literals
     args = formula_obj.args
     find_mark = args[0]
@@ -149,8 +148,7 @@ async def build_html(
     return tab_div, tab_content_divs
 
 
-async def count_result(request: RequestSchema, formula_slug: str):
-    formula_obj = storage[formula_slug]
+async def count_result(request: RequestSchema, formula_obj: Formula):
     params = formula_obj.literals
     args = formula_obj.args
     find_mark = args[0]
