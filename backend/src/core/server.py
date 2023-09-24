@@ -6,8 +6,7 @@ from src.apps import __routers__
 from src.core.config import get_app_settings, get_test_app_settings
 from src.apps.users.schemas import UserCustomModel
 from src.core.middleware import register_middleware
-from src.db import register_db
-from src.db.events import create_superuser, create_mongodb_db
+from src.db.events import create_superuser, register_mongodb_db, register_db
 from src.data.load_data import load_all_data, load_all_data_mongo
 from src.services.email import create_server, EmailService
 
@@ -60,7 +59,7 @@ class Server:
 
     def _configurate_db(self) -> None:
         """Configurate database."""
-        self.app.state.mongodb_db = create_mongodb_db(self.settings.MONGODB_URL, self.settings.MONGODB_NAME)
+        self.app.state.mongodb_db = register_mongodb_db(self.settings.MONGODB_URL, self.settings.MONGODB_NAME)
         register_db(
             app=self.app,
             modules=[
