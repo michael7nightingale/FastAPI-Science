@@ -1,7 +1,4 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, RedirectResponse
-from starlette.exceptions import HTTPException
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 from fastapi_authtools import AuthManager
 from starlette.staticfiles import StaticFiles
 
@@ -47,8 +44,6 @@ class Server:
         self.app.add_event_handler(event_type="startup", func=self._on_startup_event)
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
         register_middleware(self.app)
-        # error handlers settings
-        ErrorHandler.configure_app_error_handlers(self.app)
         self.app.state.SECRET_KEY = self.settings.SECRET_KEY
 
         # auth manager settings
@@ -102,27 +97,3 @@ class Server:
     async def _on_shutdown_event(self):
         """Shutdown handler."""
         self._smpt_server.close()
-
-
-class ErrorHandler:
-    """Error handler class."""
-    templates = Jinja2Templates(directory="backend/public/templates/error")
-
-    @classmethod
-    def configure_app_error_handlers(cls, app: FastAPI):
-        app.add_exception_handler(
-            exc_class_or_status_code=HTTPException,
-            handler=cls.http_exception_handler
-        )
-
-    @classmethod
-    async def http_exception_handler(cls, request: Request, exc):
-        if "api" in request.url.path:
-            return JSONResponse(
-                status_code=exc.status_code,
-                content={"detail": exc.detail}
-            )
-        else:
-            if exc.status_code == 401:
-                return RedirectResponse(request.app.url_path_for("login_get"), status_code=303)
-            return cls.templates.TemplateResponse(f"{exc.status_code}.html", {"request": request})
