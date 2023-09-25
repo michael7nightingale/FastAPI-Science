@@ -11,11 +11,17 @@ class UserCustomModel(BaseModel):
     is_active: bool = True
     is_authenticated: bool = True
 
+    class Config:
+        anystr_strip_whitespace = True
+
 
 class UserRegister(BaseModel):
     username: str
     email: str
     password: str
+
+    class Config:
+        anystr_strip_whitespace = True
 
 
 class UserRepresent(BaseModel):
@@ -23,3 +29,14 @@ class UserRepresent(BaseModel):
     email: str
     first_name: str | None = None
     last_name: str | None = None
+
+    class Config:
+        anystr_strip_whitespace = True
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+    class Config:
+        anystr_strip_whitespace = True

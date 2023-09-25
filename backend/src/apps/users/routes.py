@@ -1,14 +1,13 @@
 from fastapi import APIRouter, Body, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi_authtools import login_required
-from fastapi_authtools.models import UsernamePasswordToken
 from fastapi_authtools.exceptions import raise_invalid_credentials
 from tortoise.exceptions import IntegrityError
 
 from .dependencies import get_oauth_provider
 from .models import User
 from .oauth import Providers
-from .schemas import UserRegister, UserCustomModel
+from .schemas import UserRegister, UserCustomModel, UserLogin
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
 
@@ -46,7 +45,7 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
 
 
 @auth_router.post('/token')
-async def get_token(request: Request, user_token_data: UsernamePasswordToken = Body()):
+async def get_token(request: Request, user_token_data: UserLogin = Body()):
     """Token get view."""
     user = await User.login(
         **user_token_data.model_dump()
