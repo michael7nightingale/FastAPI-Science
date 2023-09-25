@@ -20,7 +20,9 @@ export default {
       this.category = response.category;
       this.formula = response.formula;
       this.info = response.info;
-      this.findMark = this.info.literals[0].literal;
+      let info = JSON.parse(JSON.stringify(this.info));
+      this.info = info;
+      this.findMark = Object.keys(info.literals)[0].literal;
     });
 
   },
@@ -38,7 +40,6 @@ export default {
 
   numberInput(event, literal){
       this.storage[literal] = event.target.value;
-      console.log(this.storage)
   },
 
   numsCommaSelect(event){
@@ -51,7 +52,7 @@ export default {
 
   getLiteralsExceptFindMark(){
       let literals = [];
-      for (const literalData of this.info.literals){
+      for (const literalData of this.info.literals.keys()){
         if (literalData.literal !== this.findMark){
           literals.push(literalData.literal);
         }

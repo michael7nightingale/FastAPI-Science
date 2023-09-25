@@ -9,12 +9,21 @@ export function setUser(token){
 }
 
 
+export function getUser(){
+    if (!localStorage.userData) return null;
+    let userData = JSON.parse(localStorage.userData)
+    if (userData.email){
+        return userData;
+    }
+    return null;
+}
+
 
 export function getHeaders(){
     let user = localStorage.user;
     let headers = {};
     if (user){
-        headers['Authorization'] = `Token ${user}`;
+        headers['authorization'] = `Token ${user}`;
     }
     return headers
 }

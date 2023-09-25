@@ -1,6 +1,6 @@
 <script>
 import Footer from "@/components/Footer.vue";
-import {logoutUser} from "@/services/Auth";
+import {getUser, logoutUser} from "@/services/Auth";
 
 export default {
   name: "AppItem",
@@ -19,7 +19,7 @@ export default {
 
   computed: {
     user(){
-      return Boolean(localStorage.user);
+      return getUser();
     }
   },
 

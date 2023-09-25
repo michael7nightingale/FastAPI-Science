@@ -19,7 +19,7 @@ export default {
             .then((response) => {
               data = response.data;
               setUser(data.access_token)
-              this.$router.push("/");
+              window.location = "/"
             })
             .catch((error) => {
               alert(error.response.data.detail);
