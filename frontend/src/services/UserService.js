@@ -47,3 +47,12 @@ export function getOauthProviderUrl(providerName){
     )
 }
 
+
+export function getOauthCallbackToken(providerName, code){
+    return axios.get(
+        buildUrl(`auth/${providerName}/callback`),
+        {
+            params: {code: code}
+        }
+    )
+}

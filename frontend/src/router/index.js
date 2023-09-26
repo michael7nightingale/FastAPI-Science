@@ -14,6 +14,7 @@ import ProblemsListView from "@/views/problems/ProblemsListView.vue";
 import ProblemView from "@/views/problems/ProblemView.vue";
 import ProblemCreateView from "@/views/problems/ProblemCreateView.vue";
 import EquationsView from "@/views/sciences/EquationsView.vue";
+import CallbackView from "@/views/users/CallbackView.vue";
 
 
 const routes = [
@@ -39,6 +40,11 @@ const routes = [
     path: '/auth/register',
     name: 'register',
     component: RegisterView
+  },
+  {
+    path: '/auth/:providerName/callback',
+    name: 'oauth_callback',
+    component: CallbackView
   },
 
    // cabinets
