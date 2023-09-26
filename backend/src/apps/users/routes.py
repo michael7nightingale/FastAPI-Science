@@ -33,7 +33,7 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
             status_code=500
         )
     try:
-        await User.create(**user_data)
+        await User.create(**user_data, active=True)
     except IntegrityError:
         return JSONResponse(
             {"detail": "User with this email or username already exists."},
