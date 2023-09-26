@@ -39,3 +39,11 @@ export function meUser(){
     )
 
 }
+
+
+export function getOauthProviderUrl(providerName){
+    return axios.get(
+        buildUrl(`auth/${providerName}/login`),
+    )
+}
+
