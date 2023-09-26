@@ -1,6 +1,6 @@
 from fastapi import Form
 
-from .oauth import Providers, get_provider, BaseProvider
+from src.services.oauth import Providers, get_provider, BaseProvider
 from .schemas import UserRegister
 
 

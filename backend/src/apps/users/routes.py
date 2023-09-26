@@ -6,7 +6,7 @@ from tortoise.exceptions import IntegrityError
 
 from .dependencies import get_oauth_provider
 from .models import User
-from .oauth import Providers
+from src.services.oauth import Providers
 from .schemas import UserRegister, UserCustomModel, UserLogin
 from src.core.config import get_app_settings
 from src.services.token import confirm_token, generate_activation_link
@@ -20,7 +20,7 @@ auth_router = APIRouter(
 @auth_router.get('/{provider}/login')
 async def provider_login(provider: Providers):
     """Login with Google."""
-    return RedirectResponse(getattr(get_app_settings(), f"{provider.value}_login_url"), status_code=303)
+    return getattr(get_app_settings(), f"{provider.value}_login_url")
 
 
 @auth_router.get("/{provider}/callback")
