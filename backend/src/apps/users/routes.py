@@ -35,10 +35,7 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
     try:
         await User.create(**user_data, active=True)
     except IntegrityError:
-        return JSONResponse(
-            {"detail": "User with this email or username already exists."},
-            status_code=400
-        )
+        pass
     user = UserCustomModel(**user_data)
     access_token = request.app.state.auth_manager.create_token(user)
     return {"access_token": access_token}
