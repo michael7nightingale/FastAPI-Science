@@ -4,6 +4,8 @@
     data(){
       return{
         author: "michael7nightingale",
+        authorGitHubUrl: "https://github.com/michael7nightingale",
+
       }
     },
     computed:{
@@ -11,13 +13,21 @@
         let now = new Date();
         return now.getFullYear();
       }
+    },
+
+    methods: {
+      openAuthorGitHubUrl(){
+        window.open(this.authorGitHubUrl, "_blank");
+      }
     }
   }
 </script>
 
 <template>
-<footer class="footer_" style="margin-top: 20px">
-      <p class="">© {{ year }}, Все права защищены. Создан {{ author }}</p>
+<footer class="border-top footer text-muted">
+  <div class="container">
+    <p class="">© {{ year }}, Все права защищены. Создан <a href="" @click="openAuthorGitHubUrl">{{ author }}</a></p>
+  </div>
   </footer>
 </template>
 

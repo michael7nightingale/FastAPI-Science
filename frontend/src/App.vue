@@ -43,8 +43,6 @@ export default {
         </router-link>
     <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
 
-
-
         <nav class="my-2 my-md-0 mr-md-4">
             <div v-if="user">
               <a href="/" @click="githubOpen">

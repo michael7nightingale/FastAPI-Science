@@ -19,10 +19,6 @@ export default {
   },
 
   mounted() {
-
-    let query = this.$route.params;
-    console.log(123, query);
-
     for (let idx in this.providers){
       let newProxy = this.providers;
       let providerData = newProxy[idx];
@@ -41,6 +37,7 @@ export default {
 
 
 <template>
+  <p>Social authorization: </p>
  <a v-for="provider in providers" v-bind:key="provider" :href="provider.url">
      <img :src="provider.imageUrl" :alt="provider.name" style="width: 40px">
 </a>

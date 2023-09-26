@@ -11,6 +11,9 @@ a{color:#58bff6;text-decoration: none;}
 a:hover{color:#aaa; }
 .pull-right{float: right;}
 .pull-left{float: left;}
+.margin-pull-left{
+    margin-left: 30px;
+}
 .clear-fix{clear:both;}
 div.logo{text-align: center; margin: 20px 20px 30px 20px; fill: #566375;}
 div.logo svg{
@@ -89,3 +92,11 @@ input[type="submit"].login{
 }
 input[type="submit"].login:hover{background-color: #fff; border:1px solid #55b1df; color:#55b1df; cursor:pointer;}
 input[type="submit"].login:focus{outline: none;}
+
+.login-container{
+    border-radius: 19px;
+    padding: 20px;
+    background-color: white;
+    margin: auto;
+    max-width: 500px
+}

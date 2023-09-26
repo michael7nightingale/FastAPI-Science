@@ -18,8 +18,8 @@ export default {
         loginUser(this.username, this.password)
             .then((response) => {
               data = response.data;
-              setUser(data.access_token)
-              window.location = "/"
+              setUser(data.access_token);
+              window.location = this.$router.resolve({name: "homepage"}).fullPath;
             })
             .catch((error) => {
               alert(error.response.data.detail);
@@ -39,13 +39,8 @@ export default {
 </script>
 
 <template>
-<div id="login">
-<div id="formWrapper">
-<div id="form">
-<div class="logo">
-
-</div>
-    <h3 align="center">Log in</h3>
+<div class="container login-container">
+  <h3 align="center">Log in</h3>
     <div class="form-item">
       <input type="text" placeholder="Username" :value="username" @input="usernameInput($event.target.value)" class="form-style" autocomplete="off"/>
     </div>
@@ -53,15 +48,14 @@ export default {
       <input type="password" placeholder="Password" :value="password" @input="passwordInput($event.target.value)" id="password" class="form-style" />
     </div>
     <div class="form-item">
-        <router-link to="/auth/register" class="pull-left"><small>register</small></router-link>
-      <button class="btn login pull-right" @click="loginClick" style="background-color: #fff; border:1px solid #55b1df; color:#55b1df; cursor:pointer;">
+        <router-link to="/auth/register" class="pull-left"><small>registration</small></router-link>
+        <router-link to="/auth/register" class="pull-left margin-pull-left"><small>forgot password?</small></router-link>
+        <button class="btn login pull-right" @click="loginClick" style="background-color: #fff; border:1px solid #55b1df; color:#55b1df; cursor:pointer;">
         Log In
       </button>
         <div class="clear-fix"></div>
     </div>
     <OAuth/>
-</div>
-</div>
 </div>
 </template>
 

@@ -40,13 +40,7 @@ export default {
 </script>
 
 <template>
-<div id="register">
-
-<div id="formWrapper">
-<div id="form">
-<div class="logo">
-
-</div>
+<div class="container login-container">
     <h3 align="center">Registration</h3>
     <div class="form-item">
       <input type="email" :value="email" @input="emailInput($event.target.value)" placeholder="Email" id="email" class="form-style" autocomplete="off"/>
@@ -65,8 +59,6 @@ export default {
         <div class="clear-fix"></div>
     </div>
     <OAuth/>
-</div>
-</div>
 </div>
 </template>
 
