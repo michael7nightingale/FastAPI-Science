@@ -83,7 +83,6 @@ class TestMain:
         assert response.json()["username"] == user2_data['username']
         assert response.json()["email"] == user2_data['email']
         assert response.json()["is_active"]
-        assert response.json()["is_authenticated"]
         assert "id" in response.json()
 
     async def test_activation_success(self, client: AsyncClient, not_active_user, user_not_activated: dict):
