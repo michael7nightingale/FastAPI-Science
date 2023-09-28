@@ -22,7 +22,7 @@ dnspython==2.4.1
 ecdsa==0.18.0
 email-validator==2.0.0.post2
 fastapi==0.100.0
-fastapi-authtools==0.5
+fastapi-authtools==0.6
 fonttools==4.42.0
 frozenlist==1.4.0
 h11==0.14.0
