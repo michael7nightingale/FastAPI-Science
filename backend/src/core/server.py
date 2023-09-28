@@ -6,7 +6,7 @@ from src.apps import __routers__
 from src.core.config import get_app_settings, get_test_app_settings
 from src.apps.users.schemas import UserCustomModel
 from src.core.middleware import register_middleware
-from src.db.events import create_superuser, register_mongodb_db, register_db
+from src.db.events import create_superuser, register_mongodb_db, register_db, authentication_user_getter
 from src.data.load_data import load_all_data, load_all_data_mongo
 from src.services.email import create_server, EmailService
 
@@ -53,6 +53,7 @@ class Server:
             algorithm=self.settings.ALGORITHM,
             secret_key=self.settings.SECRET_KEY,
             expire_minutes=self.settings.EXPIRE_MINUTES,
+            user_getter=authentication_user_getter,
         )
         self.app.mount("/static", StaticFiles(directory="src/public/static/"), name="static")
         self.app.state.STATIC_DIR = "src/public/static/"

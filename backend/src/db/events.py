@@ -17,6 +17,12 @@ def register_db(app: FastAPI, db_uri: str, modules: list) -> None:
     )
 
 
+async def authentication_user_getter(*args, **kwargs):
+    email = kwargs.get("email")
+    user = await User.get_or_none(email=email)
+    return user
+
+
 async def create_superuser(settings) -> None:
     try:
         await User.create(
