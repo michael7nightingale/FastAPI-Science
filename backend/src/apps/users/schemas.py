@@ -12,7 +12,7 @@ class UserCustomModel(BaseModel):
     is_authenticated: bool = True
 
     class Config:
-        anystr_strip_whitespace = True
+        str_strip_whitespace = True
 
 
 class UserRegister(BaseModel):
@@ -21,7 +21,7 @@ class UserRegister(BaseModel):
     password: str
 
     class Config:
-        anystr_strip_whitespace = True
+        str_strip_whitespace = True
 
 
 class UserRepresent(BaseModel):
@@ -31,7 +31,7 @@ class UserRepresent(BaseModel):
     last_name: str | None = None
 
     class Config:
-        anystr_strip_whitespace = True
+        str_strip_whitespace = True
 
 
 class UserLogin(BaseModel):
@@ -39,4 +39,4 @@ class UserLogin(BaseModel):
     password: str
 
     class Config:
-        anystr_strip_whitespace = True
+        str_strip_whitespace = True

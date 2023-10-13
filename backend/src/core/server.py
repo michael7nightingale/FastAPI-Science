@@ -65,7 +65,6 @@ class Server:
             app=self.app,
             modules=[
                 'src.apps.users.models',
-                'src.apps.main.models',
                 'src.apps.sciences.models',
                 'src.apps.problems.models',
                 'src.apps.cabinets.models',
