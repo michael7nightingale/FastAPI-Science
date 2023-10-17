@@ -33,11 +33,11 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
             status_code=500
         )
     try:
-        await User.create(**user_data, active=True)
+        user = await User.create(**user_data, active=True)
     except IntegrityError:
-        pass
-    user = UserCustomModel(**user_data)
-    access_token = request.app.state.auth_manager.create_token(user)
+        user = await User.get(email=user_data['email'], username=user_data['username'])
+    user_model = UserCustomModel(**user.as_dict())
+    access_token = request.app.state.auth_manager.create_token(user_model)
     return {"access_token": access_token}
 
 
@@ -45,7 +45,7 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
 async def get_token(request: Request, user_token_data: UserLogin = Body()):
     """Token get view."""
     user = await User.login(
-        **user_token_data.model_dump()
+        **user_token_data.model_dump(exclude={"login"})
     )
     if user is None:
         raise_invalid_credentials()

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserCustomModel(BaseModel):
@@ -35,8 +35,16 @@ class UserRepresent(BaseModel):
 
 
 class UserLogin(BaseModel):
-    username: str
+    login: str
     password: str
+    email: EmailStr | None = None
+    username: str | None = None
+
+    def model_post_init(self, __context) -> None:
+        if "@" in self.login:
+            self.email = self.login
+        else:
+            self.username = self.login
 
     class Config:
         str_strip_whitespace = True

@@ -18,8 +18,13 @@ class User(TortoiseModel):
     last_login = fields.DatetimeField(auto_now_add=True, null=True)
 
     @classmethod
-    async def login(cls, username: str, password: str):
-        user = await cls.get_or_none(username=username)
+    async def login(cls, password: str, username: str | None = None, email: str | None = None):
+        if username:
+            user = await cls.get_or_none(username=username)
+        elif email:
+            user = await cls.get_or_none(email=email)
+        else:
+            return None
         if user is not None:
             if verify_password(password, user.password) and user.is_active:
                 return user
