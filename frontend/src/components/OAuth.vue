@@ -7,6 +7,10 @@ export default {
     return {
       providers: [
         {
+          "name": "yandex",
+          "imageUrl": "../images/yandex.png",
+        },
+        {
           "name": "google",
           "imageUrl": "../images/google.png",
         },
@@ -37,8 +41,8 @@ export default {
 
 
 <template>
-  <p>Social authorization: </p>
- <a v-for="provider in providers" v-bind:key="provider" :href="provider.url">
+  <p>Вход через соцсети: </p>
+ <a v-for="provider in providers" :key="provider" :href="provider.url">
      <img :src="provider.imageUrl" :alt="provider.name" style="width: 40px">
 </a>
 </template>

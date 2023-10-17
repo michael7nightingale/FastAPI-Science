@@ -28,7 +28,7 @@ export default {
 </script>
 
 <template>
-<h3 class="base-title white_text">Callback data is received, please wait for redirect...</h3>
+<h3 class="base-title white_text">Данные получены, сейчас перенаправим...</h3>
 </template>
 
 <style scoped>

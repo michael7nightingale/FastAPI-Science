@@ -3,9 +3,9 @@ import {getHeaders} from "@/services/Auth";
 import {buildUrl} from "@/services/Base";
 
 
-export function loginUser(username, password){
+export function loginUser(login, password){
     let data = {
-        username: username,
+        login: login,
         password: password
     }
     return axios.post(

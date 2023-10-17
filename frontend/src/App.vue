@@ -45,21 +45,21 @@ export default {
 
         <nav class="my-2 my-md-0 mr-md-4">
             <div v-if="user">
+              <router-link class="p-2 text-dark" to="/">Главная</router-link>
               <a href="/" @click="githubOpen">
-                Edit me
+                GitHub
                 <img alt="" :src="`/images/github.png`" class="nav-logo" style="width:70px">
               </a>
-              <router-link class="p-2 text-dark" to="/">Home</router-link>
-               <a class="p-2 text-dark" href="" @click="logoutClick">Logout</a>
-               <router-link class="p-2 text-dark" to="/cabinet">Cabinet</router-link>
+               <a class="p-2 text-dark" href="" @click="logoutClick">Выйти</a>
+               <router-link class="p-2 text-dark" to="/cabinet">Кабинет</router-link>
             </div>
             <div v-else>
+              <router-link class="p-2 text-dark" to="/">Главная</router-link>
               <a href="/" @click="githubOpen">
-                Edit me
+                GitHub
                 <img alt="" :src="`/images/github.png`" class="nav-logo" style="width:70px">
               </a>
-              <router-link class="p-2 text-dark" to="/">Home</router-link>
-              <router-link class="p-2 text-dark" to="/auth/login">Login</router-link>
+              <router-link class="p-2 text-dark" to="/auth/login">Вход</router-link>
             </div>
         </nav>
     </div>

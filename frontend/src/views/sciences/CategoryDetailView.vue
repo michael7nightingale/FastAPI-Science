@@ -6,7 +6,7 @@ import VueMathjax from 'vue-mathjax';
 export default {
   name: "CategoryDetailView",
   components: {
-    'vue-mathjax': VueMathjax
+    'VueMathjax': VueMathjax
   },
   data(){
     return {
@@ -47,7 +47,7 @@ export default {
     <div class="row">
       <div class="col" style="background-color: white">
         <ul>
-            <h4 align="center">Contains</h4>
+            <h4 align="center">Содержание</h4>
                 <li v-for="formula in formulas" v-bind:key="formula">
                 <router-link class="" :to="{name: 'formula', params: {slug: formula.slug}}">
                      <p class="">{{ formula.title }}</p>
@@ -62,7 +62,7 @@ export default {
               <div class="row" v-if="colIdx + rowIdx * 3 < formulas.length">
                 <div class="formula" style="background-color: white; padding: 5px; margin-bottom: 20px">
                 <a class="" :href="formulas[rowIdx * 3 + colIdx].slug">
-                  <vue-mathjax :formula="formulas[rowIdx * 3 + colIdx].formula"></vue-mathjax>
+                  <VueMathjax :formula="formulas[rowIdx * 3 + colIdx].formula"></VueMathjax>
                 </a>
               </div>
               </div>
