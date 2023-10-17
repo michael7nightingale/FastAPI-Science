@@ -30,7 +30,6 @@ div.logo svg{
   left:0;
   transition:all .3s ease;}
 .darken-bg{background: rgba(0,0,0,.5) !important; transition:all .3s ease;}
-
 div#form{
   position: absolute;
   width:360px;

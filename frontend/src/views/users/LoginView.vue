@@ -8,29 +8,48 @@ export default {
   components: {OAuth},
   data(){
     return{
-      username: null,
-      password: null,
+      loginMinLength: 6,
+      passwordMinLength: 6,
+      login: "",
+      loginError: "",
+      password: "",
+      passwordError: "",
+
     }
   },
   methods: {
     loginClick(){
         let data;
-        loginUser(this.username, this.password)
+        let wereError = false;
+        if (this.login.length < this.loginMinLength) {
+          wereError = true;
+          this.loginError = `Логин должен содержать от ${this.loginMinLength} символов`
+        }
+        if (this.password.length < this.passwordMinLength) {
+          wereError = true;
+          this.passwordError = `Пароль должно содержать от ${this.passwordMinLength} символов`
+        }
+        if (wereError) return;
+        loginUser(this.login, this.password)
             .then((response) => {
               data = response.data;
-              setUser(data.access_token);
-              window.location = this.$router.resolve({name: "homepage"}).fullPath;
+              setUser(data.access_token)
+                  .then(() => {
+                    window.location = this.$router.resolve({name: "homepage"}).fullPath;
+                  });
             })
             .catch((error) => {
-              alert(error.response.data.detail);
+              this.errorText = error.response.data.detail;
             })
     },
 
-    usernameInput(value){
-      this.username = value;
+    loginInput(value){
+      this.login = value;
+      if (this.login.length >= this.loginMinLength) this.loginError = "";
     },
     passwordInput(value){
       this.password = value;
+      if (this.password.length >= this.passwordMinLength) this.passwordError = "";
     }
   }
 
@@ -40,18 +59,22 @@ export default {
 
 <template>
 <div class="container login-container">
-  <h3 align="center">Log in</h3>
+  <h3 align="center">Вкод в аккаунт</h3>
     <div class="form-item">
-      <input type="text" placeholder="Username" :value="username" @input="usernameInput($event.target.value)" class="form-style" autocomplete="off"/>
+      <label class="form-label" for="form2Example2">Логин</label>
+      <input type="text" placeholder="Логин:" :value="login" @input="loginInput($event.target.value)" class="form-style" autocomplete="off"/>
+      <p class="text-danger" style="margin: 10px">{{ loginError }}</p>
     </div>
     <div class="form-item">
-      <input type="password" placeholder="Password" :value="password" @input="passwordInput($event.target.value)" id="password" class="form-style" />
+      <label class="form-label" for="form2Example2">Пароль</label>
+      <input type="password" placeholder="Пароль:" :value="password" @input="passwordInput($event.target.value)" id="password" class="form-style" />
+      <p class="text-danger" style="margin: 10px">{{ passwordError }}</p>
     </div>
     <div class="form-item">
-        <router-link to="/auth/register" class="pull-left"><small>registration</small></router-link>
-        <router-link to="/auth/register" class="pull-left margin-pull-left"><small>forgot password?</small></router-link>
+        <router-link to="/auth/register" class="pull-left"><small>регистрация</small></router-link>
+        <router-link to="/auth/register" class="pull-left margin-pull-left"><small>зыбыли пароль?</small></router-link>
         <button class="btn login pull-right" @click="loginClick" style="background-color: #fff; border:1px solid #55b1df; color:#55b1df; cursor:pointer;">
-        Log In
+        Войти
       </button>
         <div class="clear-fix"></div>
     </div>
@@ -60,5 +83,4 @@ export default {
 </template>
 
 <style>
-@import '../../assets/css/login.css';
 </style>
