@@ -3,7 +3,7 @@ from fastapi_authtools import AuthManager
 from starlette.staticfiles import StaticFiles
 
 from src.apps import __routers__
-from src.core.config import get_app_settings, get_test_app_settings
+from src.core.config import get_app_settings
 from src.apps.users.schemas import UserCustomModel
 from src.core.middleware import register_middleware
 from src.db.events import create_superuser, register_mongodb_db, register_db, authentication_user_getter
@@ -14,14 +14,10 @@ from src.services.email import create_smtp_server
 
 class Server:
 
-    def __init__(self, test: bool = False, use_cookies: bool = False):
-        self.test = test
+    def __init__(self, use_cookies: bool = False):
         self.use_cookies = use_cookies
         self._app = FastAPI()
-        if test:
-            self._settings = get_test_app_settings()
-        else:
-            self._settings = get_app_settings()
+        self._settings = get_app_settings()
 
         self._configurate_db()
         self._configurate_app()
