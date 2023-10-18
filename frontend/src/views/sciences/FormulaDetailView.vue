@@ -23,6 +23,10 @@ export default {
       let info = JSON.parse(JSON.stringify(this.info));
       this.info = info;
       this.findMark = Object.keys(info.literals)[0].literal;
+    })
+    .then(() => {
+       document.getElementById("loader").className = document.getElementById("loader").className.replace("show", "hide")
+       document.getElementById("main").className = document.getElementById("main").className.replace("hide", "show")
     });
 
   },
@@ -99,20 +103,25 @@ export default {
 </script>
 
 <template>
-    <div class="jumbotron">
-       <div id="faq">
-      <ul>
-        <li>
-          <input type="checkbox" checked>
-          <h3 style="text-align: center">{{ formula.title }}</h3>
-        <p class="lead">{{ formula.content }}</p>
-        </li>
-      </ul>
-      </div>
-    <router-link :to="{name: 'category', params: {slug: category.slug}}" class="btn btn-primary btn-large">назад к  &raquo;
-        {{ category.title }}
-    </router-link>
+<div class="centered show" id="loader">
+  <span class="loader"></span>
 </div>
+<div class="hide" id="main">
+ <div class="jumbotron">
+    <div id="faq">
+   <ul>
+     <li>
+       <input type="checkbox" checked>
+       <h3 style="text-align: center">{{ formula.title }}</h3>
+     <p class="lead">{{ formula.content }}</p>
+     </li>
+   </ul>
+   </div>
+ <router-link :to="{name: 'category', params: {slug: category.slug}}" class="btn btn-primary btn-large">назад к  &raquo;
+     {{ category.title }}
+ </router-link>
+</div>
+
 <div class="tab" style="min-height: 400px;">
   <div v-for="literal in this.info.literals" v-bind:key="literal">
     <button
@@ -165,16 +174,16 @@ export default {
         </div>
     </div>
 
-  <button
-    class="btn btn-primary button-blue"
-    @click="countResult"
-  >
-  Считать
-  </button>
-  <h4 class="white_text">{{ findMark }} = {{ result }}</h4>
+    <button
+      class="btn btn-primary button-blue"
+      @click="countResult"
+    >
+    Считать
+    </button>
+    <h4 class="white_text">{{ findMark }} = {{ result }}</h4>
+    </div>
   </div>
 </div>
-
 </template>
 
 <style scoped>

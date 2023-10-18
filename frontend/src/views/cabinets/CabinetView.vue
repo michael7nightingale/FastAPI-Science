@@ -1,4 +1,6 @@
 <script>
+import {getUser} from "@/services/Auth";
+
 export default {
   name: "CabinetView",
   data() {
@@ -12,6 +14,12 @@ export default {
       User(){
         return JSON.parse(localStorage.userData);
       }
+  },
+  mounted() {
+    let user = getUser();
+    if (!user){
+      window.location = this.$router.resolve({name: "login"}).fullPath;
+    }
   }
 
 }
@@ -21,8 +29,7 @@ export default {
  <div class="jumbotron">
         <h2 @click="getUser">Личный кабинет - {{ User.username }}</h2>
         <p class="lead">Смотрите журнал вычислений и многое другое.</p>
-        <a href="/" class="btn btn-primary btn-large">назад на главную &raquo;</a>
-        <a href="/docs" class="btn btn-primary btn-large">документация &raquo;</a>
+        <router-link :to="{name: 'homepage'}" class="btn btn-primary btn-large">назад на главную &raquo;</router-link>
     </div>
 
     <div class="container">

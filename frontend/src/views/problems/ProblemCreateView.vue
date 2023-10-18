@@ -66,14 +66,14 @@ export default {
 
 
 <template>
-     <div class="jumbotron">
-         <h2>Создание проблемы</h2>
-         <p class="lead"></p>
-         <div class="row">
-            <div class="col-2">
-                 <router-link :to="{name: 'problems'}" class="btn btn-primary btn-large">назад к проблемам &raquo;</router-link>
-             </div>
-     </div>
+<div class="jumbotron">
+    <h2>Создание проблемы</h2>
+    <p class="lead"></p>
+    <div class="row">
+       <div class="col-2">
+            <router-link :to="{name: 'problems'}" class="btn btn-primary btn-large">назад к проблемам &raquo;</router-link>
+       </div>
+    </div>
 </div>
 
 <div class="container">

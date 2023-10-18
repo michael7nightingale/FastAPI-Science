@@ -4,7 +4,7 @@ import {setUser} from "@/services/Auth";
 import OAuth from "@/components/OAuth.vue";
 
 export default {
-  name: "LoginView",
+  name: "ActivationView",
   components: {OAuth},
   data(){
     return{

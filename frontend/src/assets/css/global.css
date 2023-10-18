@@ -207,3 +207,19 @@ ul {
     margin: 20px;
   background-color: red;
 }
+
+.show{
+   display: block;
+}
+
+.hide{
+    display: none;
+}
+
+.centered
+{
+  width:100%;
+  position:fixed;
+  top:35%;
+  left:45%;
+}

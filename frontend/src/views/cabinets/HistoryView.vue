@@ -1,5 +1,6 @@
 <script>
 import {deleteHistory, downloadHistory, getHistoryList} from "@/services/CabinetService";
+import {getUser} from "@/services/Auth";
 
 export default {
   name: "HistoryView",
@@ -18,10 +19,14 @@ export default {
   },
 
   mounted() {
-        getHistoryList()
-            .then((response) => {
-              this.history = response.data;
-            })
+    let user = getUser();
+    if (!user){
+      window.location = this.$router.resolve({name: "login"}).fullPath;
+    }
+    getHistoryList()
+        .then((response) => {
+          this.history = response.data;
+        })
   },
   methods: {
       deleteButtonClick(){
@@ -43,7 +48,7 @@ export default {
                 URL.revokeObjectURL(link.href);
             })
       }
-  }
+  },
 
 }
 </script>

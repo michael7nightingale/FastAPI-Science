@@ -74,4 +74,5 @@ export default {
 
 <style>
 @import './assets/css/global.css';
+@import './assets/css/loader.css';
 </style>
