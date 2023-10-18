@@ -1,10 +1,9 @@
-from celery import shared_task
+from asgiref.sync import async_to_sync
+
+from .proxy import send_activation_email_task_proxy
+from src.core.celery import app
 
 
-@shared_task()
-def send_activation_email(request, link, user):
-    request.app.state.email_service.send_activation_email(
-        name=user.username,
-        link=link,
-        email=user.email
-    )
+@app.task
+def send_activation_email_task(email: str, name: str) -> None:
+    return async_to_sync(send_activation_email_task_proxy)(email, name)

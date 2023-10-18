@@ -1,5 +1,8 @@
+import sys
+
 from celery import Celery
 import asyncio
+import nest_asyncio
 from tortoise import run_async, Tortoise
 
 from .config import get_app_settings
@@ -8,6 +11,7 @@ from .config import get_app_settings
 class AsyncCelery(Celery):
 
     def on_init(self):
+        nest_asyncio.apply()
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         run_async(
@@ -15,26 +19,27 @@ class AsyncCelery(Celery):
                 db_url=get_app_settings().db_uri,
                 modules={
                     'models': [
-                        'src.apps.users.models',
-                        'src.apps.main.models',
-                        'src.apps.sciences.models',
-                        'src.apps.problems.models',
-                        'src.apps.cabinets.models',
+                        # 'src.apps.users.models',
+                        # 'src.apps.sciences.models',
+                        # 'src.apps.problems.models',
+                        # 'src.apps.cabinets.models',
                     ]
                 },
             )
         )
 
 
-celery_application = AsyncCelery(__name__)
-celery_application.config_from_object(get_app_settings(), namespace='CELERY')
+sys.path.append('./')
 
-celery_application.autodiscover_tasks(
+app = AsyncCelery(__name__)
+app.config_from_object(get_app_settings(), namespace='CELERY')
+
+
+app.autodiscover_tasks(
     packages=[
-        "backend.apps.main",
-        "backend.apps.users",
-        "backend.apps.sciences",
-        "backend.apps.cabinets",
-        "backend.apps.problems",
+        "src.apps.users",
+        "src.apps.sciences",
+        "src.apps.cabinets",
+        "src.apps.problems",
     ]
 )
