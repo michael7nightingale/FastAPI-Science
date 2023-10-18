@@ -28,12 +28,16 @@ class BaseAppSettings(BaseSettings):
     MONGODB_NAME: str
 
     @property
-    def CELERY_BROKER_URL(self) -> str:
+    def REDIS_URL(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
 
     @property
+    def CELERY_BROKER_URL(self) -> str:
+        return self.REDIS_URL
+
+    @property
     def CELERY_RESULT_BACKEND(self) -> str:
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
+        return self.REDIS_URL
 
     @property
     def github_login_url(self) -> str:

@@ -7,8 +7,9 @@ from src.core.config import get_app_settings, get_test_app_settings
 from src.apps.users.schemas import UserCustomModel
 from src.core.middleware import register_middleware
 from src.db.events import create_superuser, register_mongodb_db, register_db, authentication_user_getter
+from src.db.redis import create_redis_client
 from src.data.load_data import load_all_data, load_all_data_mongo
-from src.services.email import create_server, EmailService
+from src.services.email import create_smtp_server
 
 
 class Server:
@@ -61,6 +62,7 @@ class Server:
     def _configurate_db(self) -> None:
         """Configurate database."""
         self.app.state.mongodb_db = register_mongodb_db(self.settings.MONGODB_URL, self.settings.MONGODB_NAME)
+        self.app.state.redis = create_redis_client(self.settings.REDIS_URL)
         register_db(
             app=self.app,
             modules=[
@@ -75,13 +77,12 @@ class Server:
 
     def _configure_services(self):
         """SMTP server configuration for sending email messages."""
-        self._smpt_server = create_server(
+        self._smpt_server = create_smtp_server(
             host=self.settings.EMAIL_HOST,
             port=self.settings.EMAIL_PORT,
             password=self.settings.EMAIL_PASSWORD,
             user=self.settings.EMAIL_USER
         )
-        self.app.state.email_service = EmailService(smtp_server=self._smpt_server)
 
     async def _load_data(self):
         """Data loading function."""
