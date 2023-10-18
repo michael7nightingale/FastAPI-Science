@@ -1,6 +1,7 @@
 version: "5"
 
 services:
+
   fastapi_app:
     build: ./backend
     volumes:
@@ -10,7 +11,7 @@ services:
     env_file:
       - ./backend/.docker.env
     command: >
-      sh -c "uvicorn src.main:create_app --host 0.0.0.0 --port 8001 --reload --factory"
+      sh -c "gunicorn src.main:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8001"
     ports:
       - "8001:8001"
     expose:
@@ -20,6 +21,50 @@ services:
     depends_on:
       - db
       - mongodb
+
+
+  celery:
+    build: ./backend
+    volumes:
+      - .:/backend
+    environment:
+      - DOCKER=1
+    env_file:
+      - ./backend/.docker.env
+    command: >
+      sh -c "celery -A src.worker:app worker -l info"
+    networks:
+      - default
+    depends_on:
+      - fastapi_app
+      - celery_beat
+      - redis
+
+
+  celery_beat:
+    build: ./backend
+    volumes:
+      - .:/backend
+    environment:
+      - DOCKER=1
+    env_file:
+      - ./backend/.docker.env
+    command: >
+      sh -c "celery -A src.worker:app beat -l info"
+    networks:
+      - default
+    depends_on:
+      - fastapi_app
+      - redis
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6339:6339"
+    expose:
+      - 6339
+
 
   db:
     image: postgres:15-alpine
@@ -34,8 +79,10 @@ services:
     networks:
       - default
 
+
   mongodb:
     image: mongodb/mongodb-community-server:6.0-ubi8
+
 
   frontend:
      build: ./frontend
