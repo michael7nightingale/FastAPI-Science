@@ -1,4 +1,6 @@
+import datetime
 from smtplib import SMTP_SSL
+from src.services.token import generate_activation_code
 
 
 class SMTPServer(SMTP_SSL):
@@ -28,11 +30,11 @@ def create_server(host: str, port: int, user: str, password: str) -> SMTPServer:
         host=host,
         from_addr=user,
     )
-    server_.ehlo()
-    server_.login(
-        user=user,
-        password=password
-    )
+    # server_.ehlo()
+    # server_.login(
+    #     user=user,
+    #     password=password
+    # )
     return server_
 
 
@@ -41,8 +43,14 @@ class EmailService:
     def __init__(self, smtp_server: SMTPServer):
         self._smtp_server = smtp_server
 
-    def send_activation_email(self, name, email, link):
-        message = "%s, please follow the link ro finish the registration: %s" % (name, link)
+    def send_activation_email(self, name, email):
+        code = generate_activation_code(length=6)
+        cache_data = {  # noqa: F841
+            "email": email,
+            "code": code,
+            "exp": datetime.datetime.now() + datetime.timedelta(minutes=30)
+        }
+        message = "%s, вот ваш код для завершения регистрации: %s" % (name, code)
         self._smtp_server.send_message(
             subject="Registration",
             to_addrs=[email],
