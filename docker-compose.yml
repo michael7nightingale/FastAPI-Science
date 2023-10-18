@@ -32,7 +32,7 @@ services:
     env_file:
       - ./backend/.docker.env
     command: >
-      sh -c "celery -A src.worker:app worker -l info"
+      sh -c "celery -A src.core.celery:app worker -l info"
     networks:
       - default
     depends_on:
@@ -50,7 +50,7 @@ services:
     env_file:
       - ./backend/.docker.env
     command: >
-      sh -c "celery -A src.worker:app beat -l info"
+      sh -c "celery -A src.core.celery:app beat -l info"
     networks:
       - default
     depends_on:
