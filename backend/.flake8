@@ -2,6 +2,7 @@
 exclude =
     .pytest_cache
     venv
+    aioredis
     __init__.py
     conftest.py
 
