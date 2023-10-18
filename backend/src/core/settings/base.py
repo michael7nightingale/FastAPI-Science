@@ -27,6 +27,8 @@ class BaseAppSettings(BaseSettings):
     GITHUB_CLIENT_SECRET: str
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
+    YANDEX_CLIENT_ID: str
+    YANDEX_CLIENT_SECRET: str
 
     REDIS_HOST: str
     REDIS_PORT: str
@@ -59,6 +61,14 @@ class BaseAppSettings(BaseSettings):
             client_id=self.GOOGLE_CLIENT_ID,
             redirect_uri="http://localhost:8000/auth/google/callback",
             scope="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        )
+
+    @property
+    def yandex_login_url(self) -> str:
+        return "{token_request_uri}?response_type={response_type}&client_id={client_id}".format(
+            token_request_uri="https://oauth.yandex.ru/authorize",
+            response_type="code",
+            client_id=self.YANDEX_CLIENT_ID,
         )
 
     class Config:

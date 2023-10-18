@@ -41,10 +41,10 @@ export default {
 
 
 <template>
-  <p>Вход через соцсети: </p>
- <a v-for="provider in providers" :key="provider" :href="provider.url">
-     <img :src="provider.imageUrl" :alt="provider.name" style="width: 40px">
-</a>
+   <p>Вход через соцсети: </p>
+   <a v-for="provider in providers" :key="provider" :href="provider.url">
+       <img :src="provider.imageUrl" :alt="provider.name" style="width: 40px">
+  </a>
 </template>
 
 
