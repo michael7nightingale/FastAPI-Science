@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserCustomModel(BaseModel):
@@ -48,3 +48,7 @@ class UserLogin(BaseModel):
 
     class Config:
         str_strip_whitespace = True
+
+
+class ActivationScheme(BaseModel):
+    code: str = Field(max_length=6, min_length=6)

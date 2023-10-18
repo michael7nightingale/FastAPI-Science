@@ -1,31 +1,6 @@
-from itsdangerous import URLSafeTimedSerializer
-
-from src.core.config import get_app_settings
+from random import choice
 
 
-def generate_token(email, secret_key: str | None = None):
-    if secret_key is None:
-        secret_key = get_app_settings().SECRET_KEY
-    serializer = URLSafeTimedSerializer(secret_key=secret_key)
-    return serializer.dumps(email)
-
-
-def confirm_token(token, expiration: int = 3600, secret_key: str | None = None):
-    if secret_key is None:
-        secret_key = get_app_settings().SECRET_KEY
-    serializer = URLSafeTimedSerializer(secret_key=secret_key)
-    try:
-        email = serializer.loads(
-            token, max_age=expiration
-        )
-        return email
-    except Exception:
-        return False
-
-
-def generate_activation_link(request, user) -> str:
-    token = generate_token(user.email, secret_key=request.app.state.SECRET_KEY)
-    url = request.app.url_path_for("activate_user", uuid=user.id, token=token)
-    # host = request.client.host
-    host = "http://127.0.0.1:8000"
-    return host + url
+def generate_activation_code(length: int) -> str:
+    arrange = ''.join(str(n) for n in range(10))
+    return "".join(choice(arrange) for _ in range(length))

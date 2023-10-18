@@ -1,20 +1,21 @@
+import json
+
 from fastapi import APIRouter, Body, Request, Depends
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi_authtools import login_required
 from fastapi_authtools.exceptions import raise_invalid_credentials
 from tortoise.exceptions import IntegrityError
 
+import datetime
 from .dependencies import get_oauth_provider
 from .models import User
 from src.services.oauth import Providers
-from .schemas import UserRegister, UserCustomModel, UserLogin
+from .schemas import UserRegister, UserCustomModel, UserLogin, ActivationScheme
 from src.core.config import get_app_settings
-from src.services.token import confirm_token, generate_activation_link
+from .tasks import send_activation_email_task
 
 
-auth_router = APIRouter(
-    prefix='/auth'
-)
+auth_router = APIRouter(prefix='/auth')
 
 
 @auth_router.get('/{provider}/login')
@@ -63,11 +64,11 @@ async def register(request: Request, user_data: UserRegister = Body()):
             content={"detail": "Invalid data."},
             status_code=400,
         )
-    link = generate_activation_link(request, new_user)
-    request.app.state.email_service.send_activation_email(
-        name=new_user.username,
-        link=link,
-        email=new_user.email
+    send_activation_email_task.apply_async(
+        kwargs={
+            "name": new_user.username,
+            "email": new_user.email
+        }
     )
     return {"detail": f"Activation link is sent on email {new_user.email}. Please follow the instructions."}
 
@@ -78,20 +79,30 @@ async def me(request: Request):
     return request.user
 
 
-@auth_router.get("/activation/{uuid}/{token}")
+@auth_router.patch("/activation")
 async def activate_user(
         request: Request,
-        uuid: str,
-        token: str,
+        activation_scheme: ActivationScheme = Body()
 ):
-    user = await User.get_or_none(id=uuid)
-    if user is not None:
-        email = confirm_token(token, secret_key=request.app.state.SECRET_KEY)
-        if email is not None:
-            if user.email == email:
-                await User.activate(uuid)
-                return {"detail": "User is activated successfully."}
-    return JSONResponse(
-        content={"detail": "Activation link is invalid."},
-        status_code=400
-    )
+    cache_data = json.loads(await request.app.state.redis.get(activation_scheme.code))
+    if cache_data is None:
+        return JSONResponse(
+            content={"detail": "Код не найден."},
+            status_code=400
+        )
+    user = await User.get_or_none(email=cache_data['email'])
+    exp_datetime = datetime.datetime.strptime(cache_data['exp'], "%d/%m/%y %H:%M:%S.%f")
+    now_datetime = datetime.datetime.now()
+    if exp_datetime >= now_datetime:
+        send_activation_email_task.apply_async(
+            kwargs={
+                "name": user.username,
+                "email": user.email
+            }
+        )
+        return JSONResponse(
+            content={"detail": "Срок действаия кода истек, выслали вам новый"},
+            status_code=400
+        )
+    await user.activate()
+    return {'detail': "Регистрация завершена успешно"}
