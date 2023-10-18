@@ -33,16 +33,14 @@ class User(TortoiseModel):
     async def register(cls, **kwargs):
         kwargs.update(password=hash_password(kwargs['password']))
         try:
-            user = await cls.create(**kwargs)
+            user = await cls.create(**kwargs, active=True)
         except IntegrityError:
             return
         return user
 
-    @classmethod
-    async def activate(cls, id_: str):
-        user = await cls.get_or_none(id=id_)
-        await user.update_from_dict({"is_active": True})
-        await user.save()
+    async def activate(self) -> None:
+        self.is_active = True
+        await self.save()
 
     def __str__(self):
         return self.username
