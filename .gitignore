@@ -163,4 +163,4 @@ cython_debug/
 
 backend/.dev.env
 backend/.docker.env
-backend/.test.env
+#backend/.test.env
