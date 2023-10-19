@@ -23,7 +23,7 @@ class YandexOAuthProvider(BaseProvider):
 
     def get_user_data(self, access_token: str) -> dict | None:
         response = requests.get(
-            f"https://login.yandex.ru/info",
+            "https://login.yandex.ru/info",
             params={
                 "access_token": access_token,
                 "format": "json"
@@ -32,7 +32,6 @@ class YandexOAuthProvider(BaseProvider):
         if not response:
             return
         user_data = response.json()
-        print(user_data)
         return user_data
 
     def provide(self):
@@ -42,5 +41,4 @@ class YandexOAuthProvider(BaseProvider):
         user_data = self.get_user_data(access_token)
         if not user_data:
             return
-        print(user_data)
         return user_data

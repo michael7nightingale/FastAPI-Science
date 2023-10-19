@@ -8,15 +8,18 @@ class GoogleOAuthProvider(BaseProvider):
     name = "google"
 
     def get_access_token(self) -> str | None:
-        body_data = {
+        params = {
             'code': self.code,
             'redirect_uri': "http://localhost:8000/auth/google/callback",
             'client_id': self.client_id,
             'client_secret': self.client_secret,
             'grant_type': 'authorization_code'
         }
-        query_string = "?" + "&".join(f"{k}={v}" for k, v in body_data.items())
-        response = requests.post("https://accounts.google.com/o/oauth2/token" + query_string, json=body_data)
+        response = requests.post(
+            url="https://accounts.google.com/o/oauth2/token",
+            params=params,
+            json=params
+        )
         if not response:
             return
         access_token = response.json()['access_token']
@@ -24,7 +27,8 @@ class GoogleOAuthProvider(BaseProvider):
 
     def get_user_data(self, access_token: str) -> dict | None:
         response = requests.get(
-            f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+            url="https://www.googleapis.com/oauth2/v1/userinfo",
+            params={"access_token": access_token}
         )
         if not response:
             return
