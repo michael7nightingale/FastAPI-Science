@@ -23,7 +23,7 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope='session')
 async def app() -> FastAPI:
-    server = Server(test=True, use_cookies=False)
+    server = Server()
     await Tortoise.init(
         {
             "connections": {
@@ -91,7 +91,7 @@ async def clear_users():
 @pytest_asyncio.fixture
 async def client_user1(client: AsyncClient, users_test_data: dict, user1_data: dict):
     user_token_data = {
-        "username": user1_data['username'],
+        "login": user1_data['username'],
         "password": user1_data['password']
     }
     response = await client.post(
@@ -108,7 +108,7 @@ async def client_user1(client: AsyncClient, users_test_data: dict, user1_data: d
 @pytest_asyncio.fixture
 async def client_user2(client: AsyncClient, users_test_data: dict, user2_data: dict):
     user_token_data = {
-        "username": user2_data['username'],
+        "login": user2_data['username'],
         "password": user2_data['password']
     }
     response = await client.post(
@@ -127,9 +127,9 @@ async def client_user2(client: AsyncClient, users_test_data: dict, user2_data: d
 async def users_test_data(app: FastAPI, user1_data: dict, user2_data: dict):
     await clear_users()
     user1_ = await User.register(**user1_data)
-    await User.activate(user1_.id)
+    await user1_.activate()
     user2_ = await User.register(**user2_data)
-    await User.activate(user2_.id)
+    await user2_.activate()
     users = user1_, user2_
     yield users
     users_paths = tuple((os.path.join(app.state.STATIC_DIR, str(user.id)) for user in users))
