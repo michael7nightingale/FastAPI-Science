@@ -1,9 +1,9 @@
-import sys
-
 from celery import Celery
+from celery.schedules import crontab
+from tortoise import run_async, Tortoise
 import asyncio
 import nest_asyncio
-from tortoise import run_async, Tortoise
+import sys
 
 from .config import get_app_settings
 
@@ -11,8 +11,8 @@ from .config import get_app_settings
 class AsyncCelery(Celery):
 
     def on_init(self):
-        nest_asyncio.apply()
-        loop = asyncio.new_event_loop()
+        nest_asyncio.apply()    # running several asyncio event loops in the single thread
+        loop = asyncio.new_event_loop()     # create and set event loop for sync celery worker
         asyncio.set_event_loop(loop)
         run_async(
             Tortoise.init(
@@ -43,3 +43,11 @@ app.autodiscover_tasks(
         "src.apps.problems",
     ]
 )
+
+
+app.conf.beat_schedule = {
+    'Clear-Activation-Codes': {
+        'task': 'src.apps.users.tasks.clear_activation_codes_task',
+        'schedule': crontab(minute='*/1'),
+    },
+}
