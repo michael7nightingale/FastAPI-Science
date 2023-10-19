@@ -84,16 +84,17 @@ async def activate_user(
         request: Request,
         activation_scheme: ActivationScheme = Body()
 ):
-    cache_data = json.loads(await request.app.state.redis.get(activation_scheme.code))
-    if cache_data is None:
+    cache_code_value = await request.app.state.redis.get(f"code{activation_scheme.code}")
+    if cache_code_value is None:
         return JSONResponse(
             content={"detail": "Код не найден."},
             status_code=400
         )
+    cache_data = json.loads(cache_code_value)
     user = await User.get_or_none(email=cache_data['email'])
     exp_datetime = datetime.datetime.strptime(cache_data['exp'], "%d/%m/%y %H:%M:%S.%f")
     now_datetime = datetime.datetime.now()
-    if exp_datetime >= now_datetime:
+    if now_datetime >= exp_datetime:
         send_activation_email_task.apply_async(
             kwargs={
                 "name": user.username,
