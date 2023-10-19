@@ -56,3 +56,11 @@ export function getOauthCallbackToken(providerName, code){
         }
     )
 }
+
+
+export function activateUser(code){
+    return axios.patch(
+        buildUrl("auth/activation"),
+        {code: code},
+    )
+}

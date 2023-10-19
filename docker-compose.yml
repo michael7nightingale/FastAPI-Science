@@ -11,7 +11,7 @@ services:
     env_file:
       - ./backend/.docker.env
     command: >
-      sh -c "gunicorn src.main:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8001"
+      sh -c "gunicorn src.main:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8001 --access-logfile -"
     ports:
       - "8001:8001"
     expose:

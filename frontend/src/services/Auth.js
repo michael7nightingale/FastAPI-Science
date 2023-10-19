@@ -1,5 +1,6 @@
 import {meUser} from "@/services/UserService";
 
+
 export function setUser(token){
     localStorage.user = token;
     return meUser().then(response => {

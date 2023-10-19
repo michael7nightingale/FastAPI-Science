@@ -5,9 +5,10 @@ import OAuth from "@/components/OAuth.vue";
 
 export default {
   name: "LoginView",
-  components: {OAuth},
+  components: {OAuth,},
   data(){
     return{
+      errorText: "",
       loginMinLength: 6,
       passwordMinLength: 6,
       login: "",
@@ -35,8 +36,8 @@ export default {
               data = response.data;
               setUser(data.access_token)
                   .then(() => {
-                    window.location = this.$router.resolve({name: "homepage"}).fullPath;
-                  });
+                      window.location = this.$router.resolve({name: "homepage"}).fullPath;
+                    });
             })
             .catch((error) => {
               this.errorText = error.response.data.detail;
@@ -50,7 +51,7 @@ export default {
     passwordInput(value){
       this.password = value;
       if (this.password.length >= this.passwordMinLength) this.passwordError = "";
-    }
+    },
   }
 
 }
@@ -63,13 +64,14 @@ export default {
     <div class="form-item">
       <label class="form-label" for="form2Example2">Логин</label>
       <input type="text" placeholder="Логин:" :value="login" @input="loginInput($event.target.value)" class="form-style" autocomplete="off"/>
-      <p class="text-danger" style="margin: 10px">{{ loginError }}</p>
+      <p class="text-danger text-margin">{{ loginError }}</p>
     </div>
     <div class="form-item">
       <label class="form-label" for="form2Example2">Пароль</label>
       <input type="password" placeholder="Пароль:" :value="password" @input="passwordInput($event.target.value)" id="password" class="form-style" />
-      <p class="text-danger" style="margin: 10px">{{ passwordError }}</p>
+      <p class="text-danger text-margin">{{ passwordError }}</p>
     </div>
+    <p class="text-danger text-margin">{{ errorText }}</p>
     <div class="form-item">
         <router-link to="/auth/register" class="pull-left"><small>регистрация</small></router-link>
         <router-link to="/auth/register" class="pull-left margin-pull-left"><small>зыбыли пароль?</small></router-link>
@@ -80,6 +82,7 @@ export default {
     </div>
     <OAuth/>
 </div>
+
 </template>
 
 <style>
