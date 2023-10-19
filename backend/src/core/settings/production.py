@@ -9,6 +9,8 @@ class ProdAppSettings(BaseAppSettings):
     DB_PORT: str
     DB_NAME: str
 
+    DEBUG: bool = False
+
     @property
     def db_uri(self) -> str:
         host_address = self.DB_HOST

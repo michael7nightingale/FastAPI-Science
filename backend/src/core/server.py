@@ -15,8 +15,8 @@ from src.services.email import create_smtp_server
 class Server:
 
     def __init__(self):
-        self._app = FastAPI()
         self._settings = get_app_settings()
+        self._app = FastAPI(debug=self.settings.DEBUG)
 
         self._configurate_db()
         self._configurate_app()

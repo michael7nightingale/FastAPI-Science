@@ -8,6 +8,7 @@ class DevAppSettings(BaseAppSettings):
     DB_HOST: str
     DB_PORT: str
     DB_NAME: str
+    DEBUG: bool = True
 
     @property
     def db_uri(self) -> str:

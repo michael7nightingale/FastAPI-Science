@@ -1,7 +1,8 @@
 from fastapi import Request, Response, FastAPI
+from starlette.middleware.cors import CORSMiddleware
+from debug_toolbar.middleware import DebugToolbarMiddleware
 import time
 
-from starlette.middleware.cors import CORSMiddleware
 
 middleware_stack = {}
 
@@ -31,6 +32,10 @@ def register_middleware(app: FastAPI) -> None:
             app.middleware(type_)(func)
 
     origins = ["*"]
+    app.add_middleware(
+        DebugToolbarMiddleware,
+        panels=["debug_toolbar.panels.tortoise.TortoisePanel"],
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,

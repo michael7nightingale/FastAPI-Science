@@ -9,6 +9,7 @@ class AppEnvTypes(StrEnum):
 
 
 class BaseAppSettings(BaseSettings):
+    DEBUG: bool
 
     SUPERUSER_USERNAME: str
     SUPERUSER_PASSWORD: str
