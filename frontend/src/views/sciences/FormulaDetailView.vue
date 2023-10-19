@@ -22,7 +22,7 @@ export default {
       this.info = response.info;
       let info = JSON.parse(JSON.stringify(this.info));
       this.info = info;
-      this.findMark = Object.keys(info.literals)[0].literal;
+      this.findMark = Object.keys(info.literals)[0];
     })
     .then(() => {
        document.getElementById("loader").className = document.getElementById("loader").className.replace("show", "hide")
@@ -56,9 +56,9 @@ export default {
 
   getLiteralsExceptFindMark(){
       let literals = [];
-      for (const literalData of this.info.literals.keys()){
-        if (literalData.literal !== this.findMark){
-          literals.push(literalData.literal);
+      for (const literal of Object.keys(this.info.literals)){
+        if (literal !== this.findMark){
+          literals.push(literal);
         }
       }
       return literals;
@@ -66,17 +66,14 @@ export default {
 
   checkStorage(){
       let neededLiterals = this.getLiteralsExceptFindMark();
-      let needElseNumbers = false;
-      for (const lit of neededLiterals){
-        if (!(this.storage[lit] && this.storage[`${lit}si`])){
-          needElseNumbers = true;
+      let isCorrectData = true;
+      for (const literal of neededLiterals){
+        if (!(this.storage[literal] && this.storage[`${literal}si`])){
+          isCorrectData = false;
+          document.getElementById(`${literal}-text-danger`).innerText = "Заполните поле"
         }
       }
-      if (needElseNumbers){
-        alert("Fill in the data!");
-        return false;
-      }
-      return true;
+      return isCorrectData;
   },
 
   countResult(){
@@ -90,8 +87,8 @@ export default {
           })
          .catch((error) => {
               error
-              alert("You are not authorized!")
-              this.$router.push("/auth/login")
+              alert("Авторизуйтесь, чтобы воспользоваться функцией вычислений");
+              this.$router.push({name: "login"});
             })
       }
 
@@ -136,7 +133,7 @@ export default {
 
 <div class="container" style="min-height: 400px;">
   <div id="{{ findMark }}" class="tabcontent">
-  <label class="white_text" for="nums_comma">Цифр после запятой: </label>
+  <label for="nums_comma">Цифр после запятой: </label>
   <select title="nums_comma" name="nums_comma" id="nums_comma" @change="numsCommaSelect($event)">
     <option
         v-for="n in numsComma"
@@ -149,14 +146,7 @@ export default {
 
     <div v-for="literal in this.info.literals" v-bind:key="literal">
        <div class="form"  style="{min-height: 400px}" v-if="literal.literal !== findMark">
-        <input
-            type="text"
-            :placeholder="`${literal.literal} =`"
-            class="form-control"
-            @input="numberInput($event, literal.literal)"
-            :value="storage[literal.literal]"
-        >
-        <label class="white_text" :for="`${literal.literal}si`">Ед.измерения:</label>
+         <label :for="`${literal.literal}si`">Ед.измерения:</label>
         <select
             :id="`${literal.literal}si`"
             @change="siSelect($event, literal.literal)"
@@ -171,6 +161,15 @@ export default {
             {{  ed === 1 ? storage[`${literal.literal}si`] = name : name  }}
           </option>
         </select>
+        <input
+            type="text"
+            :placeholder="`${literal.literal} =`"
+            class="form-control"
+            @input="numberInput($event, literal.literal)"
+            :value="storage[literal.literal]"
+        >
+         <p class="text-danger text-margin" :id="`${literal.literal}-text-danger`"></p>
+
         </div>
     </div>
 
@@ -180,7 +179,7 @@ export default {
     >
     Считать
     </button>
-    <h4 class="white_text">{{ findMark }} = {{ result }}</h4>
+    <h3 class="text-margin">{{ findMark }} = {{ result }}</h3>
     </div>
   </div>
 </div>

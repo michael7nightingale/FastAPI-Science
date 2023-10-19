@@ -64,10 +64,10 @@ export default {
 <div class="container">
   <div class="row">
     <div class="col">
-      <label class="white_text" for="filename-input">Название файла</label>
+      <label for="filename-input">Название файла</label>
     </div>
     <div class="col">
-      <label class="white_text" for="extension-input">Extension</label>
+      <label for="extension-input">Расширение файла</label>
     </div>
   </div>
   <div class="row">
@@ -92,9 +92,9 @@ export default {
 <table style="background-color: white; margin-top: 100px; width:100%" border=1 frame=void>
     <tbody >
         <tr>
-            <td>Result</td>
-            <td>Date Time</td>
-            <td>Formula</td>
+            <td>Результат</td>
+            <td>Время</td>
+            <td>Формула</td>
         </tr>
         <tr v-for="h in history" v-bind:key="h">
             <td>{{ h.result }}</td>
