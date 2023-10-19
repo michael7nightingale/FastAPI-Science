@@ -48,6 +48,6 @@ app.autodiscover_tasks(
 app.conf.beat_schedule = {
     'Clear-Activation-Codes': {
         'task': 'src.apps.users.tasks.clear_activation_codes_task',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/15'),
     },
 }
