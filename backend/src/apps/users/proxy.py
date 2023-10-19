@@ -19,4 +19,24 @@ async def send_activation_email_task_proxy(email: str, name: str) -> None:
         to_addrs=[email],
         body=message
     )
-    await create_redis_client().set(code, json.dumps(cache_data))
+    await create_redis_client().set(f"code{code}", json.dumps(cache_data))
+
+
+async def clear_activation_codes_task_proxy() -> None:
+    redis_client = await create_redis_client()
+    keys = await redis_client.keys()
+    delete_keys = set()
+    for key in keys:
+        if key[:4] != "code":
+            continue
+        cache_data = json.loads(await redis_client.get(key))
+        if not isinstance(cache_data, dict):
+            continue
+        if "exp" not in cache_data:
+            continue
+        now_datetime = datetime.datetime.now()
+        exp_datetime = datetime.datetime.strptime(cache_data["exp"], "%d/%m/%y %H:%M:%S.%f")
+        if now_datetime >= exp_datetime:
+            delete_keys.add(key)
+    if len(delete_keys):
+        await redis_client.delete(*delete_keys)
