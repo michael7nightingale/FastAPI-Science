@@ -126,7 +126,7 @@ export default {
     </div>
     <OAuth/>
 </div>
-  <div class="container" id="activation">
+  <div class="container hide" id="activation">
   <h3 align="center">Подтверждение почты</h3>
     <label class="text-margin">Мы отправили код для подтверждения вам на почту</label>
        <div class="input-field">
