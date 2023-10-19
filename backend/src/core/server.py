@@ -14,8 +14,7 @@ from src.services.email import create_smtp_server
 
 class Server:
 
-    def __init__(self, use_cookies: bool = False):
-        self.use_cookies = use_cookies
+    def __init__(self):
         self._app = FastAPI()
         self._settings = get_app_settings()
 
@@ -45,7 +44,7 @@ class Server:
         # auth manager settings
         self.app.state.auth_manager = AuthManager(
             app=self.app,
-            use_cookies=self.use_cookies,
+            use_cookies=False,
             user_model=UserCustomModel,
             algorithm=self.settings.ALGORITHM,
             secret_key=self.settings.SECRET_KEY,
