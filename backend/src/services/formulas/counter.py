@@ -148,7 +148,7 @@ async def build_html(
     return tab_div, tab_content_divs
 
 
-async def count_result(request: RequestSchema, formula_obj: Formula):
+def count_result(request: RequestSchema, formula_obj: Formula):
     params = formula_obj.literals
     args = formula_obj.args
     find_mark = args[0]
@@ -177,12 +177,6 @@ async def count_result(request: RequestSchema, formula_obj: Formula):
                 **dict(zip(find_args, nums * si))
             )[0]
             result = round(float(result), nums_comma)
-            if request.user_id is not None:
-                await History.create(
-                    user_id=request.user_id,
-                    result=str(result),
-                    formula_id=request.formula_id,
-                )
 
     except (SyntaxError, NameError):
         message = "Невалидные данные."
@@ -193,4 +187,4 @@ async def count_result(request: RequestSchema, formula_obj: Formula):
     except ArithmeticError:
         message = "Вычислительно невозможное выражение"
 
-    return result if result else message
+    return (result, True) if result else (message, False)

@@ -8,12 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.4.0",
     "core-js": "^3.8.3",
     "mathjax": "^3.2.2",
+    "tailwindcss": "^3.4.1",
     "vue": "^3.2.26",
     "vue-mathjax": "^0.1.1",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vue-tailwind": "^2.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

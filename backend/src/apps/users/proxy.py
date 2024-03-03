@@ -14,7 +14,7 @@ async def send_activation_email_task_proxy(email: str, name: str) -> None:
         "exp": (datetime.datetime.now() + datetime.timedelta(minutes=30)).strftime("%d/%m/%y %H:%M:%S.%f")
     }
     message = "%s, вот ваш код для завершения регистрации: %s" % (name, code)
-    create_smtp_server().send_message(
+    create_smtp_server().send_email_message(
         subject="Registration",
         to_addrs=[email],
         body=message

@@ -2,18 +2,16 @@ from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 
 
-main_router = APIRouter(
-    prefix=''
-)
+router = APIRouter(prefix='', tags=["Main"])
 
 
-@main_router.get("/")
+@router.get("/")
 async def homepage(request: Request):
     """Main page."""
     return {"detail": "Application is started."}
 
 
-@main_router.get("/github")
+@router.get("/github")
 async def github_redirect(request: Request):
     """Redirect to the GitHub project repository."""
     return RedirectResponse(

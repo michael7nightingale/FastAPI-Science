@@ -65,12 +65,12 @@ class BaseFormula(ABC):
     def __init__(
         self,
         formula: str,
-        literals: dict
+        literals: dict[str, Literal]
     ):
         global storage
         self.formula = formula
         self.pattern: sp.Eq = sp.simplify(self._template.replace("?", ", ".join(formula.split("="))))
-        self.args: tuple[str] = tuple(literals.keys())
+        self.args: tuple[str, ...] = tuple(literals.keys())
         self.literals: dict[str, Literal] = literals
 
     def __len__(self) -> int:

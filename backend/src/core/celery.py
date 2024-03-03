@@ -40,7 +40,6 @@ app.autodiscover_tasks(
         "src.apps.users",
         "src.apps.sciences",
         "src.apps.cabinets",
-        "src.apps.problems",
     ]
 )
 

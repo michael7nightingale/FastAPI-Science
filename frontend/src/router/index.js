@@ -14,6 +14,7 @@ import ProblemView from "@/views/problems/ProblemView.vue";
 import ProblemCreateView from "@/views/problems/ProblemCreateView.vue";
 import EquationsView from "@/views/sciences/EquationsView.vue";
 import CallbackView from "@/views/users/CallbackView.vue";
+import AboutView from "@/views/main/AboutView.vue";
 
 
 const routes = [
@@ -22,6 +23,11 @@ const routes = [
     path: '/',
     name: 'homepage',
     component: HomeView
+  },
+    {
+    path: '/about',
+    name: 'about',
+    component: AboutView
   },
 
   // auth

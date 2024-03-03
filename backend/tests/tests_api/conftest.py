@@ -12,7 +12,7 @@ from src.apps.sciences.routes import science_router
 from src.apps.main.routes import main_router
 from src.apps.cabinets.routes import cabinets_router
 from src.apps.problems.routes import problems_router
-from src.core.server import Server
+from src.core.app import Server
 from src.apps.users.models import User
 
 

@@ -56,7 +56,6 @@ class BaseAppSettings(BaseSettings):
     @property
     def google_login_url(self) -> str:
         return "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}".format(  # noqa: E501
-            # noqa: E501
             token_request_uri="https://accounts.google.com/o/oauth2/auth",
             response_type="code",
             client_id=self.GOOGLE_CLIENT_ID,

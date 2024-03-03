@@ -1,43 +1,36 @@
-from smtplib import SMTP_SSL, _fix_eols
+from email.message import EmailMessage
+from smtplib import SMTP_SSL
 
 from src.core.config import get_app_settings
 
 
-class SMTPServer(SMTP_SSL):
+class EmailServer:
 
-    def __init__(self, host: str, port: int, from_addr: str, *args, **kwargs):
-        super().__init__(host, port, *args, **kwargs)
-        self._from_addr = from_addr
+    def __init__(self):
+        self.settings = get_app_settings()
+        self.smtp_server = SMTP_SSL(port=self.settings.EMAIL_PORT, host=self.settings.EMAIL_HOST)
 
-    def send_message(self, subject: str, to_addrs: list, body: str) -> None:
-        email_text = f"""\
-            From: {self._from_addr}
-            To: {", ".join(to_addrs)}
-            Subject: {subject}
+    def __enter__(self):
+        self.connect()
+        return self
 
-            {body}
-            """
-        super().sendmail(
-            from_addr="suslanchikmopl@gmail.com",
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
+
+    def connect(self):
+        self.smtp_server.ehlo()
+        self.smtp_server.login(user=self.settings.EMAIL_USER, password=self.settings.EMAIL_PASSWORD)
+
+    def disconnect(self):
+        self.smtp_server.close()
+
+    def send_email(self, to_addrs: list[str], msg: EmailMessage):
+        self.smtp_server.sendmail(
+            from_addr=self.settings.EMAIL_USER,
             to_addrs=to_addrs,
-            msg=_fix_eols(email_text).encode('utf-8')
+            msg=msg.as_string()
         )
 
 
-def create_smtp_server(
-        host: str = get_app_settings().EMAIL_HOST,
-        port: int = get_app_settings().EMAIL_PORT,
-        user: str = get_app_settings().EMAIL_USER,
-        password: str = get_app_settings().EMAIL_PASSWORD
-) -> SMTPServer:
-    server_ = SMTPServer(
-        port=port,
-        host=host,
-        from_addr=user,
-    )
-    server_.ehlo()
-    server_.login(
-        user=user,
-        password=password
-    )
-    return server_
+def build_activation_email(activation_code: str) -> str:
+    return f"<h1>Activation code: {activation_code}</h1>"

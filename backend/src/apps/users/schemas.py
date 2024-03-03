@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -50,5 +52,14 @@ class UserLogin(BaseModel):
         str_strip_whitespace = True
 
 
-class ActivationScheme(BaseModel):
-    code: str = Field(max_length=6, min_length=6)
+class ActivationCodeScheme(BaseModel):
+    code: str
+
+
+class Token(BaseModel):
+    exp: datetime
+    user_id: str
+
+
+class TokenSchema(BaseModel):
+    access_token: str

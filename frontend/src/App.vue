@@ -9,7 +9,7 @@ export default {
 
   },
 
-  data(){
+  data() {
     return {
       publicPath: process.env.BASE_URL,
       editMeUrl: 'https://github.com/michael7nightingale/FastAPI-Science',
@@ -18,61 +18,140 @@ export default {
   },
 
   computed: {
-    user(){
+    user() {
       return getUser();
     }
   },
 
   methods: {
-    logoutClick(){
+    logoutClick() {
       logoutUser()
+      window.location.reload();
     },
-    githubOpen(){
+    githubOpen() {
       window.open(this.editMeUrl, "_blank");
+    },
+    openMobileMenu() {
+      const menuElement = document.getElementById("mobile-nav");
+      if (menuElement.style.display === 'none') {
+        menuElement.style.display = 'block';
+      } else {
+        menuElement.style.display = 'none';
+      }
     }
   },
 
 }
+
 </script>
 
 
 <template>
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-      <router-link to="/">
-       <img :src="`/images/logo.png`" alt="Logo" class="nav-logo" style="width: 120px">
+  <header class="bg-white">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+      <div class="flex lg:flex-1">
+        <a href="/" class="-m-1.5 p-1.5">
+          <span class="sr-only">Сайт для вычислений</span>
+          <img class="h-8 w-auto" :src="'/images/logo.png'" alt="Логотип">
+        </a>
+      </div>
+      <div class="flex lg:hidden">
+        <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+                @click="openMobileMenu">
+          <span class="sr-only">Open main menu</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+               aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+          </svg>
+        </button>
+      </div>
+      <div class="hidden lg:flex lg:gap-x-12">
+        <router-link :to="{name: 'homepage'}" class="text-sm font-semibold leading-6 text-gray-900">
+          Главная
         </router-link>
-    <h5 class="my-0 mr-md-auto font-weight-normal">сайт для вычислений</h5>
-
-        <nav class="my-2 my-md-0 mr-md-4">
-            <div v-if="user">
-              <router-link class="p-2 text-dark" to="/">Главная</router-link>
-              <a href="/" @click="githubOpen">
+        <router-link :to="{name: 'about'}" class="text-sm font-semibold leading-6 text-gray-900">
+          О портале
+        </router-link>
+        <router-link :to="{name: 'homepage'}" class="text-sm font-semibold leading-6 text-gray-900" v-if="user">
+          Кабинет
+        </router-link>
+        <a :href="editMeUrl" target="_blank" class="text-sm font-semibold leading-6 text-gray-900">
+          GitHub
+        </a>
+      </div>
+      <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+        <a href="#" @click="logoutClick" class="text-sm font-semibold leading-6 text-gray-900" v-if="user">
+          Выйти
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+        <router-link :to="{name: 'login'}" class="text-sm font-semibold leading-6 text-gray-900" v-else>
+          Войти
+          <span aria-hidden="true">&rarr;</span>
+        </router-link>
+      </div>
+    </nav>
+    <!-- Mobile menu, show/hide based on menu open state. -->
+    <div class="lg:hidden" role="dialog" aria-modal="true" style="display: none" id="mobile-nav">
+      <!-- Background backdrop, show/hide based on slide-over state. -->
+      <div class="fixed inset-0 z-10"></div>
+      <div
+          class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+        <div class="flex items-center justify-between">
+          <a href="#" class="-m-1.5 p-1.5">
+            <span class="sr-only">Your Company</span>
+            <img class="h-8 w-auto" :src="'/images/logo.png'" alt="Логотип">
+          </a>
+          <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="openMobileMenu">
+            <span class="sr-only">Close menu</span>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                 aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-6 flow-root">
+          <div class="-my-6 divide-y divide-gray-500/10">
+            <div class="space-y-2 py-6">
+              <router-link :to="{name: 'homepage'}"
+                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                Главная
+              </router-link>
+              <router-link :to="{name: 'about'}"
+                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                О портале
+              </router-link>
+              <router-link :to="{name: 'cabinet'}" v-if="user"
+                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Кабинет</router-link>
+              <a class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                 :href="editMeUrl" target="_blank">
                 GitHub
-                <img alt="" :src="`/images/github.png`" class="nav-logo" style="width:70px">
               </a>
-               <a class="p-2 text-dark" href="" @click="logoutClick">Выйти</a>
-               <router-link class="p-2 text-dark" to="/cabinet">Кабинет</router-link>
             </div>
-            <div v-else>
-              <router-link class="p-2 text-dark" to="/">Главная</router-link>
-              <a href="/" @click="githubOpen">
-                GitHub
-                <img alt="" :src="`/images/github.png`" class="nav-logo" style="width:70px">
+            <div class="py-6">
+              <a href="#" @click="logoutClick" v-if="user"
+                           class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                Выйти
               </a>
-              <router-link class="p-2 text-dark" to="/auth/login">Вход</router-link>
+              <router-link :to="{name: 'login'}" v-else
+                           class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                Войти
+              </router-link>
             </div>
-        </nav>
+          </div>
+        </div>
+      </div>
     </div>
+  </header>
 
-  <div class="body-content background">
-    <hr/>
+  <main class="body-content">
     <router-view/>
-  </div>
-
+  </main>
   <Footer/>
 </template>
 
 <style>
 @import './assets/css/global.css';
 @import './assets/css/loader.css';
+@import './assets/css/main.css';
+@import './assets/css/output.css';
 </style>

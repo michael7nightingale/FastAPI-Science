@@ -1,38 +1,32 @@
-import json
-
 from fastapi import APIRouter, Body, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi_authtools import login_required
 from fastapi_authtools.exceptions import raise_invalid_credentials
 from tortoise.exceptions import IntegrityError
 
-import datetime
 from .dependencies import get_oauth_provider
-from .models import User
+from .models import User, ActivationCode
 from src.services.oauth import Providers
-from .schemas import UserRegister, UserCustomModel, UserLogin, ActivationScheme
+from .schemas import UserRegister, UserCustomModel, UserLogin, ActivationCodeScheme
 from src.core.config import get_app_settings
-from .tasks import send_activation_email_task
+from .tasks import send_email_task
+from ...services.email import build_activation_email
+
+router = APIRouter(prefix='/auth', tags=["Authentication"])
 
 
-auth_router = APIRouter(prefix='/auth')
-
-
-@auth_router.get('/{provider}/login')
+@router.get('/{provider}/login')
 async def provider_login(provider: Providers):
     """Login with Google."""
     return getattr(get_app_settings(), f"{provider.value}_login_url")
 
 
-@auth_router.get("/{provider}/callback")
-async def provider_callback(request: Request, code: str, provider=Depends(get_oauth_provider)):
+@router.get("/{provider}/callback")
+async def provider_callback_view(request: Request, code: str, provider=Depends(get_oauth_provider)):
     """Add access token from GitHub to cookies"""
     user_data = provider.provide()
     if user_data is None:
-        return JSONResponse(
-            {'detail': "Something went wrong."},
-            status_code=500
-        )
+        return JSONResponse({'detail': "Something went wrong."}, status_code=500)
     try:
         user = await User.create(**user_data, active=True)
     except IntegrityError:
@@ -42,68 +36,68 @@ async def provider_callback(request: Request, code: str, provider=Depends(get_oa
     return {"access_token": access_token}
 
 
-@auth_router.post('/token')
-async def get_token(request: Request, user_token_data: UserLogin = Body()):
+@router.post('/token')
+async def get_token_view(request: Request, user_token_data: UserLogin = Body()):
     """Token get view."""
-    user = await User.login(
+    user, password_correct = await User.login(
         **user_token_data.model_dump(exclude={"login"})
     )
-    if user is None:
-        raise_invalid_credentials()
+    print(await User.all().values_list("email", flat=True))
+    print(user_token_data.model_dump())
+    print(123123, await User.get_or_none(email=user_token_data.login))
+    if not user.is_active:
+        activation_code = await ActivationCode.create_activation_code(user=user)
+        send_email_task.apply_async(
+            kwargs={
+                "body": build_activation_email(activation_code),
+                "to_addrs": [user.email],
+                "subject": "Activation",
+            }
+        )
+        return JSONResponse(
+            {"detail": "Activation required check you email."},
+            status_code=403
+        )
+    if not password_correct:
+        return JSONResponse(
+            {"detail": "Password is invalid."},
+            status_code=400
+        )
     user_model = UserCustomModel(**user.as_dict())
     token = request.app.state.auth_manager.create_token(user_model)
     return {"access_token": token}
 
 
-@auth_router.post("/register")
-async def register(request: Request, user_data: UserRegister = Body()):
+@router.post("/register")
+async def register_view(request: Request, user_data: UserRegister = Body()):
     """Registration POST view."""
     new_user = await User.register(**user_data.model_dump())
     if new_user is None:
-        return JSONResponse(
-            content={"detail": "Invalid data."},
-            status_code=400,
-        )
-    send_activation_email_task.apply_async(
+        return JSONResponse({"detail": "Invalid data."}, status_code=400)
+    activation_code = await ActivationCode.create_activation_code(user=new_user)
+    send_email_task.apply_async(
         kwargs={
-            "name": new_user.username,
-            "email": new_user.email
+            "body": build_activation_email(activation_code),
+            "to_addrs": [new_user.email],
+            "subject": "Activation",
         }
     )
     return {"detail": f"Activation link is sent on email {new_user.email}. Please follow the instructions."}
 
 
-@auth_router.get("/me")
+@router.get("/me")
 @login_required
-async def me(request: Request):
+async def me_view(request: Request):
     return request.user
 
 
-@auth_router.patch("/activation")
-async def activate_user(
+@router.patch("/activation")
+async def activate_user_view(
         request: Request,
-        activation_scheme: ActivationScheme = Body()
+        data: ActivationCodeScheme = Body()
 ):
-    cache_code_value = await request.app.state.redis.get(f"code{activation_scheme.code}")
-    if cache_code_value is None:
-        return JSONResponse(
-            content={"detail": "Код не найден."},
-            status_code=400
-        )
-    cache_data = json.loads(cache_code_value)
-    user = await User.get_or_none(email=cache_data['email'])
-    exp_datetime = datetime.datetime.strptime(cache_data['exp'], "%d/%m/%y %H:%M:%S.%f")
-    now_datetime = datetime.datetime.now()
-    if now_datetime >= exp_datetime:
-        send_activation_email_task.apply_async(
-            kwargs={
-                "name": user.username,
-                "email": user.email
-            }
-        )
-        return JSONResponse(
-            content={"detail": "Срок действаия кода истек, выслали вам новый"},
-            status_code=400
-        )
-    await user.activate()
-    return {'detail': "Регистрация завершена успешно"}
+    code = await ActivationCode.filter(**data.model_dump()).first().select_related("user")
+    if code is None:
+        return JSONResponse({"detail": False}, status_code=400)
+    await code.user.activate()
+    return {"detail": True}

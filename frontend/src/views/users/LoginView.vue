@@ -1,13 +1,11 @@
 <script>
 import {loginUser} from "@/services/UserService";
 import {setUser} from "@/services/Auth";
-import OAuth from "@/components/OAuth.vue";
 
 export default {
   name: "LoginView",
-  components: {OAuth,},
-  data(){
-    return{
+  data() {
+    return {
       errorText: "",
       loginMinLength: 6,
       passwordMinLength: 6,
@@ -19,36 +17,26 @@ export default {
     }
   },
   methods: {
-    loginClick(){
-        let data;
-        let wereError = false;
-        if (this.login.length < this.loginMinLength) {
-          wereError = true;
-          this.loginError = `Логин должен содержать от ${this.loginMinLength} символов`
-        }
-        if (this.password.length < this.passwordMinLength) {
-          wereError = true;
-          this.passwordError = `Пароль должно содержать от ${this.passwordMinLength} символов`
-        }
-        if (wereError) return;
-        loginUser(this.login, this.password)
-            .then((response) => {
-              data = response.data;
-              setUser(data.access_token)
-                  .then(() => {
-                      window.location = this.$router.resolve({name: "homepage"}).fullPath;
-                    });
-            })
-            .catch((error) => {
-              this.errorText = error.response.data.detail;
-            })
+    loginClick() {
+      let data;
+      loginUser(this.login, this.password)
+          .then((response) => {
+            data = response.data;
+            setUser(data.access_token)
+                .then(() => {
+                  window.location = this.$router.resolve({name: "homepage"}).fullPath;
+                });
+          })
+          .catch((error) => {
+            this.errorText = error.response.data.detail;
+          })
     },
 
-    loginInput(value){
+    loginInput(value) {
       this.login = value;
       if (this.login.length >= this.loginMinLength) this.loginError = "";
     },
-    passwordInput(value){
+    passwordInput(value) {
       this.password = value;
       if (this.password.length >= this.passwordMinLength) this.passwordError = "";
     },
@@ -59,30 +47,53 @@ export default {
 </script>
 
 <template>
-<div class="container login-container">
-  <h3 align="center">Вкод в аккаунт</h3>
-    <div class="form-item">
-      <label class="form-label" for="form2Example2">Логин</label>
-      <input type="text" placeholder="Логин:" :value="login" @input="loginInput($event.target.value)" class="form-style" autocomplete="off"/>
-      <p class="text-danger text-margin">{{ loginError }}</p>
+  <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <img class="mx-auto h-10 w-auto" :src="'/images/logo.png'"
+           alt="Логотип">
+      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        Вход в аккаунт
+      </h2>
     </div>
-    <div class="form-item">
-      <label class="form-label" for="form2Example2">Пароль</label>
-      <input type="password" placeholder="Пароль:" :value="password" @input="passwordInput($event.target.value)" id="password" class="form-style" />
-      <p class="text-danger text-margin">{{ passwordError }}</p>
-    </div>
-    <p class="text-danger text-margin">{{ errorText }}</p>
-    <div class="form-item">
-        <router-link to="/auth/register" class="pull-left"><small>регистрация</small></router-link>
-        <router-link to="/auth/register" class="pull-left margin-pull-left"><small>зыбыли пароль?</small></router-link>
-        <button class="btn login pull-right" @click="loginClick" style="background-color: #fff; border:1px solid #55b1df; color:#55b1df; cursor:pointer;">
-        Войти
-      </button>
-        <div class="clear-fix"></div>
-    </div>
-    <OAuth/>
-</div>
 
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <form class="space-y-6">
+        <div>
+          <label for="email" class="block text-sm font-medium leading-6 text-gray-900 flex">Логин</label>
+          <div class="mt-2">
+            <input id="email" :name="login" type="text" autocomplete="text" required @input="loginInput($event.target.value)"
+                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Пароль</label>
+            <div class="text-sm">
+              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Забыли пароль?</a>
+            </div>
+          </div>
+          <div class="mt-2">
+            <input id="password" :name="password" type="password" autocomplete="current-password" required  @input="passwordInput($event.target.value)"
+                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div>
+          <button @click="loginClick" type="button"
+                  class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            Войти
+          </button>
+        </div>
+      </form>
+      <p class="mt-10 text-center text-sm text-gray-500">
+        Нет аккаунта?
+        <router-link :to="{name: 'register'}" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+          Зарегистрироваться
+        </router-link>
+      </p>
+    </div>
+  </div>
 </template>
 
 <style>

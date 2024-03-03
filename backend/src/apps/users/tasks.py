@@ -1,14 +1,19 @@
-from asgiref.sync import async_to_sync
+from email.message import EmailMessage
 
-from .proxy import send_activation_email_task_proxy, clear_activation_codes_task_proxy
 from src.core.celery import app
+from ...core.config import get_app_settings
+from ...services.email import EmailServer
 
 
 @app.task
-def send_activation_email_task(email: str, name: str) -> None:
-    return async_to_sync(send_activation_email_task_proxy)(email, name)
-
-
-@app.task
-def clear_activation_codes_task():
-    return async_to_sync(clear_activation_codes_task_proxy)()
+def send_email_task(subject: str, to_addrs: list[str], body: str) -> int:
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = get_app_settings().EMAIL_USER
+    msg['To'] = ','.join(to_addrs)
+    msg.set_content(body, subtype="html")
+    with EmailServer() as email_server:
+        return email_server.send_email(
+            to_addrs=to_addrs,
+            msg=msg
+        )

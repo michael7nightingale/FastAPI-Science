@@ -1,15 +1,13 @@
-from .main.routes import main_router
-from .users.routes import auth_router
-from .problems.routes import problems_router
-from .sciences.routes import science_router
-from .cabinets.routes import cabinets_router
+from .main.routes import router as main_router
+from .cabinets.routes import router as cabinets_router
+from .users.routes import router as users_router
+from .sciences.routes import router as sciences_router
 
 
 __routers__ = (
+    users_router,
     main_router,
-    auth_router,
-    problems_router,
-    science_router,
     cabinets_router,
+    sciences_router,
 
 )

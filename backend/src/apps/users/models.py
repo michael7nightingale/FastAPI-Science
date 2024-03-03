@@ -1,8 +1,10 @@
+from datetime import datetime, timedelta
+
 from tortoise import fields
 from tortoise.exceptions import IntegrityError
 
 from src.base.models import TortoiseModel
-from src.services.hash import hash_password, verify_password
+from src.services.password import hash_password, verify_password, generate_activation_code
 
 
 class User(TortoiseModel):
@@ -24,10 +26,11 @@ class User(TortoiseModel):
         elif email:
             user = await cls.get_or_none(email=email)
         else:
-            return None
+            return None, None
+        print(123123, user)
         if user is not None:
-            if verify_password(password, user.password) and user.is_active:
-                return user
+            return user, verify_password(password, user.password)
+        return None, None
 
     @classmethod
     async def register(cls, **kwargs):
@@ -35,6 +38,7 @@ class User(TortoiseModel):
         try:
             user = await cls.create(**kwargs, active=True)
         except IntegrityError:
+            raise
             return
         return user
 
@@ -49,3 +53,19 @@ class User(TortoiseModel):
         if self.first_name or self.last_name:
             return f"{self.first_name or ''} {self.last_name or ''}"
         return self.username
+
+
+class ActivationCode(TortoiseModel):
+    user = fields.ForeignKeyField("models.User", related_name="activation_code")
+    code = fields.CharField(max_length=6, default=generate_activation_code)
+    expire = fields.DatetimeField()
+
+    class Meta:
+        ordering = ['-expire']
+
+    @classmethod
+    async def create_activation_code(cls, user: User):
+        code = generate_activation_code()
+        while (await cls.get_or_none(code=code)) is not None:
+            code = generate_activation_code()
+        return await cls.create(user=user, code=code, expire=datetime.now() + timedelta(hours=1))
