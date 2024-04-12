@@ -92,7 +92,8 @@
 <script>
 export default {
   name: 'AboutView',
-  components: {}
+  components: {},
+
 }
 </script>
 

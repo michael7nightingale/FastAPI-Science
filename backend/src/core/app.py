@@ -1,16 +1,17 @@
+import logging
+import sys
+
 from fastapi import FastAPI
-from fastapi_authtools import AuthManager
+from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
 from src.apps import __routers__
 from src.core.config import get_app_settings
-from src.apps.users.schemas import UserCustomModel
 from src.core.middleware.time import process_time_middleware
 from .middleware.cors import use_cors_middleware
-from .middleware.authentication import use_authentication_middleware
-from src.db.events import create_superuser, register_mongodb_db, register_db, authentication_user_getter
+from .middleware.authentication import AuthenticationBackend
+from src.db.events import create_superuser, register_db
 from src.db.redis import create_redis_client
-from src.data.load_data import load_all_data, load_all_data_mongo
 
 
 class Application:
@@ -41,28 +42,27 @@ class Application:
         self.app.add_event_handler(event_type="startup", func=self._on_startup_event)
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
         self.app.state.SECRET_KEY = self.settings.SECRET_KEY
-
-        # auth manager settings
-        self.app.state.auth_manager = AuthManager(
-            app=self.app,
-            use_cookies=False,
-            user_model=UserCustomModel,
-            algorithm=self.settings.ALGORITHM,
-            secret_key=self.settings.SECRET_KEY,
-            expire_minutes=self.settings.EXPIRE_MINUTES,
-            user_getter=authentication_user_getter,
+        fmt = logging.Formatter(
+            fmt="%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
+        sh = logging.StreamHandler(sys.stdout)
+        sh.setLevel(getattr(logging, "DEBUG"))
+        sh.setFormatter(fmt)
+        logger_db_client = logging.getLogger("tortoise.db_client")
+        logger_db_client.setLevel(getattr(logging, "DEBUG"))
+        logger_db_client.addHandler(sh)
+        # auth manager settings
         self.app.mount("/static", StaticFiles(directory="src/public/static/"), name="static")
         self.app.state.STATIC_DIR = "src/public/static/"
 
     def _configurate_middleware(self) -> None:
         use_cors_middleware(self.app)
-        use_authentication_middleware(self.app)
+        self.app.add_middleware(AuthenticationMiddleware, backend=AuthenticationBackend())
         self.app.middleware("http")(process_time_middleware)
 
     def _configurate_db(self) -> None:
         """Configurate database."""
-        self.app.state.mongodb_db = register_mongodb_db(self.settings.MONGODB_URL, self.settings.MONGODB_NAME)
         self.app.state.redis = create_redis_client(self.settings.REDIS_URL)
         register_db(
             app=self.app,
@@ -86,8 +86,7 @@ class Application:
     async def _load_data(self):
         """Data loading function."""
         await create_superuser(settings=self.settings)
-        await load_all_data()
-        await load_all_data_mongo(self.app.state.mongodb_db)
+        # await load_all_data()
 
     async def _on_startup_event(self):
         """Startup handler."""

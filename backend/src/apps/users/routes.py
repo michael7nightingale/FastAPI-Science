@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Body, Request, Depends
 from fastapi.responses import JSONResponse
-from fastapi_authtools import login_required
-from fastapi_authtools.exceptions import raise_invalid_credentials
 from tortoise.exceptions import IntegrityError
 
 from .dependencies import get_oauth_provider
 from .models import User, ActivationCode
 from src.services.oauth import Providers
+from .permissions import login_required
 from .schemas import UserRegister, UserCustomModel, UserLogin, ActivationCodeScheme
 from src.core.config import get_app_settings
 from .tasks import send_email_task
 from ...services.email import build_activation_email
+from ...services.jwt import encode_jwt_token
 
 router = APIRouter(prefix='/auth', tags=["Authentication"])
 
@@ -32,7 +32,7 @@ async def provider_callback_view(request: Request, code: str, provider=Depends(g
     except IntegrityError:
         user = await User.get(email=user_data['email'], username=user_data['username'])
     user_model = UserCustomModel(**user.as_dict())
-    access_token = request.app.state.auth_manager.create_token(user_model)
+    access_token = encode_jwt_token(user_id=user_model.id)
     return {"access_token": access_token}
 
 
@@ -42,14 +42,21 @@ async def get_token_view(request: Request, user_token_data: UserLogin = Body()):
     user, password_correct = await User.login(
         **user_token_data.model_dump(exclude={"login"})
     )
-    print(await User.all().values_list("email", flat=True))
-    print(user_token_data.model_dump())
-    print(123123, await User.get_or_none(email=user_token_data.login))
+    if user is None:
+        return JSONResponse(
+            {"detail": "User does not exists."},
+            status_code=404
+        )
+    if not password_correct:
+        return JSONResponse(
+            {"detail": "Password is invalid."},
+            status_code=400
+        )
     if not user.is_active:
         activation_code = await ActivationCode.create_activation_code(user=user)
         send_email_task.apply_async(
             kwargs={
-                "body": build_activation_email(activation_code),
+                "body": build_activation_email(activation_code.code),
                 "to_addrs": [user.email],
                 "subject": "Activation",
             }
@@ -58,13 +65,8 @@ async def get_token_view(request: Request, user_token_data: UserLogin = Body()):
             {"detail": "Activation required check you email."},
             status_code=403
         )
-    if not password_correct:
-        return JSONResponse(
-            {"detail": "Password is invalid."},
-            status_code=400
-        )
     user_model = UserCustomModel(**user.as_dict())
-    token = request.app.state.auth_manager.create_token(user_model)
+    token = encode_jwt_token(user_id=user_model.id)
     return {"access_token": token}
 
 
@@ -77,7 +79,7 @@ async def register_view(request: Request, user_data: UserRegister = Body()):
     activation_code = await ActivationCode.create_activation_code(user=new_user)
     send_email_task.apply_async(
         kwargs={
-            "body": build_activation_email(activation_code),
+            "body": build_activation_email(activation_code.code),
             "to_addrs": [new_user.email],
             "subject": "Activation",
         }

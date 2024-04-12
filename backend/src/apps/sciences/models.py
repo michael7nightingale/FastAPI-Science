@@ -9,6 +9,9 @@ class Science(TortoiseModel):
     image_path = fields.CharField(max_length=255, null=True)
     slug = fields.CharField(max_length=40, unique=True, index=True)
 
+    class Meta:
+        ordering = ["title"]
+
     def __str__(self):
         return self.title
 
@@ -31,6 +34,9 @@ class Category(TortoiseModel):
     )
     slug = fields.CharField(max_length=40, unique=True, index=True)
     is_special = fields.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["title"]
 
     def __str__(self):
         return self.title
@@ -55,6 +61,7 @@ class Formula(TortoiseModel):
         related_name="formulas"
     )
     slug = fields.CharField(max_length=40, unique=True, index=True)
+    data = fields.JSONField(null=True)
 
     def __str__(self):
         return self.title

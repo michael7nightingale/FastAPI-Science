@@ -16,6 +16,7 @@ async def get_mongodb_db(request: Request):
 def get_mongodb_repository(repository_class):
     def inner(db=Depends(get_mongodb_db)):
         return repository_class(db)
+
     return inner
 
 
@@ -37,7 +38,7 @@ async def get_science_dependency(science_slug: str) -> Science:
 
 
 async def get_category_dependency(category_slug: str) -> Category:
-    category = await Formula.get_or_none(slug=category_slug)
+    category = await Category.get_or_none(slug=category_slug)
     if category is None:
         raise HTTPException(status_code=404, detail="Category is not found.")
     return category

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import IntegrityError
-from motor.motor_asyncio import AsyncIOMotorClient
+# from motor.motor_asyncio import AsyncIOMotorClient
 
 from src.apps.users.models import User
 from src.services.password import hash_password
@@ -42,7 +42,6 @@ async def create_superuser(settings) -> None:
     except IntegrityError:
         pass
 
-
-def register_mongodb_db(db_url: str, db_name: str):
-    client = AsyncIOMotorClient(db_url)
-    return getattr(client, db_name)
+# def register_mongodb_db(db_url: str, db_name: str):
+#     client = AsyncIOMotorClient(db_url)
+#     return getattr(client, db_name)

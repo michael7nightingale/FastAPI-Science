@@ -6,14 +6,13 @@ export default {
   name: "AppItem",
   components: {
     Footer,
-
   },
 
   data() {
     return {
       publicPath: process.env.BASE_URL,
-      editMeUrl: 'https://github.com/michael7nightingale/FastAPI-Science',
-
+      githubUrl: 'https://github.com/michael7nightingale/FastAPI-Science',
+      menuOpened: false
     }
   },
 
@@ -28,18 +27,32 @@ export default {
       logoutUser()
       window.location.reload();
     },
-    githubOpen() {
-      window.open(this.editMeUrl, "_blank");
-    },
     openMobileMenu() {
-      const menuElement = document.getElementById("mobile-nav");
-      if (menuElement.style.display === 'none') {
-        menuElement.style.display = 'block';
-      } else {
-        menuElement.style.display = 'none';
+      this.menuOpened = !this.menuOpened;
+    },
+    checkLogin(){
+      let user = getUser();
+      if (!user){
+        window.location = this.$router.resolve({name: "login"}).fullPath;
       }
     }
   },
+  watch: {
+    // eslint-disable-next-line no-unused-vars
+    $route(to, from) {
+      this.menuOpened = false;
+      document.title = to.meta.title ? `${to.meta.title} | Сайт для вычислений` : 'Сайт для вычислений'
+      const description = document.querySelector('meta[name="description"]')
+      if (description) {
+        description.setAttribute("content", to.meta.description ? `${to.meta.description} | Сайт для вычислений` : 'Сайт для вычислений')
+      }
+      let loginRequired = to.loginRequired || false;
+      if (loginRequired){
+        this.checkLogin();
+      }
+    }
+  }
+
 
 }
 
@@ -47,7 +60,7 @@ export default {
 
 
 <template>
-  <header class="bg-white">
+  <header class="bg-white shadow-lg">
     <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
       <div class="flex lg:flex-1">
         <a href="/" class="-m-1.5 p-1.5">
@@ -72,10 +85,10 @@ export default {
         <router-link :to="{name: 'about'}" class="text-sm font-semibold leading-6 text-gray-900">
           О портале
         </router-link>
-        <router-link :to="{name: 'homepage'}" class="text-sm font-semibold leading-6 text-gray-900" v-if="user">
+        <router-link :to="{name: 'cabinet'}" class="text-sm font-semibold leading-6 text-gray-900" v-if="user">
           Кабинет
         </router-link>
-        <a :href="editMeUrl" target="_blank" class="text-sm font-semibold leading-6 text-gray-900">
+        <a :href="githubUrl" target="_blank" class="text-sm font-semibold leading-6 text-gray-900">
           GitHub
         </a>
       </div>
@@ -91,9 +104,9 @@ export default {
       </div>
     </nav>
     <!-- Mobile menu, show/hide based on menu open state. -->
-    <div class="lg:hidden" role="dialog" aria-modal="true" style="display: none" id="mobile-nav">
+    <div class="lg:hidden" role="dialog" aria-modal="true" :style="menuOpened ? 'display: block' : 'display: none'"
+         id="mobile-nav">
       <!-- Background backdrop, show/hide based on slide-over state. -->
-      <div class="fixed inset-0 z-10"></div>
       <div
           class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
         <div class="flex items-center justify-between">
@@ -113,23 +126,25 @@ export default {
           <div class="-my-6 divide-y divide-gray-500/10">
             <div class="space-y-2 py-6">
               <router-link :to="{name: 'homepage'}"
-                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                           class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                 Главная
               </router-link>
               <router-link :to="{name: 'about'}"
-                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                           class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                 О портале
               </router-link>
               <router-link :to="{name: 'cabinet'}" v-if="user"
-                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Кабинет</router-link>
+                           class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                Кабинет
+              </router-link>
               <a class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                 :href="editMeUrl" target="_blank">
+                 :href="githubUrl" target="_blank">
                 GitHub
               </a>
             </div>
             <div class="py-6">
               <a href="#" @click="logoutClick" v-if="user"
-                           class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                 class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                 Выйти
               </a>
               <router-link :to="{name: 'login'}" v-else
@@ -143,7 +158,7 @@ export default {
     </div>
   </header>
 
-  <main class="body-content">
+  <main>
     <router-view/>
   </main>
   <Footer/>

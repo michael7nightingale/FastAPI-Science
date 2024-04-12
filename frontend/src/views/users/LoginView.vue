@@ -24,12 +24,34 @@ export default {
             data = response.data;
             setUser(data.access_token)
                 .then(() => {
-                  window.location = this.$router.resolve({name: "homepage"}).fullPath;
+                  if (this.$route.query.redirect){
+                    window.location = this.$route.query.redirect.fullPath;
+                  }
+                  else{
+                    window.location = this.$router.resolve({name: "homepage"}).fullPath;
+                  }
                 });
           })
           .catch((error) => {
-            this.errorText = error.response.data.detail;
+            switch (error.response.status) {
+              case 403: {
+                this.$router.push({name: "activation"}); break;
+              }
+              case 404: {
+                this.errorText = "Пользователь не найден"; break;
+              }
+              case 400: {
+                this.errorText = "Неправильный пароль"; break;
+              }
+              case 422: {
+                this.errorText = "Невалидные данные"; break;
+              }
+              default: {
+                this.errorText = "Невалидные данные"; break;
+              }
+            }
           })
+
     },
 
     loginInput(value) {
@@ -58,10 +80,14 @@ export default {
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6">
+        <div class="flex">
+          <label class="mx-auto text-center text-red-500">{{ errorText }}</label>
+        </div>
         <div>
           <label for="email" class="block text-sm font-medium leading-6 text-gray-900 flex">Логин</label>
           <div class="mt-2">
-            <input id="email" :name="login" type="text" autocomplete="text" required @input="loginInput($event.target.value)"
+            <input id="email" :name="login" type="text" autocomplete="text" required
+                   @input="loginInput($event.target.value)"
                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           </div>
         </div>
@@ -74,7 +100,8 @@ export default {
             </div>
           </div>
           <div class="mt-2">
-            <input id="password" :name="password" type="password" autocomplete="current-password" required  @input="passwordInput($event.target.value)"
+            <input id="password" :name="password" type="password" autocomplete="current-password" required
+                   @input="passwordInput($event.target.value)"
                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           </div>
         </div>

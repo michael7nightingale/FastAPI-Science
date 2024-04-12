@@ -24,7 +24,7 @@ export default {
 </script>
 
 <template>
-  <footer class="border-top footer text-muted">
+  <footer class="border-top footer text-muted text-center">
     <div class="p-2">
       <p class="">© {{ year }}, Все права защищены. Создан <a href="#" @click="openAuthorGitHubUrl">{{ author }}</a></p>
     </div>

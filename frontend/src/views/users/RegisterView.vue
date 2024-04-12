@@ -37,10 +37,14 @@ export default {
       }
       if (wereError) return;
       registerUser(this.email, this.username, this.password)
-          .then((responseData) => {
-            console.log(responseData)
-            document.getElementById("activation").className = document.getElementById("activation").className.replace("hide", "show");
-            document.getElementById("main").className = document.getElementById("main").className.replace("show", "hide");
+          .then((response) => {
+            if (response.status === 200) {
+              this.$router.push({name: "activation"})
+            }
+            this.errorText = "Невалидные данные или пользователь с такими данными уже существует."
+          })
+          .catch(() => {
+            this.errorText = "Невалидные данные или пользователь с такими данными уже существует."
           })
     },
     emailInput(value) {
@@ -105,17 +109,22 @@ export default {
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6">
+        <div class="flex">
+          <label class="mx-auto text-center text-red-500">{{ errorText }}</label>
+        </div>
         <div>
           <label for="email" class="block text-sm font-medium leading-6 text-gray-900 flex">Почта</label>
           <div class="mt-2">
-            <input id="email" :name="email" type="email" autocomplete="email" required @input="emailInput($event.target.value)"
+            <input id="email" :name="email" type="email" autocomplete="email" required
+                   @input="emailInput($event.target.value)"
                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           </div>
         </div>
         <div>
           <label for="email" class="block text-sm font-medium leading-6 text-gray-900 flex">Логин</label>
           <div class="mt-2">
-            <input id="email" :name="username" type="text" autocomplete="text" required @input="usernameInput($event.target.value)"
+            <input id="email" :name="username" type="text" autocomplete="text" required
+                   @input="usernameInput($event.target.value)"
                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           </div>
         </div>
@@ -127,7 +136,8 @@ export default {
             </div>
           </div>
           <div class="mt-2">
-            <input id="password" :name="password" type="password" autocomplete="current-password" required @input="passwordInput($event.target.value)"
+            <input id="password" :name="password" type="password" autocomplete="current-password" required
+                   @input="passwordInput($event.target.value)"
                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           </div>
         </div>

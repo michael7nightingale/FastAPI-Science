@@ -176,6 +176,7 @@ def count_result(request: RequestSchema, formula_obj: Formula):
             result = formula_obj.match(
                 **dict(zip(find_args, nums * si))
             )[0]
+            print(result, nums_comma)
             result = round(float(result), nums_comma)
 
     except (SyntaxError, NameError):

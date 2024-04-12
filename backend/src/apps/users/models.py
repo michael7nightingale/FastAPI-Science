@@ -19,6 +19,9 @@ class User(TortoiseModel):
     time_registered = fields.DatetimeField(auto_now=True)
     last_login = fields.DatetimeField(auto_now_add=True, null=True)
 
+    def __str__(self):
+        return self.username
+
     @classmethod
     async def login(cls, password: str, username: str | None = None, email: str | None = None):
         if username:
@@ -27,7 +30,6 @@ class User(TortoiseModel):
             user = await cls.get_or_none(email=email)
         else:
             return None, None
-        print(123123, user)
         if user is not None:
             return user, verify_password(password, user.password)
         return None, None
@@ -38,16 +40,12 @@ class User(TortoiseModel):
         try:
             user = await cls.create(**kwargs, active=True)
         except IntegrityError:
-            raise
             return
         return user
 
     async def activate(self) -> None:
         self.is_active = True
         await self.save()
-
-    def __str__(self):
-        return self.username
 
     def full_name(self) -> str:
         if self.first_name or self.last_name:

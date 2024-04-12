@@ -1,8 +1,8 @@
 from pydantic_settings import BaseSettings
-from enum import StrEnum
+from enum import Enum
 
 
-class AppEnvTypes(StrEnum):
+class AppEnvTypes(Enum):
     prod = "prod"
     dev = "dev"
     test = "test"
@@ -36,6 +36,8 @@ class BaseAppSettings(BaseSettings):
 
     MONGODB_URL: str
     MONGODB_NAME: str
+
+    BASE_URL: str
 
     @property
     def REDIS_URL(self) -> str:

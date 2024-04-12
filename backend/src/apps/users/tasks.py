@@ -1,6 +1,6 @@
 from email.message import EmailMessage
 
-from src.core.celery import app
+from src.core.worker import app
 from ...core.config import get_app_settings
 from ...services.email import EmailServer
 

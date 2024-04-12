@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from enum import Enum
 
 
 class RequestSchema(BaseModel):
@@ -43,6 +42,41 @@ class DownloadPlot(BaseModel):
     filename: str
 
 
-class ScienceEnum(Enum):
-    physics = "physics"
-    mathem = "mathem"
+class ScienceListSchema(BaseModel):
+    id: str
+    title: str
+    slug: str
+    image_path: str | None = None
+    content: str
+
+
+class CategoryListSchema(BaseModel):
+    id: str
+    title: str
+    slug: str
+    content: str
+    image_path: str | None = None
+    is_special: bool
+
+
+class ScienceDetailSchema(ScienceListSchema):
+    categories: list[CategoryListSchema]
+
+
+class FormulaListSchema(BaseModel):
+    id: str
+    title: str
+    slug: str
+    formula: str
+    image_path: str | None = None
+
+
+class CategoryDetailSchema(CategoryListSchema):
+    science: ScienceListSchema
+    formulas: list[FormulaListSchema]
+
+
+class FormulaDetailSchema(FormulaListSchema):
+    info: dict
+    category: CategoryListSchema
+    science: ScienceListSchema

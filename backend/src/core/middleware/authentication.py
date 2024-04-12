@@ -1,6 +1,4 @@
-from fastapi import FastAPI
 from starlette.middleware import authentication
-from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import HTTPConnection
 
 from src.apps.users.models import User
@@ -31,7 +29,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         return scopes, user
 
     @staticmethod
-    def get_token_ws(conn: HTTPConnection) -> str:
+    def get_token_ws(conn: HTTPConnection) -> str | None:
         """Get token from current http connection."""
         query_token = conn.query_params.get("authorization")
         if query_token is None:
@@ -58,7 +56,3 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         response = await self.verify_token(token)
         scopes, user = response
         return authentication.AuthCredentials(scopes=scopes), user
-
-
-def use_authentication_middleware(app: FastAPI) -> None:
-    app.add_middleware(AuthenticationMiddleware, backend=AuthenticationBackend())

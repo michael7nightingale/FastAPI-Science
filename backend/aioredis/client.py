@@ -515,7 +515,7 @@ def parse_georadius_generic(response, **options):
         # with other command arguments.
         return response
 
-    if type(response) != list:
+    if not isinstance(response, list):
         response_list = [response]
     else:
         response_list = response
