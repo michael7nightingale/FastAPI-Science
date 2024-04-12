@@ -38,7 +38,7 @@ class Application:
         # including routers
         # event handlers settings
         for router in __routers__:
-            self.app.include_router(router, prefix="/api/v1")
+            self.app.include_router(router, prefix="/api")
         self.app.add_event_handler(event_type="startup", func=self._on_startup_event)
         self.app.add_event_handler(event_type="shutdown", func=self._on_shutdown_event)
         self.app.state.SECRET_KEY = self.settings.SECRET_KEY

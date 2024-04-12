@@ -1,4 +1,4 @@
-let baseUrl = 'http://localhost:8002/api/v1/'
+let baseUrl = 'https://ping.astrum.studio/api/'
 
 export function buildUrl(path){
     return baseUrl.concat(path);
