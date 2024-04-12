@@ -10,7 +10,7 @@ Some new features are coming. The web-app is both fullstack and API.
 *NOTE*: .git root is project root;
 
 ## Stack
-- `Python 3.11`;
+- `Python 3.12`;
 - `FastAPI`;
 - `PostgreSQL`;
 - `fastapi_authtools` (my authentication library);
@@ -22,7 +22,7 @@ Some new features are coming. The web-app is both fullstack and API.
 - `Vue.js`;
 - `HTML` / `CSS` / `js` for fullstack;
 - `pytest` in async mode for testing;
-- `flake8` linter;
+- `ruff` linter;
 
 ## Requirements
 I use `Python 3.11` as the project language.
@@ -42,7 +42,7 @@ pip install -r dev-requirements.txt
 
 To run flake8 linter:
 ```commandline
-flake8
+ruff check .
 ```
 
 To run tests:
@@ -67,5 +67,5 @@ docker-compose up -d --build
 
 For local running using `uvicorn` run:
 ```commandline
-uvicorn app.main:create_app --reload --port 8000
+uvicorn src.main:create_app --reload --port 8000
 ```
