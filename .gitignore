@@ -161,6 +161,6 @@ cython_debug/
 .idea/
 
 
-backend/.dev.env
-backend/.docker.env
-#backend/.test.env
+backend/dev.env
+backend/prod.env
+backend/test.env
