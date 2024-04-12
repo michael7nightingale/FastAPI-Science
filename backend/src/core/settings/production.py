@@ -17,4 +17,4 @@ class ProdAppSettings(BaseAppSettings):
         return f"{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{host_address}:{self.DB_PORT}/{self.DB_NAME}"
 
     class Config:
-        env_file = ".docker.env"
+        env_file = "prod.env"

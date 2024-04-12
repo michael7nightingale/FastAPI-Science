@@ -8,7 +8,6 @@ import socket
 import ssl
 import threading
 import warnings
-from distutils.version import StrictVersion
 from itertools import chain
 from types import MappingProxyType
 from typing import (

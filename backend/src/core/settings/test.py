@@ -11,4 +11,4 @@ class TestAppSettings(BaseAppSettings):
         return f"{self.DB_DRIVER}:///{self.DB_NAME}"
 
     class Config:
-        env_file = ".test.env"
+        env_file = "test.env"

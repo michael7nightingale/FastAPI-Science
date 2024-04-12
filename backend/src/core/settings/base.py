@@ -74,5 +74,5 @@ class BaseAppSettings(BaseSettings):
         )
 
     class Config:
-        env_file = ".env"
+        env_file = "example.env"
         app_env: AppEnvTypes = AppEnvTypes.dev
