@@ -1,5 +1,6 @@
 <script>
 import {downloadPlot, getSpecialCategoryDetail, postPlot} from "/src/services/ScienceService";
+import {buildStaticUrl} from "@/services/Base";
 
 
 export default {
@@ -100,7 +101,7 @@ export default {
     },
 
     plotUrl() {
-      return "http://localhost:8002/static/".concat(this.plotPath)
+      return buildStaticUrl(this.plotPath)
     }
 
   }

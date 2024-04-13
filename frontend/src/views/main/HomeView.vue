@@ -34,7 +34,7 @@
             class=" absolute bg-blue-500/50 top-0 left-0 w-24 h-1 z-30  transition-all duration-200 group-hover:bg-white group-hover:w-1/2  ">
         </div>
         <div class="py-2 px-9 relative  ">
-          <img class="w-40 h-40" :alt="science.title" :src="`http://localhost:8002/static/sciences/${science.image_path}`">
+          <img class="w-40 h-40" :alt="science.title" :src="buildStaticUrl(`sciences/${science.image_path}`)">
           <h3 class="mt-8 text-lg font-semibold text-black group-hover:text-white ">
             {{ science.title }}
           </h3>
@@ -46,25 +46,14 @@
 </template>
 
 <script>
-import {getScienceList} from "@/services/ScienceService";
+import {buildStaticUrl} from "@/services/Base";
+import {defineComponent} from "vue";
 
-export default {
-  name: 'HomeView',
-  components: {},
-  data() {
-    return {
-      sciences: []
-    }
-  },
-  mounted() {
-    let promise = getScienceList()
-    promise.then(response => this.sciences = response)
-        .then(() => {
-          // document.getElementById("loader").className = document.getElementById("loader").className.replace("show", "hide")
-          // document.getElementById("main").className = document.getElementById("main").className.replace("hide", "show")
-        });
-  }
-}
+export default defineComponent({
+  methods: {buildStaticUrl}
+
+})
+
 </script>
 
 

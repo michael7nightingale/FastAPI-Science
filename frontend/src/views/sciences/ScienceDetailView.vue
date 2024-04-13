@@ -1,8 +1,10 @@
 <script>
 import {getScienceDetail} from "/src/services/ScienceService";
+import {buildStaticUrl} from "@/services/Base";
 
 export default {
   name: "SciencesDetailView",
+  methods: {buildStaticUrl},
   data() {
     return {
       scienceData: {},
@@ -40,7 +42,7 @@ export default {
       <div class="lg:w-1/3" v-for="category in scienceData.categories" v-bind:key="category.id">
         <router-link v-if="category.is_special" :to="`/special-category/${category.slug}/`" class="flex min-w-0 gap-x-4">
           <img class="h-20 w-20 flex-none rounded-full bg-gray-50"
-               :src="`http://localhost:8002/static/sciences/${category.image_path}`"
+               :src="buildStaticUrl(`sciences/${category.image_path}`)"
                :alt="category.title">
           <div class="min-w-0 flex-auto">
             <p class="text-sm font-semibold leading-6 text-gray-900">{{category.title}}</p>
@@ -48,7 +50,7 @@ export default {
         </router-link>
         <router-link v-else :to="{name: 'category', params: {slug: category.slug}}" class="flex min-w-0 gap-x-4">
           <img class="h-20 w-20 flex-none rounded-full bg-gray-50"
-               :src="`http://localhost:8002/static/sciences/${category.image_path}`"
+               :src="buildStaticUrl(`sciences/${category.image_path}`)"
                :alt="category.title">
           <div class="flex-auto">
             <p class="text-sm font-semibold leading-6 text-gray-900">{{category.title}}</p>
