@@ -46,14 +46,23 @@
 </template>
 
 <script>
+import {getScienceList} from "@/services/ScienceService";
 import {buildStaticUrl} from "@/services/Base";
-import {defineComponent} from "vue";
 
-export default defineComponent({
-  methods: {buildStaticUrl}
-
-})
-
+export default {
+  name: 'HomeView',
+  methods: {buildStaticUrl},
+  components: {},
+  data() {
+    return {
+      sciences: []
+    }
+  },
+  mounted() {
+    let promise = getScienceList()
+    promise.then(response => this.sciences = response)
+  }
+}
 </script>
 
 
