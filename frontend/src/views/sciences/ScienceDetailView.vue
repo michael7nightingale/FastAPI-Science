@@ -54,7 +54,7 @@ export default {
                :alt="category.title">
           <div class="flex-auto">
             <p class="text-sm font-semibold leading-6 text-gray-900">{{category.title}}</p>
-            <p class="mt-1 truncate text-xs leading-5 text-gray-500">leslie.alexander@example.com</p>
+            <p class="mt-1 truncate text-xs leading-5 text-gray-500">формул: {{category.formulas_count}}</p>
           </div>
         </router-link>
       </div>

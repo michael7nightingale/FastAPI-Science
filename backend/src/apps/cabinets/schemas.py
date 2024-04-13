@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from src.apps.sciences.schemas import FormulaListSchema, CategoryListSchema
+from src.apps.sciences.schemas import FormulaListSchema, CategorySchema
 
 
 class DownloadFile(BaseModel):
@@ -15,4 +15,4 @@ class HistoryListSchema(BaseModel):
     result: float | str
     date_time: datetime
     formula: FormulaListSchema
-    category: CategoryListSchema
+    category: CategorySchema

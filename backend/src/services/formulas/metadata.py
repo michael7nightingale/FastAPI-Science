@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import deepcopy
-from typing import Iterable
+from typing import Iterable, Optional
 
 import numpy as np    # noqa: F401
 from numpy import cos, sin  # noqa: F401
@@ -94,9 +94,12 @@ class BaseFormula(ABC):
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "BaseFormula":
+    def from_dict(cls, data: dict | None) -> Optional["BaseFormula"]:
         fields = "formula", "literals"
-        assert all(field in data for field in fields)
+        if data is None:
+            return
+        if not all(field in data for field in fields):
+            return
         literals = {
             literal_key: Literal.from_dict(literal_data) for literal_key, literal_data in data['literals'].items()
         }

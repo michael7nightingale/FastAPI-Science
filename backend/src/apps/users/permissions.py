@@ -10,7 +10,7 @@ def login_required(view_func: Callable):
 
     @wraps(view_func)
     async def inner(request: Request, *args, **kwargs):
-        if isinstance(request.user, UnauthenticatedUser):  # raise exception if user is not found
+        if request.user is None:  # raise exception if user is not found
             raise HTTPException(403, "Authentication required.")
         return await view_func(request, *args, **kwargs)
 
@@ -22,7 +22,7 @@ def ws_login_required(view_func: Callable):
 
     @wraps(view_func)
     async def inner(websocket: WebSocket, *args, **kwargs):
-        if isinstance(websocket.user, UnauthenticatedUser):  # raise exception if user is not found
+        if websocket.user is None:  # raise exception if user is not found
             raise HTTPException(403, "Authentication required.")
         return await view_func(websocket, *args, **kwargs)
 

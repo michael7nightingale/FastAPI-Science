@@ -50,6 +50,15 @@ class ScienceListSchema(BaseModel):
     content: str
 
 
+class CategorySchema(BaseModel):
+    id: str
+    title: str
+    slug: str
+    content: str
+    image_path: str | None = None
+    is_special: bool
+
+
 class CategoryListSchema(BaseModel):
     id: str
     title: str
@@ -57,6 +66,7 @@ class CategoryListSchema(BaseModel):
     content: str
     image_path: str | None = None
     is_special: bool
+    formulas_count: int
 
 
 class ScienceDetailSchema(ScienceListSchema):
@@ -71,12 +81,12 @@ class FormulaListSchema(BaseModel):
     image_path: str | None = None
 
 
-class CategoryDetailSchema(CategoryListSchema):
+class CategoryDetailSchema(CategorySchema):
     science: ScienceListSchema
     formulas: list[FormulaListSchema]
 
 
 class FormulaDetailSchema(FormulaListSchema):
     info: dict
-    category: CategoryListSchema
+    category: CategorySchema
     science: ScienceListSchema

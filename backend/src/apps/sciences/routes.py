@@ -23,16 +23,16 @@ PLOTS_DIR = "files/plots/"
 async def plots_view(request: Request):
     """Plot get endpoint."""
     category = await Category.get_or_none(slug="plots")
-    response = {
+    data = {
         "science": category.science,
         "category": category
     }
-    if request.user is not None:
+    if request.user:
         plot_path = PLOTS_DIR + f'/{request.user.id}.png'
         full_plot_path = request.app.state.STATIC_DIR + plot_path
         if os.path.exists(full_plot_path):
-            response.update(plotPath=plot_path)
-    return response
+            data.update(plotPath=plot_path)
+    return data
 
 
 @router.post('/special-category/plots')
@@ -113,7 +113,12 @@ async def science_detail_view(science: Science = Depends(get_science_dependency)
     """Science detail endpoint."""
     return {
         **science.as_dict(),
-        "categories": (i.as_dict() for i in science.categories)
+        "categories": [
+            {
+                **category.as_dict(),
+                "formulas_count": category.formulas_count
+            } for category in await science.get_categories()
+        ]
     }
 
 
@@ -139,7 +144,14 @@ async def formula_detail_view(
     # formula_data = await formula_repository.get(slug=formula.slug)
     formula_obj = FormulaObject.from_dict(formula.data)
     if formula_obj is None:
-        return JSONResponse({"detail": "Cannot find formula metadata."}, status_code=404)
+        return JSONResponse(
+            {
+                "detail": "Cannot find formula metadata.",
+                "category": formula.category.as_dict(),
+                "science": (await Science.get(id=formula.category.science_id)).as_dict(),
+            },
+            status_code=404
+        )
     return {
         **formula.as_dict(),
         "category": formula.category.as_dict(),

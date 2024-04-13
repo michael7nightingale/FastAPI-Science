@@ -5,7 +5,7 @@ from src.apps.users.models import User
 from src.services.jwt import decode_jwt_token
 
 
-RequestUser = User | authentication.UnauthenticatedUser
+RequestUser = User | None
 
 
 class AuthenticationBackend(authentication.AuthenticationBackend):
@@ -19,10 +19,10 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         """Get user from token."""
         scopes = []
         if token is None:
-            return scopes, authentication.UnauthenticatedUser()
+            return scopes, None
         token_data = decode_jwt_token(token)
         if token_data is None:
-            return scopes, authentication.UnauthenticatedUser()
+            return scopes, None
         user = await User.get_or_none(id=token_data.user_id)
         if user is None:
             raise authentication.AuthenticationError({"detail": "Invalid credentials."})

@@ -1,4 +1,5 @@
 from tortoise import fields
+from tortoise.functions import Count
 
 from src.base.models import TortoiseModel
 
@@ -15,13 +16,8 @@ class Science(TortoiseModel):
     def __str__(self):
         return self.title
 
-    @classmethod
-    def get_or_none(cls, *args, using_db=None, **kwargs):
-        return (
-            super()
-            .get_or_none(*args, using_db=using_db, **kwargs)
-            .prefetch_related("categories")
-        )
+    async def get_categories(self):
+        return await Category.annotate(formulas_count=Count("formulas")).filter(science=self)
 
 
 class Category(TortoiseModel):

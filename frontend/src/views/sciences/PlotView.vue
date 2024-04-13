@@ -16,7 +16,6 @@ export default {
       plotPath: null,
       storage: [""],
       filename: "plot",
-
     }
   },
   mounted() {
@@ -65,7 +64,7 @@ export default {
           })
           .catch((error) => {
             error
-            alert("You are not authorized!")
+            alert("Войдите в систему, чтобы построить график!")
             this.$router.push("/auth/login")
           })
     },
@@ -101,7 +100,7 @@ export default {
     },
 
     plotUrl() {
-      return buildStaticUrl(this.plotPath)
+      return `${buildStaticUrl(this.plotPath)}?no_cache=${Math.random()}`;
     }
 
   }
