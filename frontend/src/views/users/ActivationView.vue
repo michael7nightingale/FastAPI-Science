@@ -53,7 +53,9 @@ export default {
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6">
         <div class="flex">
-          <label class="mx-auto text-center text-red-500">{{ errorText }}</label>
+          <label class="mx-auto text-center text-gray-900">
+            На указанную почту мы выслали код для активации аккаунта
+          </label>
         </div>
         <div>
           <div class="mt-2 flex gap-x-1.5">
