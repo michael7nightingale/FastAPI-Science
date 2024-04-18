@@ -2,7 +2,6 @@ from functools import wraps
 from typing import Callable
 
 from fastapi import Request, HTTPException, WebSocket
-from starlette.authentication import UnauthenticatedUser
 
 
 def login_required(view_func: Callable):
