@@ -46,17 +46,27 @@
         </li>
       </ol>
     </nav>
-    <div class="grid grid-cols-1 gap-4 mt-3 sm:grid-cols-3 lg:mt-20">
+    <div class="grid grid-cols-1 gap-4 mt-3 sm:grid-cols-3 lg:mt-20" v-if="categoryData.formulas && categoryData.formulas.length">
       <div class="lg:w-1/3 border-black" v-for="formula in categoryData.formulas" v-bind:key="formula.id">
         <router-link :to="{name: 'formula', params: {slug: formula.slug}}" class="flex min-w-0 gap-x-4">
-          <!--          <img class="h-20 w-20 flex-none rounded-full bg-gray-50"-->
-          <!--               :src="buildStaticUrl(`sciences/${category.image_path}`)"-->
-          <!--               :alt="category.title">-->
           <div class="flex-auto">
             <p class="text-sm font-semibold leading-6 text-gray-900">{{ formula.title }}</p>
             <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{ formula.formula }}</p>
           </div>
         </router-link>
+      </div>
+    </div>
+    <div class="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8" v-else>
+      <div class="text-center">
+        <p class="mt-6 text-base leading-7 text-gray-600">
+          В данной категории пока нет формул, но они скоро появятся
+        </p>
+        <div class="mt-10 flex items-center justify-center gap-x-6">
+          <router-link :to="{name: 'science', params: {slug: scienceData.slug}}" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            Назад к {{ scienceData.title }}
+          </router-link>
+          <a href="mailto:suslanchikmopl@gmail.com" class="text-sm font-semibold text-gray-900">Поддержка <span aria-hidden="true">&rarr;</span></a>
+        </div>
       </div>
     </div>
   </div>

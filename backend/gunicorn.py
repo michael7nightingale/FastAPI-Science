@@ -6,4 +6,5 @@ bind = '0.0.0.0:9002'
 max_requests = 10000
 timeout = 60
 worker_class = 'uvicorn.workers.UvicornWorker'
-workers = cpu_count() * 2 + 1
+# workers = cpu_count() * 2 + 1
+workers = 2
